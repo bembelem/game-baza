@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AuthForm from "@/app/widgets/auth/ui/AuthForm.vue"
+import AuthForm from "@/widgets/auth/ui/AuthForm.vue"
 </script>
 
 <template>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const props = defineProps<{
 	label?: string,
-	error: string
+	error?: string
 }>()
 </script>
 
@@ -28,6 +28,7 @@ const props = defineProps<{
 
 .error {
 	margin-top: 0.25rem;
+	min-height: 0.75rem;
 	font-size: 0.75rem;
 	color: var(--c_text__error);
 }
