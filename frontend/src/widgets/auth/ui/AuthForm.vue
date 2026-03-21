@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import FormField from "@/shared/ui/FormField.vue"
 import InputField from "@/shared/ui/InputField.vue"
+import PasswordField from "@/shared/ui/PasswordField.vue"
+import LoadIndicator from "@/shared/ui/LoadIndicator.vue"
 import { useForm, useField } from "vee-validate"
 import { emailValidate, passwordValidate } from "../lib/authValidation"
 import { authFetch } from "@/features/auth/api/authAPI"
@@ -38,21 +40,20 @@ const onSubmit = handleSubmit(async () => {
 		<FormField
 		label="Логин"
 		:error="emailError">
-			<InputField 
-			v-model="emailValue"/>
+			<InputField v-model="emailValue"/>
 		</FormField>
 		<FormField
 		label="Пароль"
 		:error="passwordError">
-			<InputField 
-			v-model="passwordValue"
-			type="password"/>
+			<PasswordField v-model="passwordValue"/>
 		</FormField>
 
-		<input class="submit_button" 
+		<button class="submit_button" 
 		type="submit"
-		value="войти"
-		:disabled="isSubmitting"/>
+		:disabled="isSubmitting">
+			<LoadIndicator class="load" :is-short="true" v-if="isSubmitting"/>
+			<p v-else>войти</p>
+		</button>
 	</form>
 </template>
 
@@ -76,5 +77,11 @@ const onSubmit = handleSubmit(async () => {
 	border-color: var(--c_placeholder);
 	background-color: transparent;
 	color: var(--c_placeholder);
+}
+
+.load {
+	--fs_load: 1rem;
+  	--c_load: var(--c_placeholder);
+	--c_load__accent: var(--c_placeholder);
 }
 </style>

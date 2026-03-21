@@ -21,6 +21,7 @@
 
 input {
 	box-sizing: border-box;
+	padding: 0;
 	outline: none;
 	border: none;
 	font-size: 1rem;

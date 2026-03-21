@@ -1,14 +1,15 @@
 <script setup lang="ts">
 const value = defineModel()
 const props = defineProps<{
-	type?: "text" | "password" | "email" | "tel",
+	type?: "text" | "email" | "tel",
+	placeholder?: string
 }>()
 </script>
 
 <template>
 	<input class="input" 
 	:type="props.type ?? 'text'"
-	placeholder="Укажите значение"
+	:placeholder="props.placeholder"
 	v-model="value"/>
 </template>
 
