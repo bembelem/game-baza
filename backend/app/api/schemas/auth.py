@@ -1,14 +1,15 @@
 from pydantic import BaseModel
 
-class RegisterDTO(BaseModel):
+
+class UserRegisterRequest(BaseModel):
     username: str
     email: str
     password: str
 
-class LoginDTO(BaseModel):
+class UserLoginRequest(BaseModel):
     email: str
     password: str
 
-class TokenDTO(BaseModel):
+class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"

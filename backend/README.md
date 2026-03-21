@@ -60,7 +60,9 @@ GET  /genres               # жанры
 ```
 GET  /users/{id}                      # публичный профиль
 GET  /users/{id}/wishlist             # вишлист пользователя
-GET  /users/me                        # свой профиль (требует auth)
+GET  /users/me                        # свой профиль
+PATCH  /users/me                      # изменить профиль
+DELETE /users/me                      # удалить свой профиль
 POST   /users/me/wishlist/{game_id}   # добавить игру в вишлист
 DELETE /users/me/wishlist/{game_id}   # убрать игру из вишлиста
 ```

@@ -1,48 +1,38 @@
-from fastapi import APIRouter
-
-from backend.app.api.v1.schemas.auth import RegisterDTO, TokenDTO, LoginDTO
-from backend.app.api.v1.schemas.user import UserDTO, CommentDTO
+from fastapi import APIRouter, Body
+from backend.app.api.schemas.auth import UserRegisterRequest, Token, UserLoginRequest
+from backend.app.api.schemas.users import User
+from backend.app.api.controllers.examples.examples import register_examples, login_examples
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post(
     "/register",
-    response_model=UserDTO,
+    response_model=User,
     status_code=201,
-    summary="Register a new user",
-    description="Creates a new user. Returns user profile.",
+    summary="Регистрация пользователя",
+    description="Создаёт нового пользователя. Возвращает профиль.",
+    responses={
+        409: {"description": "Пользователь с таким email/username уже существует"},
+        422: {"description": "Ошибка валидации"},
+    }
 )
-def register(body: RegisterDTO):
-    return UserDTO(
-        id=1,
-        username=body.username,
-        email=body.email,
-        created_at="2026-03-13",
-    )
+async def register(
+    body: UserRegisterRequest = Body(openapi_examples=register_examples)
+):
+    ...
+
 
 @router.post(
     "/login",
-    response_model=TokenDTO,
-    summary="Login",
-    description="Returns JWT access token.",
+    response_model=Token,
+    summary="Вход в аккаунт",
+    description="Возвращает JWT токен доступа.",
+    responses={
+        401: {"description": "Неверный email или пароль"},
+        422: {"description": "Ошибка валидации"},
+    }
 )
-def login(body: LoginDTO):
-    # TODO
-    return TokenDTO(access_token="fake-jwt-token")
-
-@router.get(
-    "/me",
-    response_model=UserDTO,
-    summary="Current user profile",
-    description="Returns profile of the authenticated user with wishlist and comments.",
-)
-def get_me():
-    # TODO
-    return UserDTO(
-        id=1,
-        username="nikita",
-        email="nikita@example.com",
-        created_at="2026-03-13",
-        wishlist_count=3,
-        comments_count=3,
-    )
+async def login(
+    body: UserLoginRequest = Body(openapi_examples=login_examples)
+):
+    ...
