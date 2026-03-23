@@ -5,7 +5,6 @@ import PasswordField from "@/shared/ui/PasswordField.vue"
 import LoadIndicator from "@/shared/ui/LoadIndicator.vue"
 import { useForm, useField } from "vee-validate"
 
-
 export interface RegistrationFormFields {
 	userName: string,
 	email: string,
@@ -15,10 +14,20 @@ export interface RegistrationFormFields {
 
 const { isSubmitting } = useForm<RegistrationFormFields>()
 
-const fieldOptions = { validateOnValueUpdate: false }
-const { value: userNameValue, errorMessage: userNameError } = useField('userName', undefined, fieldOptions)
-const { value: emailValue, errorMessage: emailError } = useField('email', undefined, fieldOptions)
-const { value: passwordValue, errorMessage: passwordError } = useField('password', undefined, fieldOptions)
+const useFormField = (name: string) => useField<string>(name, undefined, { validateOnValueUpdate: false })
+
+const { value: userNameValue, errorMessage: userNameError } = useFormField('userName')
+const { value: emailValue, errorMessage: emailError } = useFormField('email')
+const { value: birthdayValue, errorMessage: birthdayError } = useFormField('birthday')
+const { value: passwordValue, errorMessage: passwordError } = useFormField('password')
+
+const formatDate = (input: string) => {
+	const digits = input.replace(/\D/g, '').slice(0, 8)
+
+	if (digits.length <= 2) return digits
+	if (digits.length <= 4) return `${digits.slice(0, 2)}.${digits.slice(2)}`
+	return `${digits.slice(0, 2)}.${digits.slice(2, 4)}.${digits.slice(4)}`
+}
 </script>
 
 <template>
@@ -31,12 +40,24 @@ const { value: passwordValue, errorMessage: passwordError } = useField('password
 		<FormField
 		label="Логин"
 		:error="emailError">
-			<InputField v-model="emailValue"/>
+			<InputField 
+			v-model="emailValue"
+			type="email"/>
+		</FormField>
+		<FormField
+		label="Дата рождения"
+		:error="birthdayError">
+			<InputField
+			placeholder="дд.мм.гггг"
+			:format-input="formatDate"
+			:max-length="10"
+			v-model="birthdayValue"/>
 		</FormField>
 		<FormField
 		label="Пароль"
 		:error="passwordError">
-			<PasswordField v-model="passwordValue"/>
+			<PasswordField 
+			v-model="passwordValue"/>
 		</FormField>
 
 		<button class="submit_button" 

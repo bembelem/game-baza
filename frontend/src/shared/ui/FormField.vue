@@ -6,7 +6,7 @@ const props = defineProps<{
 </script>
 
 <template>
-	<div class="form_field">
+	<div class="form_field" :class="{ form_field__error: props.error }">
 		<label>
 			<p class="label">{{ props.label }}</p>
 			<slot></slot>
@@ -19,6 +19,9 @@ const props = defineProps<{
 .form_field {
 	display: flex;
 	flex-direction: column;
+}
+.form_field__error {
+	--bc_input_field: var(--c_error);
 }
 
 .label {

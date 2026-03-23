@@ -7,7 +7,6 @@ import { useForm, useField } from "vee-validate"
 import { emailValidate, passwordValidate } from "../lib/authValidation"
 import { authFetch } from "@/features/auth/api/authAPI"
 
-
 export interface AuthFormFields {
 	email: string,
 	password: string 
@@ -20,9 +19,10 @@ const { values, isSubmitting, handleSubmit } = useForm<AuthFormFields>({
  	}, 
 })
 
-const fieldOptions = { validateOnValueUpdate: false }
-const { value: emailValue, errorMessage: emailError } = useField('email', undefined, fieldOptions)
-const { value: passwordValue, errorMessage: passwordError } = useField('password', undefined, fieldOptions)
+const useFormField = (name: string) => useField<string>(name, undefined, { validateOnValueUpdate: false })
+
+const { value: emailValue, errorMessage: emailError } = useFormField('email')
+const { value: passwordValue, errorMessage: passwordError } = useFormField('password')
 
 const onSubmit = handleSubmit(async () => {
 	try {
@@ -40,7 +40,7 @@ const onSubmit = handleSubmit(async () => {
 		<FormField
 		label="Логин"
 		:error="emailError">
-			<InputField v-model="emailValue"/>
+			<InputField v-model="emailValue" />
 		</FormField>
 		<FormField
 		label="Пароль"
