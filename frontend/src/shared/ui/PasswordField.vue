@@ -37,7 +37,7 @@ const handleSwitchVisible = () => { isVisible.value = !isVisible.value }
 	display: flex;
 	align-items: center;
 	width: 100%;
-	border: 0.25rem solid var(--c_secondary);
+	border: 0.25rem solid var(--bc_password_field, var(--c_secondary));
 	background-color: var(--c_bg__surface);
 	transition: border-color 0.2s ease-in-out;
 }
@@ -46,7 +46,7 @@ const handleSwitchVisible = () => { isVisible.value = !isVisible.value }
 }
 .password_input:focus-within,
 .password_input__error:focus-within {
-	border-color: var(--c_secondary__accent);
+	border-color: var(--bc_password_field__focus, var(--c_secondary__accent));
 }
 
 .input {

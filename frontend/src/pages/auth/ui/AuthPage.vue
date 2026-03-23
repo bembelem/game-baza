@@ -1,19 +1,34 @@
 <script setup lang="ts">
 import AuthForm from "@/widgets/auth/ui/AuthForm.vue"
+import RegistartionFrom from "@/widgets/registration/ui/RegistartionFrom.vue"
+import { ref } from "vue"
+
+const isAuth = ref(true)
+
+const handleSwitchForm = () => { isAuth.value = !isAuth.value }
 </script>
 
 <template>
 	<div class="auth_page">
-		<div class="forms_container">
-			<section class="auth_form_container">
+		<div class="forms_container" :class="{ forms_container__registration: !isAuth }">
+			<section class="form" v-if="isAuth">
 				<h2 class="title">Вход</h2>
 				<AuthForm/>
 			</section>
 
 			<div class="form_switcher">
-				<p>Новенький? Тогда тебе сюда</p>
-				<button class="switch_button">Регистрация</button>
+				{{ isAuth ? "Новенький? Тогда тебе сюда" : "Мы знакомы? Давай проверим"}}
+				<button class="switch_button" 
+				:class="{ switch_button__registration: !isAuth}" 
+				@click="handleSwitchForm">
+					{{ isAuth ? "Регистрация" :  "Вход"}}
+				</button>
 			</div>
+
+			<section class="form" v-if="!isAuth">
+				<h2 class="title">Регистрация</h2>
+				<RegistartionFrom/>
+			</section>
 		</div>
 	</div>
 </template>
@@ -39,8 +54,16 @@ import AuthForm from "@/widgets/auth/ui/AuthForm.vue"
 		0 0 1.5rem var(--c_secondary),
 		0 0 1.875rem rgba(102, 0, 153, 0.4);
 }
+.forms_container__registration {
+	box-shadow:
+		0 0 0.375rem var(--c_highlight),
+		0 0 0.75rem var(--c_highlight),
+		0 0 1.125rem var(--c_highlight),
+		0 0 1.5rem var(--c_highlight),
+		0 0 1.875rem rgba(204, 153, 0, 0.4);
+}
 
-.auth_form_container {
+.form {
 	padding: 2.5rem;
 	display: flex;
 	flex-direction: column;
@@ -68,5 +91,8 @@ import AuthForm from "@/widgets/auth/ui/AuthForm.vue"
 	background-color: transparent;	
 	color: var(--c_highlight__accent);
 	cursor: pointer;
+}
+.switch_button__registration {
+	color: var(--c_secondary__accent);
 }
 </style>

@@ -4,39 +4,30 @@ import InputField from "@/shared/ui/InputField.vue"
 import PasswordField from "@/shared/ui/PasswordField.vue"
 import LoadIndicator from "@/shared/ui/LoadIndicator.vue"
 import { useForm, useField } from "vee-validate"
-import { emailValidate, passwordValidate } from "../lib/authValidation"
-import { authFetch } from "@/features/auth/api/authAPI"
 
 
-export interface AuthFormFields {
+export interface RegistrationFormFields {
+	userName: string,
 	email: string,
-	password: string 
+	birthday: string
+	password: string,
 } 
 
-const { values, isSubmitting, handleSubmit } = useForm<AuthFormFields>({
-  	validationSchema: {
-		email: emailValidate,
-		password: passwordValidate
- 	}, 
-})
+const { isSubmitting } = useForm<RegistrationFormFields>()
 
 const fieldOptions = { validateOnValueUpdate: false }
+const { value: userNameValue, errorMessage: userNameError } = useField('userName', undefined, fieldOptions)
 const { value: emailValue, errorMessage: emailError } = useField('email', undefined, fieldOptions)
 const { value: passwordValue, errorMessage: passwordError } = useField('password', undefined, fieldOptions)
-
-const onSubmit = handleSubmit(async () => {
-	try {
-		console.log(values)
-		const data = await authFetch(values)
-		console.log(data)
-	} catch (error) {
-		console.log(error)
-	}
-})
 </script>
 
 <template>
-	<form class="auth_form" @submit.prevent="onSubmit">
+	<form class="auth_form">
+		<FormField
+		label="Никнейм"
+		:error="userNameError">
+			<InputField v-model="userNameValue"/>
+		</FormField>
 		<FormField
 		label="Логин"
 		:error="emailError">
@@ -52,13 +43,18 @@ const onSubmit = handleSubmit(async () => {
 		type="submit"
 		:disabled="isSubmitting">
 			<LoadIndicator class="load" :is-short="true" v-if="isSubmitting"/>
-			<p v-else>войти</p>
+			<p v-else>зарегистрироваться</p>
 		</button>
 	</form>
 </template>
 
 <style scoped>
 .auth_form {
+	--bc_input_field: var(--c_highlight);
+	--bc_input_field__focus: var(--c_highlight__accent);
+	--bc_password_field: var(--c_highlight);
+	--bc_password_field__focus: var(--c_highlight__accent);
+
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -70,14 +66,14 @@ const onSubmit = handleSubmit(async () => {
 .submit_button {
 	margin-top: 2rem;
 	padding: 0.5rem;
-	border: 0.25rem solid var(--c_secondary);
-	background-color: var(--c_secondary);
+	border: 0.25rem solid var(--c_highlight);
+	background-color: var(--c_highlight);
 	transition: background-color 0.2s ease-in-out,
 				border-color 0.2s ease-in-out;
 }
 .submit_button:hover {
-	border: 0.25rem solid var(--c_secondary__accent);
-	background-color: var(--c_secondary__accent);
+	border: 0.25rem solid var(--c_highlight__accent);
+	background-color: var(--c_highlight__accent);
 }
 .submit_button:disabled {
 	border-color: var(--c_placeholder);
