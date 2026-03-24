@@ -48,18 +48,18 @@ const handleSwitchForm = () => { isAuth.value = !isAuth.value }
 	width: 55rem;
 	min-height: 35rem;
 	box-shadow:
-		0 0 0.375rem var(--c_secondary),
-		0 0 0.75rem var(--c_secondary),
-		0 0 1.125rem var(--c_secondary),
-		0 0 1.5rem var(--c_secondary),
+		0 0 0.375rem var(--c_secondary__accent),
+		0 0 0.75rem var(--c_secondary__accent),
+		0 0 1.125rem var(--c_secondary__accent),
+		0 0 1.5rem var(--c_secondary__accent),
 		0 0 1.875rem rgba(102, 0, 153, 0.4);
 }
 .forms_container__registration {
 	box-shadow:
-		0 0 0.375rem var(--c_highlight),
-		0 0 0.75rem var(--c_highlight),
-		0 0 1.125rem var(--c_highlight),
-		0 0 1.5rem var(--c_highlight),
+		0 0 0.375rem var(--c_tertiary__accent),
+		0 0 0.75rem var(--c_tertiary__accent),
+		0 0 1.125rem var(--c_tertiary__accent),
+		0 0 1.5rem var(--c_tertiary__accent),
 		0 0 1.875rem rgba(204, 153, 0, 0.4);
 }
 
@@ -89,7 +89,7 @@ const handleSwitchForm = () => { isAuth.value = !isAuth.value }
 
 .switch_button {
 	background-color: transparent;	
-	color: var(--c_highlight__accent);
+	color: var(--c_tertiary__accent);
 	cursor: pointer;
 }
 .switch_button__registration {

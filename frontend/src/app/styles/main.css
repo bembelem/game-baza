@@ -8,10 +8,12 @@
 
 	--c_bg: #0B0D17;
 	--c_bg__surface: #1A1D2E; 
-	--c_secondary: #660099;
-	--c_secondary__accent: #9933CC;
-	--c_highlight: #CC9900;
-	--c_highlight__accent: #FFCC33;
+	--c_secondary: #4B0077;
+	--c_secondary__accent: #AA33EE;
+	--c_tertiary: #004D77;
+	--c_tertiary__accent: #00BBEE;
+	--c_highlight: #996600;
+	--c_highlight__accent: #FFDD00;
 	--c_error: #CC2255;
 	--c_text: #F5F5F5;
 	--c_text__muted: #C7C7C7;
@@ -27,6 +29,17 @@ input {
 	font-size: 1rem;
 	font-family: "Press Start 2P", sans-serif;
 	color: var(--c_text);
+	transition: background-color 5000s ease-in-out 0s;
+}
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  	-webkit-box-shadow: 0 0 0px 100vh var(--c_bg__surface) inset;
+  	-webkit-text-fill-color: var(--c_text);
+}
+input:-moz-autofill {
+  	background-color: var(--c_bg__surface) !important;
+  	color: var(--c_text) !important;
 }
 
 button {

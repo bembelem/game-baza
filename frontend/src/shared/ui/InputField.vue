@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import { computed } from "vue"
+import { toRefs, computed } from "vue"
+import { useFormField } from "@/shared/lib/useFormField"
 
-const value = defineModel<string>()
 const props = defineProps<{
+	name: string,
 	type?: "text" | "email" | "tel",
 	placeholder?: string,
 	maxLength?: number,
-	formatInput?: (input: string) => string
+	autoComplete?: string,
+	formatInput?: (input: string) => string,
 }>()
+
+const { value, onBlur } = toRefs(useFormField(props.name))
 
 const proxyValue = computed({
 	get() {
@@ -25,10 +29,13 @@ const proxyValue = computed({
 
 <template>
 	<input class="input"
+	:name="props.name"
 	:type="props.type ?? 'text'"
 	:placeholder="props.placeholder"
 	:maxlength="maxLength"
-	v-model="proxyValue"/>
+	:autocomplete="props.autoComplete ?? 'off'"
+	v-model="proxyValue"
+	@blur="onBlur"/>
 </template>
 
 <style scoped>

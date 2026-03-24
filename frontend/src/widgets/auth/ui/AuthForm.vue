@@ -2,9 +2,10 @@
 import FormField from "@/shared/ui/FormField.vue"
 import InputField from "@/shared/ui/InputField.vue"
 import PasswordField from "@/shared/ui/PasswordField.vue"
-import LoadIndicator from "@/shared/ui/LoadIndicator.vue"
-import { useForm, useField } from "vee-validate"
-import { emailValidate, passwordValidate } from "../lib/authValidation"
+import SubmitButton from "@/shared/ui/SubmitButton.vue"
+import { useForm } from "vee-validate"
+import { emailValidate, passwordValidate } from "@/features/auth/lib/authValidation"
+import { computed } from "vue"
 import { authFetch } from "@/features/auth/api/authAPI"
 
 export interface AuthFormFields {
@@ -12,17 +13,14 @@ export interface AuthFormFields {
 	password: string 
 } 
 
-const { values, isSubmitting, handleSubmit } = useForm<AuthFormFields>({
+const { values, errors, meta, isSubmitting, handleSubmit, isFieldValid } = useForm<AuthFormFields>({
   	validationSchema: {
 		email: emailValidate,
 		password: passwordValidate
  	}, 
 })
 
-const useFormField = (name: string) => useField<string>(name, undefined, { validateOnValueUpdate: false })
-
-const { value: emailValue, errorMessage: emailError } = useFormField('email')
-const { value: passwordValue, errorMessage: passwordError } = useFormField('password')
+const isFormFulfilled = computed(() => meta.value.touched && meta.value.valid)
 
 const onSubmit = handleSubmit(async () => {
 	try {
@@ -39,55 +37,39 @@ const onSubmit = handleSubmit(async () => {
 	<form class="auth_form" @submit.prevent="onSubmit">
 		<FormField
 		label="Логин"
-		:error="emailError">
-			<InputField v-model="emailValue" />
+		:error="errors.email"
+		:is-valid="isFieldValid('email')">
+			<InputField 
+			name="email"
+			auto-complete="email"/>
 		</FormField>
+		
 		<FormField
 		label="Пароль"
-		:error="passwordError">
-			<PasswordField v-model="passwordValue"/>
+		:error="errors.password"
+		:is-valid="isFieldValid('password')">
+			<PasswordField 
+			name="password"
+			auto-complete="current-password"/>
 		</FormField>
 
-		<button class="submit_button" 
-		type="submit"
-		:disabled="isSubmitting">
-			<LoadIndicator class="load" :is-short="true" v-if="isSubmitting"/>
-			<p v-else>войти</p>
-		</button>
+		<SubmitButton
+		label="вход"
+		:is-available="isFormFulfilled"
+		:is-submitting="isSubmitting"/>
 	</form>
 </template>
 
 <style scoped>
 .auth_form {
+	--bc_input_field__focus: var(--c_secondary__accent);
+	--bc_password_field__focus: var(--c_secondary__accent);
+
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	width: 100%;
 	flex: 1;
 	row-gap: 1rem;
-}
-
-.submit_button {
-	margin-top: 2rem;
-	padding: 0.5rem;
-	border: 0.25rem solid var(--c_secondary);
-	background-color: var(--c_secondary);
-	transition: background-color 0.2s ease-in-out,
-				border-color 0.2s ease-in-out;
-}
-.submit_button:hover {
-	border: 0.25rem solid var(--c_secondary__accent);
-	background-color: var(--c_secondary__accent);
-}
-.submit_button:disabled {
-	border-color: var(--c_placeholder);
-	background-color: transparent;
-	color: var(--c_placeholder);
-}
-
-.load {
-	--fs_load: 1rem;
-  	--c_load: var(--c_placeholder);
-	--c_load__accent: var(--c_placeholder);
 }
 </style>

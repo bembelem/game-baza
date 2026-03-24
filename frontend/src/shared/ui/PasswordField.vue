@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import { ref } from "vue"
 import EyeIcon from "@/assets/icons/interface-essential-view-eye--Streamline-Pixel.svg?component"
+import { toRefs, ref } from "vue"
+import { useFormField } from "@/shared/lib/useFormField"
 
-const value = defineModel()
 const props = defineProps<{
-	placeholder?: string
+	name: string,
+	placeholder?: string,
+	autoComplete?: "current-password" | "new-password",
+	onBlur?: () => void
 }>()
+
+const { value, onBlur } = toRefs(useFormField(props.name))
 const isVisible = ref(false)
 
 const handleSwitchVisible = () => { isVisible.value = !isVisible.value }
@@ -16,7 +21,9 @@ const handleSwitchVisible = () => { isVisible.value = !isVisible.value }
 		<input class="input" 
 		:type=" isVisible ? 'text' : 'password'"
 		:placeholder="props.placeholder"
-		v-model="value"/>
+		:autocomplete="props.autoComplete"
+		v-model="value"
+		@blur="onBlur"/>
 		
 		<button class="icon_button" type="button" v-if="isVisible" @click="handleSwitchVisible">
 			<EyeIcon class="icon"/>
@@ -30,8 +37,7 @@ const handleSwitchVisible = () => { isVisible.value = !isVisible.value }
 </template>
 
 <style scoped>
-.password_input,
-.password_input__error {
+.password_input {
 	box-sizing: border-box;
 	padding: 0.5rem;
 	display: flex;
@@ -41,16 +47,13 @@ const handleSwitchVisible = () => { isVisible.value = !isVisible.value }
 	background-color: var(--c_bg__surface);
 	transition: border-color 0.2s ease-in-out;
 }
-.password_input__error {
-	border-color: var(--c_error);
-}
-.password_input:focus-within,
-.password_input__error:focus-within {
+.password_input:focus-within {
 	border-color: var(--bc_password_field__focus, var(--c_secondary__accent));
 }
 
 .input {
 	width: 100%;
+	background-color: var(--c_bg__surface);
 }
 .input::placeholder {
 	color: var(--c_placeholder);

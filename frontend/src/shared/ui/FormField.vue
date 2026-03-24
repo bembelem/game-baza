@@ -1,13 +1,16 @@
 <script setup lang="ts">
 const props = defineProps<{
 	label?: string,
-	error?: string
+	error?: string,
+	isValid?: boolean,
+	onBlur?: () => void
 }>()
 </script>
 
 <template>
-	<div class="form_field" :class="{ form_field__error: props.error }">
-		<label>
+	<div class="form_field" 
+	:class="{ form_field__fulfilled: props.isValid, form_field__error: props.error }">
+		<label @blur="props.onBlur">
 			<p class="label">{{ props.label }}</p>
 			<slot></slot>
 		</label>
@@ -22,6 +25,11 @@ const props = defineProps<{
 }
 .form_field__error {
 	--bc_input_field: var(--c_error);
+	--bc_password_field: var(--c_error);
+}
+.form_field__fulfilled {
+	--bc_input_field: var(--bc_input_field__focus);
+	--bc_password_field: var(--bc_password_field__focus);
 }
 
 .label {
