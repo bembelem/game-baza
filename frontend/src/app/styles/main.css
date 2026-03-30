@@ -20,6 +20,18 @@
 	--c_text__muted: #C7C7C7;
 	--c_text__error: #FF3366;
 	--c_placeholder: #7F7F7F;
+
+	--h_header: 6.5rem;
+}
+@media (max-width: 1024px) {
+	#app {
+		--h_header: 6rem;
+	}
+}
+@media (max-width: 600px) {
+	#app {
+		--h_header: 5.5rem;
+	}
 }
 
 input {
