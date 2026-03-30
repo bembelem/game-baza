@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import AuthPage from "@/pages/auth/ui/AuthPage.vue"
+import AppHeader from "@/widgets/header/ui/AppHeader.vue"
+import { RouterView } from "vue-router"
 import "../styles/fonts.css"
 import "../styles/main.css"
 import "../styles/reset.css"
 </script>
 
 <template>
-	<AuthPage/>
+	<AppHeader/>
+	<RouterView/>
 </template>

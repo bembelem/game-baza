@@ -38,7 +38,6 @@ const handleSwitchForm = () => { isAuth.value = !isAuth.value }
 	display: flex;
 	width: 100%;
 	height: 100vh;
-	background-color: var(--c_bg);
 }
 
 .forms_container {
