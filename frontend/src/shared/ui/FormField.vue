@@ -9,7 +9,7 @@ const props = defineProps<{
 
 <template>
 	<div class="form_field" 
-	:class="{ form_field__fulfilled: props.isValid, form_field__error: props.error }">
+	:class="{ 'form_field--fulfilled': props.isValid, 'form_field--error': props.error }">
 		<label @blur="props.onBlur">
 			<p class="label">{{ props.label }}</p>
 			<slot></slot>
@@ -23,11 +23,11 @@ const props = defineProps<{
 	display: flex;
 	flex-direction: column;
 }
-.form_field__error {
+.form_field--error {
 	--bc_input_field: var(--c_error);
 	--bc_password_field: var(--c_error);
 }
-.form_field__fulfilled {
+.form_field--fulfilled {
 	--bc_input_field: var(--bc_input_field__focus);
 	--bc_password_field: var(--bc_password_field__focus);
 }

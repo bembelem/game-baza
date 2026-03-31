@@ -10,7 +10,7 @@ const handleSwitchForm = () => { isAuth.value = !isAuth.value }
 
 <template>
 	<div class="auth_page">
-		<div class="forms_container" :class="{ forms_container__registration: !isAuth }">
+		<div class="forms_container" :class="{ 'forms_container--registration': !isAuth }">
 			<section class="form" v-if="isAuth">
 				<h2 class="title">Вход</h2>
 				<AuthForm/>
@@ -19,7 +19,7 @@ const handleSwitchForm = () => { isAuth.value = !isAuth.value }
 			<div class="form_switcher">
 				{{ isAuth ? "Новенький? Тогда тебе сюда" : "Мы знакомы? Давай проверим"}}
 				<button class="switch_button" 
-				:class="{ switch_button__registration: !isAuth}" 
+				:class="{ 'switch_button--registration': !isAuth}" 
 				@click="handleSwitchForm">
 					{{ isAuth ? "Регистрация" :  "Вход"}}
 				</button>
@@ -53,7 +53,7 @@ const handleSwitchForm = () => { isAuth.value = !isAuth.value }
 		0 0 1.5rem var(--c_secondary__accent),
 		0 0 1.875rem rgba(102, 0, 153, 0.4);
 }
-.forms_container__registration {
+.forms_container--registration {
 	box-shadow:
 		0 0 0.375rem var(--c_tertiary__accent),
 		0 0 0.75rem var(--c_tertiary__accent),
@@ -91,7 +91,7 @@ const handleSwitchForm = () => { isAuth.value = !isAuth.value }
 	color: var(--c_tertiary__accent);
 	cursor: pointer;
 }
-.switch_button__registration {
+.switch_button--registration {
 	color: var(--c_secondary__accent);
 }
 </style>

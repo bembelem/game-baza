@@ -10,7 +10,7 @@ const props = defineProps<{
 
 <template>
 	<button class="submit_button" 
-	:class="{ submit_button__fulfilled: props.isAvailable, submit_button__submitted: props.isSubmitting }" 
+	:class="{ 'submit_button--fulfilled': props.isAvailable, 'submit_button--submitted': props.isSubmitting }" 
 	type="submit"
 	:disabled="!props.isAvailable || props.isSubmitting">
 		<LoadIndicator class="load" :is-short="true" v-if="props.isSubmitting"/>
@@ -30,11 +30,11 @@ const props = defineProps<{
 .submit_button:disabled {
 	color: var(--c_bg);
 }
-.submit_button__fulfilled {
+.submit_button--fulfilled {
 	border-color: var(--bc_submit_button__accent, var(--c_secondary__accent));
 	background-color: var(--bc_submit_button__accent, var(--c_secondary__accent));
 }
-.submit_button__submitted:disabled {
+.submit_button--submitted:disabled {
 	border-color: var(--c_placeholder);
 	background-color: transparent;
 	color: var(--c_placeholder);

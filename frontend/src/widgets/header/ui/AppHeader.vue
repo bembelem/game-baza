@@ -6,7 +6,7 @@ const route = useRoute()
 </script>
 
 <template>
-	<div class="header" :class="{ header__accent: route.name != Routes.auth }">
+	<div class="header" :class="{ 'header--highlighted': route.name != Routes.auth }">
 		<RouterLink to="/">
 			<p class="logo"><span class="underlining"></span></p>
 		</RouterLink>
@@ -26,7 +26,7 @@ const route = useRoute()
 	backdrop-filter: blur(4px);
   	-webkit-backdrop-filter: blur(4px); 
 }
-.header__accent {
+.header--highlighted {
 	border-bottom: 0.125rem solid var(--c_secondary__accent);
 	box-shadow:
 		0 0 0.375rem var(--c_secondary__accent),
