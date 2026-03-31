@@ -18,6 +18,7 @@ const props = defineProps<{ isShort: boolean }>()
 	display: inline;
 	font-size: var(--fs_load, 2rem);
   	color: var(--c_load, var(--c_secondary));
+	white-space: nowrap;
 
 	animation-name: loading;
 	animation-duration: var(--ad_loading);

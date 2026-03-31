@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import GamesCatalog from '@/widgets/games_catalog/ui/GamesCatalog.vue'
 import LoadIndicator from '@/shared/ui/LoadIndicator.vue'
 import { useTemplateRef } from 'vue'
 
@@ -16,12 +17,13 @@ const handleFloatedButtonClick = () => {
 	<section class="games_catalog">
 		<h2 class="games_count" ref="games_count">
 			КАТАЛОГ ИГР
-			<span class="games_count__highlighted">
+			<span class="games_count--highlighted">
 				<LoadIndicator class="load" :is-short="true"/>
 			</span>
 		</h2>
+		<GamesCatalog/>
 	</section>
-
+	
 	<button class="floated_button" @click="handleFloatedButtonClick">↑</button>
 </template>
 
@@ -38,7 +40,7 @@ const handleFloatedButtonClick = () => {
 	font-size: 2rem;
 	color: var(--c_text);
 }
-.games_count__highlighted {
+.games_count--highlighted {
 	color: var(--c_highlight__accent);
 }
 
@@ -62,30 +64,23 @@ const handleFloatedButtonClick = () => {
 		0 0 1.5rem var(--c_secondary__accent),
 		0 0 1.875rem rgba(102, 0, 153, 0.4);
 	font-size: var(--fs_floated_button);
-	color: var(--c_secondary);
+	color: var(--c_secondary__accent);
 	transition: color 0.1s ease-out,
 				box-shadow 0.1s ease-out;
 	cursor: pointer;
 }
-.floated_button:active {
-	color: var(--c_secondary__accent);
-	box-shadow:
-		0 0 0.625rem var(--c_secondary__accent),
-		0 0 1.25rem var(--c_secondary__accent),
-		0 0 1.875rem var(--c_secondary__accent),
-		0 0 2.5rem var(--c_secondary__accent),
-		0 0 3.125rem rgba(153, 51, 204, 0.7),
-		0 0 3.75rem rgba(153, 51, 204, 0.4);
-}
 
 @media (max-width: 1024px) {
 	.games_catalog {
-		padding: 3.5rem;
+		padding: 2rem;
 	}
 }
 @media (max-width: 600px) {
 	.games_catalog {
-		padding: 1.5rem;
+		padding: 1rem;
+	}
+	.games_count {
+		font-size: 1.5rem;
 	}
 	.floated_button {
 		--fs_floated_button: 1.5rem;
