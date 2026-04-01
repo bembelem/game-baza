@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 
-from backend.app.api.schemas.publishers import PublishersResponse, Publisher
-from backend.app.api.schemas.stores import Store
+from app.api.schemas.publishers import PublishersResponse, Publisher
 
 router = APIRouter(prefix="/publishers", tags=["Publishers"])
 

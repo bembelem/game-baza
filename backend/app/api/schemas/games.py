@@ -3,7 +3,7 @@ from typing import List, Optional, Annotated
 
 from fastapi import Query
 from fastapi.openapi.models import Example
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from backend.app.api.schemas.offers import Offer
 

@@ -1,7 +1,9 @@
 from typing import Any
 
-from backend.app.api.schemas.users import User, UserPatch, Wishlist, UserPublic
 from fastapi import APIRouter
+
+from app.api.schemas.auth import UserAdd
+from app.api.schemas.users import UserPatch, Wishlist, UserPublic
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -58,7 +60,7 @@ async def remove_from_wishlist(game_id: int):
 
 @router.get(
     "/me",
-    response_model=User,
+    response_model=UserAdd,
     summary="Свой профиль",
     description="Возвращает профиль авторизованного пользователя.",
     responses={**UNAUTHORIZED}
@@ -69,7 +71,7 @@ async def get_me():
 
 @router.patch(
     "/me",
-    response_model=User,
+    response_model=UserAdd,
     summary="Изменить профиль",
     description="Изменяет профиль авторизованного пользователя и возвращает обновлённые данные.",
     responses={**UNAUTHORIZED}

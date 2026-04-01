@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 
-from backend.app.api.schemas.genres import GenresResponse
-from backend.app.api.schemas.stores import Store, StoresResponse
+from app.api.schemas.stores import Store, StoresResponse
 
 router = APIRouter(prefix="/stores", tags=["Stores"])
 

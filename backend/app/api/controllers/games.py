@@ -1,10 +1,8 @@
 from fastapi import APIRouter
-from typing import Annotated
-from fastapi import Depends
 
-from backend.app.api.dependencies import PaginationDep, GameFiltersDep
-from backend.app.api.schemas.games import GamesPage, GameDetails, GameFilters, Game
-from backend.app.api.schemas.games import ReviewsResponse, Review
+from app.api.dependencies import PaginationDep, GameFiltersDep
+from app.api.schemas.games import GamesPage, GameDetails
+from app.api.schemas.games import ReviewsResponse
 
 router = APIRouter(prefix="/games", tags=["Games"])
 

@@ -7,6 +7,7 @@ register_examples = {
             "username": "john doe",
             "email": "john@example.com",
             "password": "SecurePass123!",
+            "birthdate": "2026-03-30"
         },
     ),
     "2": Example(

@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from backend.app.api.schemas.offers import Offer, OfferPrices
+from app.api.schemas.offers import Offer, OfferPrices
 
 router = APIRouter(prefix="/offers", tags=["Offers"])
 
