@@ -5,7 +5,7 @@ from fastapi import Query
 from fastapi.openapi.models import Example
 from pydantic import BaseModel
 
-from backend.app.api.schemas.offers import Offer
+from app.api.schemas.offers import Offer
 
 
 class Game(BaseModel):

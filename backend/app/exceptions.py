@@ -2,26 +2,26 @@ from fastapi import HTTPException
 
 
 class GameBazaException(Exception):
-    detail = "Неожиданная ошибка"
+    detail = "Unexpected error"
 
     def __init__(self, *args, **kwargs):
         super().__init__(self.detail, *args, **kwargs)
 
 
 class ObjectAlreadyExistsException(GameBazaException):
-    detail = "Похожий объект уже существует"
+    detail = "Similar object already exists"
 
 class UserAlreadyExistsException(ObjectAlreadyExistsException):
-    detail = "Пользователь уже существует"
+    detail = "User already exists"
 
 class EmailNotRegisteredException(GameBazaException):
-    detail = "Пользователь с таким email не зарегистрирован"
+    detail = "User with this email is not registered"
 
 class IncorrectPasswordException(GameBazaException):
-    detail = "Пароль неверный"
+    detail = "Incorrect password"
 
 class IncorrectTokenException(GameBazaException):
-    detail = "Некорректный токен"
+    detail = "Invalid token"
 
 
 class AppHTTPException(HTTPException):
@@ -34,16 +34,16 @@ class AppHTTPException(HTTPException):
 
 class UserEmailAlreadyExistsHTTPException(AppHTTPException):
     status_code = 409
-    detail = "Пользователь с такой почтой уже существует"
+    detail = "User with this email already exists"
 
 class EmailNotRegisteredHTTPException(AppHTTPException):
     status_code = 401
-    detail = "Пользователь с таким email не зарегистрирован"
+    detail = "User with this email is not registered"
 
 class IncorrectPasswordHTTPException(AppHTTPException):
     status_code = 401
-    detail = "Пароль неверный"
+    detail = "Incorrect password"
 
 class IncorrectTokenHTTPException(AppHTTPException):
     status_code = 401
-    detail = "Некорректный токен"
+    detail = "Invalid token"

@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel, EmailStr, field_validator, model_validator
 
-from backend.app.api.schemas.games import Game
+from app.api.schemas.games import Game
 
 
 # Базовая модель пользователя — используется как основа или для внутренних нужд

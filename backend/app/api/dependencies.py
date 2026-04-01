@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Depends
 from pydantic import BaseModel, Field
 
-from backend.app.api.schemas.games import GameFilters
+from app.api.schemas.games import GameFilters
 
 
 class PaginationParams(BaseModel):

@@ -14,7 +14,7 @@ class ValidationErrorResponse(BaseModel):
 
 REGISTER_RESPONSES = {
     409: {
-        "description": "Пользователь уже существует",
+        "description": "User already exists",
         "model": ErrorResponse,
         "content": {
             "application/json": {
@@ -23,17 +23,17 @@ REGISTER_RESPONSES = {
         }
     },
     422: {
-        "description": "Ошибка валидации",
+        "description": "Validation error",
         "model": ValidationErrorResponse,
         "content": {
             "application/json": {
                 "examples": {
                     "invalid_email": {
-                        "summary": "Невалидный email",
+                        "summary": "Invalid email",
                         "value": {"detail": "email: value is not a valid email address"}
                     },
                     "invalid_birthdate": {
-                        "summary": "Дата рождения в будущем",
+                        "summary": "Birthdate is in the future",
                         "value": {"detail": "birthdate: Birthdate must be in the past"}
                     },
                 }
@@ -44,17 +44,17 @@ REGISTER_RESPONSES = {
 
 LOGIN_RESPONSES = {
     401: {
-        "description": "Неверный email или пароль",
+        "description": "Invalid email or password",
         "model": ErrorResponse,
         "content": {
             "application/json": {
                 "examples": {
                     "email_not_registered": {
-                        "summary": "Email не зарегистрирован",
+                        "summary": "Email is not registered",
                         "value": {"detail": EmailNotRegisteredHTTPException.detail}
                     },
                     "incorrect_password": {
-                        "summary": "Неверный пароль",
+                        "summary": "Incorrect password",
                         "value": {"detail": IncorrectPasswordHTTPException.detail}
                     },
                 }
@@ -62,13 +62,13 @@ LOGIN_RESPONSES = {
         }
     },
     422: {
-        "description": "Ошибка валидации",
+        "description": "Validation error",
         "model": ValidationErrorResponse,
         "content": {
             "application/json": {
                 "examples": {
                     "invalid_email": {
-                        "summary": "Невалидный email",
+                        "summary": "Invalid email",
                         "value": {"detail": "email: value is not a valid email address"}
                     },
                 }

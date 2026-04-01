@@ -17,10 +17,15 @@ from app.api.controllers.publishers import router as publishers_router
 from app.api.controllers.users import router as users_router
 
 app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"]
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+
 
 app.include_router(auth_router)
 app.include_router(users_router)
