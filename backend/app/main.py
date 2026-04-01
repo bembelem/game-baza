@@ -1,6 +1,8 @@
 import sys
 from pathlib import Path
 
+from starlette.middleware.cors import CORSMiddleware
+
 sys.path.append(str(Path(__file__).parent.parent))
 
 from fastapi import FastAPI
@@ -15,6 +17,10 @@ from app.api.controllers.publishers import router as publishers_router
 from app.api.controllers.users import router as users_router
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"]
+)
 
 app.include_router(auth_router)
 app.include_router(users_router)
@@ -24,7 +30,6 @@ app.include_router(stores_router)
 app.include_router(platforms_router)
 app.include_router(publishers_router)
 app.include_router(genres_router)
-
 
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
