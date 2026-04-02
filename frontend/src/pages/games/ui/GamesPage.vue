@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import GamesCatalog from '@/widgets/games_catalog/ui/GamesCatalog.vue'
-import LoadIndicator from '@/shared/ui/LoadIndicator.vue'
-import { useTemplateRef } from 'vue'
+import LoadIndicator from "@/shared/ui/LoadIndicator.vue"
+import GamesFilters from "@/widgets/games_filters/ui/GamesFilters.vue"
+import GamesCatalog from "@/widgets/games_catalog/ui/GamesCatalog.vue"
+import { useTemplateRef } from "vue"
 
 const gamesCatalogRef = useTemplateRef<HTMLElement>("games_count")
 
@@ -21,6 +22,7 @@ const handleFloatedButtonClick = () => {
 				<LoadIndicator class="load" :is-short="true"/>
 			</span>
 		</h2>
+		<GamesFilters/>
 		<GamesCatalog/>
 	</section>
 	

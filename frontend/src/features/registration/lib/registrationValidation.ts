@@ -1,4 +1,4 @@
-import type { RegistrationFormFields } from "../ui/RegistartionFrom.vue"
+import type { RegistrationFormFields } from "@/widgets/registration/ui/RegistartionFrom.vue"
 
 
 export function usernameValidate(value: RegistrationFormFields["username"]) {
