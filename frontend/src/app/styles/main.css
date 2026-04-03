@@ -1,12 +1,4 @@
-#app {
-	display: flex;
-	width: 100vw;
-	min-height: 100vh;
-	overflow-x: hidden;
-	background-color: var(--c_bg);
-	font-family: "Press Start 2P", sans-serif;
-	color: var(--c_text);
-
+:root {
 	--c_bg: #0B0D17;
 	--c_bg__surface: #1A1D2E; 
 	--c_secondary: #4B0077;
@@ -20,6 +12,30 @@
 	--c_text__muted: #C7C7C7;
 	--c_text__error: #FF3366;
 	--c_placeholder: #7F7F7F;
+
+	--h_header: 6.5rem;
+
+	scrollbar-color: var(--c_placeholder) var(--c_bg);
+	scrollbar-width: thin;
+}
+@media (max-width: 1024px) {
+	:root {
+		--h_header: 6rem;
+	}
+}
+@media (max-width: 600px) {
+	:root {
+		--h_header: 5.5rem;
+	}
+}
+
+#app {
+	display: flex;
+	min-height: 100vh;
+	overflow-x: hidden;
+	background-color: var(--c_bg);
+	font-family: "Press Start 2P", sans-serif;
+	color: var(--c_text);
 }
 
 input {

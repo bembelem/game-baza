@@ -1,4 +1,4 @@
-import type { RegistrationFormFields } from "../ui/RegistartionFrom.vue"
+import type { RegistrationFormFields } from "../ui/RegistartionForm.vue"
 
 
 export function usernameValidate(value: RegistrationFormFields["username"]) {
@@ -23,7 +23,7 @@ export function emailValidate(value: RegistrationFormFields["email"]) {
 }
 
 
-export function birthdayValidate(value: RegistrationFormFields["birthday"]) {
+export function birthdateValidate(value: RegistrationFormFields["birthdate"]) {
 	if (!value) 
 		return "День рождения обязателен"
 	if (value.length < 10) 

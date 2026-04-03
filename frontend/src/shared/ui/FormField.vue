@@ -39,7 +39,7 @@ const props = defineProps<{
 
 .error {
 	margin-top: 0.25rem;
-	min-height: 0.75rem;
+	min-height: 1.5rem;
 	font-size: 0.75rem;
 	color: var(--c_text__error);
 }

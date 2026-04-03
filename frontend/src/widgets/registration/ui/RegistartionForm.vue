@@ -3,23 +3,26 @@ import FormField from "@/shared/ui/FormField.vue"
 import InputField from "@/shared/ui/InputField.vue"
 import PasswordField from "@/shared/ui/PasswordField.vue"
 import SubmitButton from "@/shared/ui/SubmitButton.vue"
+import { ref, computed } from "vue"
 import { useForm } from "vee-validate"
-import { usernameValidate, emailValidate, birthdayValidate, passwordValidate } from "@/features/registration/lib/registrationValidation"
-import { computed } from "vue"
-import { registrationFetch } from "@/features/registration/api/registrationAPI"
+import { usernameValidate, emailValidate, birthdateValidate, passwordValidate } from "@/widgets/registration/lib/registrationValidation"
+import { toRegistrationPayload } from "../lib/registrationTransform"
+import { registrationFetch, isRegistrationResponseError } from "@/features/registration/api/registrationAPI"
 
 export interface RegistrationFormFields {
 	username: string,
 	email: string,
-	birthday: string
+	birthdate: string
 	password: string,
 } 
 
-const { values, errors, meta, isSubmitting, handleSubmit, isFieldValid } = useForm<RegistrationFormFields>({
+const networkError = ref(false)
+
+const { values, errors, meta, isSubmitting, handleSubmit, isFieldValid, setErrors } = useForm<RegistrationFormFields>({
 	validationSchema: {
 		username: usernameValidate,
 		email: emailValidate,
-		birthday: birthdayValidate,
+		birthdate: birthdateValidate,
 		password: passwordValidate
 	}
 })
@@ -35,12 +38,23 @@ const formatDate = (input: string) => {
 }
 
 const onSubmit = handleSubmit(async () => {
+	networkError.value = false
+
 	try {
-		console.log(values)
-		const data = await registrationFetch(values)
-		console.log(data)
+		const transformedValues = toRegistrationPayload(values)
+		await registrationFetch(transformedValues)
 	} catch (error) {
-		console.log(error)
+		if (error instanceof TypeError) {
+			networkError.value = true
+			return
+		}
+
+		if (isRegistrationResponseError(error)) {
+			const { details } = error
+			setErrors(details)
+		}
+
+		console.error("Непредвиденная ошибка", error)
 	}
 })
 </script>
@@ -68,10 +82,10 @@ const onSubmit = handleSubmit(async () => {
 
 		<FormField
 		label="Дата рождения"
-		:error="errors.birthday"
-		:is-valid="isFieldValid('birthday')">
+		:error="errors.birthdate"
+		:is-valid="isFieldValid('birthdate')">
 			<InputField
-			name="birthday"
+			name="birthdate"
 			placeholder="дд.мм.гггг"
 			:max-length="10"
 			:format-input="formatDate"/>
@@ -84,6 +98,10 @@ const onSubmit = handleSubmit(async () => {
 			<PasswordField 
 			name="password"/>
 		</FormField>
+
+		<p class="network_error" v-if="networkError">
+			Не удалось подключиться к серверу. Проверьте интернет и попробуйте снова
+		</p>
 
 		<SubmitButton 
 		label="зарегистрироваться"

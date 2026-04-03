@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AuthForm from "@/widgets/auth/ui/AuthForm.vue"
-import RegistartionFrom from "@/widgets/registration/ui/RegistartionFrom.vue"
+import RegistartionForm from "@/widgets/registration/ui/RegistartionForm.vue"
 import { ref } from "vue"
 
 const isAuth = ref(true)
@@ -27,7 +27,7 @@ const handleSwitchForm = () => { isAuth.value = !isAuth.value }
 
 			<section class="form" v-if="!isAuth">
 				<h2 class="title">Регистрация</h2>
-				<RegistartionFrom/>
+				<RegistartionForm/>
 			</section>
 		</div>
 	</div>
@@ -37,14 +37,14 @@ const handleSwitchForm = () => { isAuth.value = !isAuth.value }
 .auth_page {
 	display: flex;
 	width: 100%;
-	height: 100vh;
 }
 
 .forms_container {
 	margin: auto;
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
-	width: 55rem;
+	max-width: 55rem;
+	width: 100%;
 	min-height: 35rem;
 	box-shadow:
 		0 0 0.375rem var(--c_secondary__accent),
@@ -82,6 +82,7 @@ const handleSwitchForm = () => { isAuth.value = !isAuth.value }
 	justify-content: center;
 	align-items: center;
 	text-align: center;
+	text-wrap: balance;
 	row-gap: 1rem;
 	background-color: var(--c_bg__surface);
 }
@@ -93,5 +94,36 @@ const handleSwitchForm = () => { isAuth.value = !isAuth.value }
 }
 .switch_button--registration {
 	color: var(--c_secondary__accent);
+}
+
+@media (max-width: 1024px) {
+	.auth_page {
+		padding: 2rem;
+	}
+	.forms_container {
+		width: 100%;
+	}
+}
+@media (max-width: 600px) {
+	.auth_page {
+		margin-top: var(--h_header);
+		padding: 0;
+	}
+	.forms_container {
+		margin: 0;
+		padding: 1rem;
+		grid-template-columns: 1fr;
+		grid-template-rows: auto 1fr;
+		row-gap: 2rem;
+		min-height: unset;
+	}
+	.form,
+	.form_switcher {
+		padding: 0;
+	}
+	.form_switcher {
+		order: 2;
+		background-color: transparent;
+	}
 }
 </style>
