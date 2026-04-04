@@ -1,45 +1,42 @@
 <script setup lang="ts">
 import MonoSelector from "@/shared/ui/MonoSelector.vue"
 import MultiSelector from "@/shared/ui/MultiSelector.vue"
-import { searchGamesFilters, sortValues, priceValues } from "@/features/search_games/filters/searchGamesFilters"
+import type { SearchGamesFilters } from "@/features/search_games/filters/searchGamesFilters"
+import { sortValues, priceValues, searchGamesFiltersDefinition } from "@/features/search_games/filters/searchGamesFilters"
+import { useFilters } from "@/shared/lib/useFilters"
 
-const onValueClick = <K extends keyof typeof searchGamesFilters>(
-	name: K, 
-	value: typeof searchGamesFilters[K]
-) => {
-  	searchGamesFilters[name] = value
-}
+const { filters, updateFilters, resetFilters } = useFilters<SearchGamesFilters>(searchGamesFiltersDefinition)
 </script>
 
 <template>
 	<div class="games_filters">
 		<MonoSelector
 		name="sort"
-		:value="searchGamesFilters.sort"
+		:value="filters.sort"
 		:values="sortValues"
-		@value-click="onValueClick<'sort'>"/>
+		@value-click="updateFilters<'sort'>"/>
 		
 		<MonoSelector
 		name="price"
-		:value="searchGamesFilters.price"
+		:value="filters.price"
 		:values="priceValues"
-		@value-click="onValueClick<'price'>"/>
+		@value-click="updateFilters<'price'>"/>
 
 		<MultiSelector
 		name="genres"
-		:selected-values="searchGamesFilters.genres"
+		:selected-values="filters.genres"
 		:values="undefined"
 		label="жанры"
-		@value-click="onValueClick<'genres'>"/>
+		@value-click="updateFilters<'genres'>"/>
 
 		<MultiSelector
 		name="stores"
-		:selected-values="searchGamesFilters.stores"
+		:selected-values="filters.stores"
 		:values="undefined"
 		label="магазины"
-		@value-click="onValueClick<'stores'>"/> 
+		@value-click="updateFilters<'stores'>"/> 
 
-		<button class="button_reset">Очистить</button>
+		<button class="button_reset" @click="resetFilters">Очистить</button>
 		<button class="button_apply">Применить</button>
 	</div>
 </template>

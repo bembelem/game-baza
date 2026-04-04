@@ -1,25 +1,19 @@
-import type { SelectorValue } from "@/shared/interface/Filters"
-import { reactive } from "vue"
+import { 
+	type SelectorValue, 
+	type FiltersDefinition,
+	ResetBehavior 
+} from "@/shared/interface/Filters"
 
 
-export interface GamesSelectedFiltersState {
-	sort: SelectorValue<string>,
-	price: SelectorValue<[number, number] | undefined>
-	genres?: SelectorValue<string>[]
-	stores?: SelectorValue<string>[]
+export interface SearchGamesFilters {
+ 	sort: SelectorValue<string>,
+ 	price: SelectorValue<[number, number] | undefined>
+ 	genres: SelectorValue<string>[]
+ 	stores: SelectorValue<string>[]
 }
 
+type SearchGamesFiltersDefinition = FiltersDefinition<SearchGamesFilters>
 
-export const searchGamesFilters = reactive<GamesSelectedFiltersState>({
-	sort: {
-		title: "по популярности", 
-		value: "popularity"
-	},
-	price: {
-		title: "все цены",
-		value: undefined
-	}
-})
 
 export const sortValues = [
 	{
@@ -78,3 +72,22 @@ export const priceValues: SelectorValue<[number, number] | undefined>[] = [
 		value: [6000, 0]
 	}
 ] 
+
+export const searchGamesFiltersDefinition: SearchGamesFiltersDefinition = {
+	sort: {
+		values: sortValues,
+		defaultValue: sortValues[0],
+		resetBehavior: ResetBehavior.ToDefault
+	},
+	price: {
+		values: priceValues,
+		defaultValue: priceValues[0],
+		resetBehavior: ResetBehavior.ToDefault
+	},
+	genres: {
+		resetBehavior: ResetBehavior.Clear
+	},
+	stores: {
+		resetBehavior: ResetBehavior.Clear
+	},
+}
