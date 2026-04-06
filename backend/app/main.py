@@ -48,4 +48,4 @@ app.include_router(genres_router)
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app.main:app", log_level="debug", reload=True)
+    uvicorn.run("app.main:app", log_level="debug", port=8080)

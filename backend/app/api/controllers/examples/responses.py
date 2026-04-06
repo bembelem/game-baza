@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from app.api.schemas.users import User
 
 
 class ErrorDetailResponse(BaseModel):
@@ -6,6 +7,34 @@ class ErrorDetailResponse(BaseModel):
     message: str
     details: dict
     traceId: str
+
+
+_422_register = {
+    "error": "2020_VALIDATION_ERROR",
+    "message": "Данные не прошли валидацию.",
+    "details": {
+        "username": "Value error, Username must be at least 3 characters",
+        "email": "value is not a valid email address: An email address must have an @-sign.",
+        "password": "Value error, Password must contain at least one uppercase letter",
+    },
+    "traceId": "12e797e6-bdfa-466b-99c8-dbb4122e7c9b",
+}
+
+_422_login = {
+    "error": "2020_VALIDATION_ERROR",
+    "message": "Данные не прошли валидацию.",
+    "details": {
+        "email": "value is not a valid email address: An email address must have an @-sign.",
+    },
+    "traceId": "12e797e6-bdfa-466b-99c8-dbb4122e7c9b",
+}
+
+_401_token = {
+    "error": "2011_IncorrectToken_ERROR",
+    "message": "Токен не передан или не действителен.",
+    "details": {},
+    "traceId": "9696004a-6866-4a79-bc53-f4383040cba1",
+}
 
 
 REGISTER_RESPONSES = {
@@ -40,20 +69,7 @@ REGISTER_RESPONSES = {
     422: {
         "description": "Ошибка валидации",
         "model": ErrorDetailResponse,
-        "content": {
-            "application/json": {
-                "example": {
-                    "error": "2020_VALIDATION_ERROR",
-                    "message": "Данные не прошли валидацию.",
-                    "details": {
-                        "username": "Value error, Username must be at least 3 characters",
-                        "email": "value is not a valid email address: An email address must have an @-sign.",
-                        "password": "Value error, Password must contain at least one uppercase letter",
-                    },
-                    "traceId": "12e797e6-bdfa-466b-99c8-dbb4122e7c9b",
-                }
-            }
-        },
+        "content": {"application/json": {"example": _422_register}},
     },
 }
 
@@ -89,17 +105,14 @@ LOGIN_RESPONSES = {
     422: {
         "description": "Ошибка валидации",
         "model": ErrorDetailResponse,
-        "content": {
-            "application/json": {
-                "example": {
-                    "error": "2020_VALIDATION_ERROR",
-                    "message": "Данные не прошли валидацию.",
-                    "details": {
-                        "email": "value is not a valid email address: An email address must have an @-sign.",
-                    },
-                    "traceId": "12e797e6-bdfa-466b-99c8-dbb4122e7c9b",
-                }
-            }
-        },
+        "content": {"application/json": {"example": _422_login}},
+    },
+}
+
+ME_RESPONSES = {
+    401: {
+        "description": "Токен не передан или не действителен",
+        "model": ErrorDetailResponse,
+        "content": {"application/json": {"example": _401_token}},
     },
 }

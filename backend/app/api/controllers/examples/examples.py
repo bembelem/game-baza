@@ -1,6 +1,6 @@
 from fastapi.openapi.models import Example
 
-register_examples = {
+REGISTER_EXAMPLES = {
     "1": Example(
         summary="Обычный пользователь",
         value={
@@ -9,23 +9,22 @@ register_examples = {
             "password": "SecurePass123!",
             "birthdate": "2026-03-30"
         },
-    ),
-    "2": Example(
-        summary="Администратор",
-        value={
-            "username": "admin",
-            "email": "admin@example.com",
-            "password": "AdminPass456!",
-        },
-    ),
+    )
 }
 
-login_examples = {
+LOGIN_EXAMPLES = {
     "1": Example(
-        summary="Успешный вход",
+        summary="Вход по email",
         value={
             "email": "john@example.com",
             "password": "SecurePass123!",
         },
     ),
+    "2": Example(
+            summary="Вход по username",
+            value={
+                "username": "john doe",
+                "password": "SecurePass123!",
+            },
+        ),
 }

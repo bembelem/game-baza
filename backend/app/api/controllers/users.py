@@ -1,15 +1,32 @@
 from typing import Any
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 
+from app.api.controllers.examples.responses import ME_RESPONSES
+from app.api.dependencies import UserIdDep
 from app.api.schemas.auth import UserAdd
-from app.api.schemas.users import UserPatch, Wishlist, UserPublic
+from app.api.schemas.users import UserPatch, Wishlist, UserPublic, User
+from app.database import async_session_maker
+from app.repositories.users import UsersRepository
+from app.services.auth import AuthService
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
 UNAUTHORIZED: dict[int | str, dict[str, Any]] = {401: {"description": "Не авторизован, токен отсутствует или недействителен"}}
 NOT_FOUND: dict[int | str, dict[str, Any]] = {404: {"description": "Пользователь не найден"}}
 
+@router.get(
+    path="/me",
+    responses=ME_RESPONSES,
+    response_model=User,
+    status_code=200,
+)
+async def me(
+        user_id: UserIdDep
+):
+    async with async_session_maker() as session:
+        user = await UsersRepository(session).get_one_or_none(id=user_id)
+    return user
 
 @router.get(
     "/{user_id}",
@@ -56,16 +73,6 @@ async def add_to_wishlist(game_id: int):
     }
 )
 async def remove_from_wishlist(game_id: int):
-    ...
-
-@router.get(
-    "/me",
-    response_model=UserAdd,
-    summary="Свой профиль",
-    description="Возвращает профиль авторизованного пользователя.",
-    responses={**UNAUTHORIZED}
-)
-async def get_me():
     ...
 
 

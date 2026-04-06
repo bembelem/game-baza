@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
 import jwt
+from jwt import ExpiredSignatureError, DecodeError
 from pwdlib import PasswordHash
 
 from app.api.schemas.auth import UserRequestAdd, UserAdd, UserRequestLogin
@@ -8,7 +9,7 @@ from app.config import settings
 from app.database import async_session_maker
 from app.exceptions import EmailAlreadyExistsHTTPException, UsernameAlreadyExistsHTTPException, \
     EmailNotRegisteredHTTPException, UsernameNotRegisteredHTTPException, IncorrectPasswordHTTPException, \
-    ObjectAlreadyExistsError, AppHTTPException
+    ObjectAlreadyExistsError, AppHTTPException, IncorrectTokenHTTPException
 from app.repositories.users import UsersRepository
 
 
@@ -62,3 +63,10 @@ class AuthService:
                 raise AppHTTPException()
             await session.commit()
             return user
+
+    def decode_token(self, token) -> dict:
+        try:
+            res = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=settings.JWT_ALGORITHM)
+        except (ExpiredSignatureError, DecodeError) as e:
+            raise IncorrectTokenHTTPException
+        return res

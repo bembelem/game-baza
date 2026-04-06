@@ -17,8 +17,8 @@ class UserRequestAdd(BaseModel):
             raise ValueError("Username must be at least 3 characters")
         if len(value) > 50:
             raise ValueError("Username must be at most 50 characters")
-        if not re.match(r"^[a-zA-Z0-9_]+$", value):
-            raise ValueError("Username can only contain letters, digits and underscores")
+        if not re.match(r"^[a-zA-Z0-9_ ]+$", value):
+            raise ValueError("Username can only contain letters, digits, underscores and whitespaces")
         return value
 
     @field_validator("password")
@@ -31,17 +31,6 @@ class UserRequestAdd(BaseModel):
         if not re.search(r"[0-9]", value):
             raise ValueError("Password must contain at least one digit")
         return value
-
-    model_config = {
-        "json_schema_extra": {
-            "examples": [{
-                "username": "john_doe",
-                "email": "john@example.com",
-                "birthdate": "2000-01-01",
-                "password": "securepassword123"
-            }]
-        }
-    }
 
     @field_validator("birthdate")
     @classmethod
