@@ -1,11 +1,28 @@
 <script setup lang="ts">
 import MonoSelector from "@/shared/ui/MonoSelector.vue"
 import MultiSelector from "@/shared/ui/MultiSelector.vue"
+import type { SelectorValue } from "@/shared/interface/Filters"
 import type { SearchGamesFilters } from "@/features/search_games/filters/searchGamesFilters"
-import { sortValues, priceValues, searchGamesFiltersDefinition } from "@/features/search_games/filters/searchGamesFilters"
+import { searchGamesFiltersDefinition } from "@/features/search_games/filters/searchGamesFilters"
 import { useFilters } from "@/shared/lib/useFilters"
+import { useDataStore } from "@/shared/lib/useDataStore"
+import { fetchData } from "@/shared/lib/fetchData"
+import { getGenresFilterFetch, getPlatformsFilterFetch, getPublishersFilterFetch, getStoresFilterFetch } from "@/entities/filter/api/filtersAPI"
+import { onMounted } from "vue"
 
 const { filters, updateFilters, resetFilters } = useFilters<SearchGamesFilters>(searchGamesFiltersDefinition)
+
+const genresFilterValues = useDataStore<SelectorValue<string>[]>()
+const platformsFilterValues = useDataStore<SelectorValue<string>[]>()
+const publishersFilterValues = useDataStore<SelectorValue<string>[]>()
+const storesFilterValues = useDataStore<SelectorValue<string>[]>()
+
+onMounted(() => {
+	fetchData(genresFilterValues, getGenresFilterFetch)
+	fetchData(platformsFilterValues, getPlatformsFilterFetch)
+	fetchData(publishersFilterValues, getPublishersFilterFetch)
+	fetchData(storesFilterValues, getStoresFilterFetch)
+})
 </script>
 
 <template>
@@ -13,28 +30,42 @@ const { filters, updateFilters, resetFilters } = useFilters<SearchGamesFilters>(
 		<MonoSelector
 		name="sort"
 		:value="filters.sort"
-		:values="sortValues"
+		:values="searchGamesFiltersDefinition.sort.values"
 		@value-click="updateFilters<'sort'>"/>
-		
-		<MonoSelector
-		name="price"
-		:value="filters.price"
-		:values="priceValues"
-		@value-click="updateFilters<'price'>"/>
 
 		<MultiSelector
 		name="genres"
 		:selected-values="filters.genres"
-		:values="undefined"
+		:values="genresFilterValues.data.value"
 		label="жанры"
 		@value-click="updateFilters<'genres'>"/>
 
 		<MultiSelector
+		name="platforms"
+		:selected-values="filters.platforms"
+		:values="platformsFilterValues.data.value"
+		label="платформы"
+		@value-click="updateFilters<'platforms'>"/>
+
+		<MultiSelector
+		name="publishers"
+		:selected-values="filters.publishers"
+		:values="publishersFilterValues.data.value"
+		label="издатели"
+		@value-click="updateFilters<'publishers'>"/>
+
+		<MultiSelector
 		name="stores"
 		:selected-values="filters.stores"
-		:values="undefined"
+		:values="storesFilterValues.data.value"
 		label="магазины"
-		@value-click="updateFilters<'stores'>"/> 
+		@value-click="updateFilters<'stores'>"/>
+
+		<MonoSelector
+		name="price"
+		:value="filters.price"
+		:values="searchGamesFiltersDefinition.price.values"
+		@value-click="updateFilters<'price'>"/>
 
 		<button class="button_reset" @click="resetFilters">Очистить</button>
 		<button class="button_apply">Применить</button>

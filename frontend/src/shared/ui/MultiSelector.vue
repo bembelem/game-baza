@@ -6,7 +6,7 @@ import { ref } from "vue"
 const props = defineProps<{
 	name: string,
 	selectedValues: SelectorValue<T>[] | undefined,
-	values: SelectorValue<T>[] | undefined,
+	values?: SelectorValue<T>[] | null,
 	label?: string,
 	isAutoClose?: boolean,
 	onValueClick: (name: string, value: SelectorValue<T>[]) => void
@@ -24,7 +24,6 @@ const handleValueClick = (name: string, newValue: SelectorValue<T>) => {
 		newValues.splice(valueIndex, 1)
 	}
 	
-	console.log(newValues)
 	props.onValueClick(name, newValues)
 	isOpen.value = !props.isAutoClose
 }

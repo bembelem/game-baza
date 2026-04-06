@@ -6,7 +6,7 @@ import { ref } from "vue"
 const props = withDefaults(defineProps<{
 	name: string,
 	value: SelectorValue<T> | undefined,
-	values: SelectorValue<T>[] | undefined,
+	values?: SelectorValue<T>[] | null,
 	label?: string,
 	isAutoClose?: boolean,
 	onValueClick: (name: string, value: SelectorValue<T>) => void

@@ -7,15 +7,17 @@ import {
 
 export interface SearchGamesFilters {
  	sort: SelectorValue<string>,
- 	price: SelectorValue<[number, number] | undefined>
- 	genres: SelectorValue<string>[]
- 	stores: SelectorValue<string>[]
+	genres: SelectorValue<string>[],
+	platforms: SelectorValue<string>[],
+	publishers: SelectorValue<string>[],
+	stores: SelectorValue<string>[],
+	price: SelectorValue<[number, number] | undefined>
 }
 
 type SearchGamesFiltersDefinition = FiltersDefinition<SearchGamesFilters>
 
 
-export const sortValues = [
+const sortValues = [
 	{
 		title: "по популярности", 
 		value: "popularity"
@@ -50,7 +52,7 @@ export const sortValues = [
 	}
 ]
 
-export const priceValues: SelectorValue<[number, number] | undefined>[] = [
+const priceValues: SelectorValue<[number, number] | undefined>[] = [
 	{
 		title: "все цены",
 		value: undefined
@@ -79,15 +81,21 @@ export const searchGamesFiltersDefinition: SearchGamesFiltersDefinition = {
 		defaultValue: sortValues[0],
 		resetBehavior: ResetBehavior.ToDefault
 	},
-	price: {
-		values: priceValues,
-		defaultValue: priceValues[0],
-		resetBehavior: ResetBehavior.ToDefault
-	},
 	genres: {
 		resetBehavior: ResetBehavior.Clear
+	},
+	platforms: {
+		resetBehavior: ResetBehavior.Clear 
+	},
+	publishers: {
+		resetBehavior: ResetBehavior.Clear,
 	},
 	stores: {
 		resetBehavior: ResetBehavior.Clear
 	},
+	price: {
+		values: priceValues,
+		defaultValue: priceValues[0],
+		resetBehavior: ResetBehavior.ToDefault
+	}
 }
