@@ -13,9 +13,8 @@ class UsersRepository(BaseRepository):
     mapper = UsersDataMapper
 
     async def get_user_with_hashed_password(self, email: EmailStr = None, username: str = None):
-
         if not (email or username):
-            raise HTTPException(status_code=422, detail="Необходимо указать email или username")
+            raise ValueError("Необходимо указать email или username")
 
         filters = {}
         if email:

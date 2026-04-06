@@ -8,7 +8,7 @@ from sqlalchemy import select, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import Base
-from app.exceptions import ObjectAlreadyExistsException
+from app.exceptions import ObjectAlreadyExistsError
 from app.repositories.mappers.base import DataMapper
 
 
@@ -39,11 +39,6 @@ class BaseRepository:
             model = result.scalars().one()
             return self.mapper.map_to_domain_entity(model)
         except IntegrityError as ex:
-            logging.exception(f"Не удалось добавить данные в БД, входные данные={data}")
             if isinstance(ex.orig.__cause__, UniqueViolationError):
-                raise ObjectAlreadyExistsException from ex
-            else:
-                logging.exception(
-                    f"Незнакомая ошибка: не удалось добавить данные в БД, входные данные={data}"
-                )
-                raise ex
+                constraint = getattr(ex.orig.__cause__, "constraint_name", None)
+                raise ObjectAlreadyExistsError(constraint=constraint) from ex

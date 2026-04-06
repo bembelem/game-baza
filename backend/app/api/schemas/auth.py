@@ -1,3 +1,4 @@
+import re
 from datetime import date
 
 from pydantic import BaseModel, field_validator, EmailStr, model_validator
@@ -8,6 +9,28 @@ class UserRequestAdd(BaseModel):
     email: EmailStr
     birthdate: date
     password: str
+
+    @field_validator("username")
+    @classmethod
+    def validate_username(cls, value: str):
+        if len(value) < 3:
+            raise ValueError("Username must be at least 3 characters")
+        if len(value) > 50:
+            raise ValueError("Username must be at most 50 characters")
+        if not re.match(r"^[a-zA-Z0-9_]+$", value):
+            raise ValueError("Username can only contain letters, digits and underscores")
+        return value
+
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, value: str):
+        if len(value) < 8:
+            raise ValueError("Password must be at least 8 characters")
+        if not re.search(r"[A-Z]", value):
+            raise ValueError("Password must contain at least one uppercase letter")
+        if not re.search(r"[0-9]", value):
+            raise ValueError("Password must contain at least one digit")
+        return value
 
     model_config = {
         "json_schema_extra": {
