@@ -16,11 +16,12 @@ const route = useRoute()
 <style scoped>
 .header {
 	position: fixed;
-	padding: 1.5rem 2rem;
+	padding: 0 2rem;
 	display: grid;
 	grid-template-columns: 2fr 3fr 2fr;
 	column-gap: 1rem;
 	width: 100%;
+	height: var(--h_header);
 	place-items: center;
   	background-color: rgba(11, 13, 23, 0.7);
 	backdrop-filter: blur(4px);
@@ -63,7 +64,6 @@ const route = useRoute()
 
 @media (max-width: 1024px) {
 	.header {
-		padding: 1rem 1.5rem;
 		grid-template-columns: 1fr 5fr 1fr;
 	}
 	.logo::before {
@@ -72,7 +72,6 @@ const route = useRoute()
 }
 @media (max-width: 600px) {
 	.header {
-		padding: 0.5rem 1rem;
 		grid-template-columns: 1fr 6fr;
 	}
 	.underlining::before {

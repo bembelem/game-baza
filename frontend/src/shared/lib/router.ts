@@ -1,3 +1,4 @@
 export const Routes = {
-	auth: "Auth"
+	auth: "Auth",
+	games: "Games"
 } as const
