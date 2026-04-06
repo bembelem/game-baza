@@ -1,15 +1,24 @@
 from typing import Any
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 
 from app.api.schemas.auth import UserAdd
 from app.api.schemas.users import UserPatch, Wishlist, UserPublic
+from app.services.auth import AuthService
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
 UNAUTHORIZED: dict[int | str, dict[str, Any]] = {401: {"description": "Не авторизован, токен отсутствует или недействителен"}}
 NOT_FOUND: dict[int | str, dict[str, Any]] = {404: {"description": "Пользователь не найден"}}
 
+@router.get(
+    path="/me",
+    status_code=201,
+)
+async def me(request: Request):
+    access_token = request.cookies.get("access_token", None)
+    data = AuthService().decode_token(access_token)
+    return data
 
 @router.get(
     "/{user_id}",
@@ -56,16 +65,6 @@ async def add_to_wishlist(game_id: int):
     }
 )
 async def remove_from_wishlist(game_id: int):
-    ...
-
-@router.get(
-    "/me",
-    response_model=UserAdd,
-    summary="Свой профиль",
-    description="Возвращает профиль авторизованного пользователя.",
-    responses={**UNAUTHORIZED}
-)
-async def get_me():
     ...
 
 

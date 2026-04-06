@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -28,6 +30,7 @@ async def request_validation_handler(request: Request, exc: RequestValidationErr
 
 
 async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    logging.exception(exc)
     return JSONResponse(
         status_code=500,
         content={

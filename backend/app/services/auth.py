@@ -62,3 +62,6 @@ class AuthService:
                 raise AppHTTPException()
             await session.commit()
             return user
+
+    def decode_token(self, token) -> str:
+        return jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=settings.JWT_ALGORITHM)
