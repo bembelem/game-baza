@@ -27,7 +27,7 @@ async def register(
 
 @router.post(
     path="/login",
-    status_code=201,
+    status_code=200,
     response_model=Token,
     responses=LOGIN_RESPONSES,
 )
