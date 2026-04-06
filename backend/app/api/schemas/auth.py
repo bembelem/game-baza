@@ -39,6 +39,14 @@ class UserRequestAdd(BaseModel):
             raise ValueError("Birthdate must be in the past")
         return value
 
+    @field_validator("birthdate", mode="before")
+    @classmethod
+    def parse_birthdate(cls, value):
+        if isinstance(value, str) and "." in value:
+            day, month, year = value.split(".")
+            return date(int(year), int(month), int(day))
+        return value
+
 
 # Данные для записи в БД (пароль уже захеширован)
 class UserAdd(BaseModel):
