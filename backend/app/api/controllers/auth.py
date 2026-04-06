@@ -38,4 +38,4 @@ async def login(
     user = await auth_service.login_user(data)
     access_token = auth_service.create_access_token({"user_id": user.id})
     response.set_cookie("access_token", access_token)
-    return {"message": "Успешный вход"}
+    return user

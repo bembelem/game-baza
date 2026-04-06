@@ -5,7 +5,7 @@ from fastapi import APIRouter, Request
 from app.api.controllers.examples.responses import ME_RESPONSES
 from app.api.dependencies import UserIdDep
 from app.api.schemas.auth import UserAdd
-from app.api.schemas.users import UserPatch, Wishlist, UserPublic
+from app.api.schemas.users import UserPatch, Wishlist, UserPublic, User
 from app.database import async_session_maker
 from app.repositories.users import UsersRepository
 from app.services.auth import AuthService
@@ -18,6 +18,7 @@ NOT_FOUND: dict[int | str, dict[str, Any]] = {404: {"description": "Пользо
 @router.get(
     path="/me",
     responses=ME_RESPONSES,
+    response_model=User,
     status_code=200,
 )
 async def me(

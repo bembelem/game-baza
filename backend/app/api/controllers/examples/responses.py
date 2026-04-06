@@ -1,6 +1,5 @@
-# responses.py
-
 from pydantic import BaseModel
+from app.api.schemas.users import User
 
 
 class ErrorDetailResponse(BaseModel):
@@ -9,20 +8,6 @@ class ErrorDetailResponse(BaseModel):
     details: dict
     traceId: str
 
-
-class UserResponse(BaseModel):
-    user_id: int
-
-
-_401_token = {
-    "summary": "Токен не передан или не действителен",
-    "value": {
-        "error": "2011_IncorrectToken_ERROR",
-        "message": "Токен не передан или не действителен.",
-        "details": {},
-        "traceId": "9696004a-6866-4a79-bc53-f4383040cba1",
-    },
-}
 
 _422_register = {
     "error": "2020_VALIDATION_ERROR",
@@ -42,6 +27,13 @@ _422_login = {
         "email": "value is not a valid email address: An email address must have an @-sign.",
     },
     "traceId": "12e797e6-bdfa-466b-99c8-dbb4122e7c9b",
+}
+
+_401_token = {
+    "error": "2011_IncorrectToken_ERROR",
+    "message": "Токен не передан или не действителен.",
+    "details": {},
+    "traceId": "9696004a-6866-4a79-bc53-f4383040cba1",
 }
 
 
@@ -118,15 +110,6 @@ LOGIN_RESPONSES = {
 }
 
 ME_RESPONSES = {
-    200: {
-        "description": "Данные пользователя",
-        "model": UserResponse,
-        "content": {
-            "application/json": {
-                "example": {"user_id": 1}
-            }
-        },
-    },
     401: {
         "description": "Токен не передан или не действителен",
         "model": ErrorDetailResponse,
