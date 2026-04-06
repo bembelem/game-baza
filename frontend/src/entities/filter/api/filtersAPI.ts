@@ -64,7 +64,7 @@ export async function getStoresFilterFetch(): Promise<SelectorValue<string>[]> {
 	const response = await fetch("http://127.0.0.1:8000/stores", { method: "GET" })
 
 	if (!response.ok) {
-		throw new Error(`Ошибка getPublishersFilterFetch: ${response.status}`) 
+		throw new Error(`Ошибка getStoresFilterFetch: ${response.status}`) 
 	}
 
 	const data: StoresFilter = await response.json()

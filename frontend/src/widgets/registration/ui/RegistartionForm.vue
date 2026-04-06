@@ -8,6 +8,7 @@ import { useForm } from "vee-validate"
 import { usernameValidate, emailValidate, birthdateValidate, passwordValidate } from "@/widgets/registration/lib/registrationValidation"
 import { toRegistrationPayload } from "../lib/registrationTransform"
 import { registrationFetch, isRegistrationResponseError } from "@/features/registration/api/registrationAPI"
+import { authStore } from "@/entities/user/store/authStore"
 
 export interface RegistrationFormFields {
 	username: string,
@@ -38,11 +39,13 @@ const formatDate = (input: string) => {
 }
 
 const onSubmit = handleSubmit(async () => {
+	authStore.isPending.value = true
 	networkError.value = false
 
 	try {
 		const transformedValues = toRegistrationPayload(values)
-		await registrationFetch(transformedValues)
+		const data = await registrationFetch(transformedValues)
+		authStore.data.value = data
 	} catch (error) {
 		if (error instanceof TypeError) {
 			networkError.value = true
@@ -55,6 +58,8 @@ const onSubmit = handleSubmit(async () => {
 		}
 
 		console.error("Непредвиденная ошибка", error)
+	} finally {
+		authStore.isPending.value = false
 	}
 })
 </script>

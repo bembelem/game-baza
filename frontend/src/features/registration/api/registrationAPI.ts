@@ -1,3 +1,6 @@
+import type { User } from "@/entities/user/model/User"
+
+
 export interface RegistrationPayload {
 	username: string,
 	email: string,
@@ -17,15 +20,18 @@ export function isRegistrationResponseError(error: unknown): error is Registrati
 }
 
 
-export async function registrationFetch(registrationPayload: RegistrationPayload) {
-	await new Promise(resolve => setTimeout(resolve, 2000))
-
+export async function registrationFetch(registrationPayload: RegistrationPayload): Promise<User> {
 	const response = await fetch("http://127.0.0.1:8000/auth/register", {
 		method: "POST",
-		body: JSON.stringify(registrationPayload)
+		body: JSON.stringify(registrationPayload),
+		headers: { "Content-Type": "application/json" },
+		credentials: "include"
 	})
+	const data = await response.json()
 
 	if (!response.ok) {
-		throw await response.json()
+		throw data
 	}
+
+	return data
 }

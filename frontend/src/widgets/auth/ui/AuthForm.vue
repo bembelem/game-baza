@@ -7,6 +7,7 @@ import { ref, computed } from "vue"
 import { useForm } from "vee-validate"
 import { emailValidate, passwordValidate } from "../lib/authValidation"
 import { authFetch, isAuthResponseError } from "@/features/auth/api/authAPI"
+import { authStore } from "@/entities/user/store/authStore"
 
 
 export interface AuthFormFields {
@@ -26,11 +27,12 @@ const { values, errors, meta, isSubmitting, handleSubmit, isFieldValid, setError
 const isFormFulfilled = computed(() => meta.value.touched && meta.value.valid)
 
 const onSubmit = handleSubmit(async () => {
+	authStore.isPending.value = true
 	networkError.value = false
 
 	try {
 		const data = await authFetch(values)
-		console.log(data)
+		authStore.data.value = data
 	} catch (error) {
 		if (error instanceof TypeError) {
 			networkError.value = true
@@ -43,6 +45,8 @@ const onSubmit = handleSubmit(async () => {
 		}
 
 		console.error("Непредвиденная ошибка", error)
+	} finally {
+		authStore.isPending.value = false
 	}
 })
 </script>

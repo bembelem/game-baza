@@ -1,14 +1,22 @@
 <script setup lang="ts">
+import { computed } from "vue"
+import { authStore } from "@/entities/user/store/authStore"
 import { RouterLink, useRoute } from "vue-router"
 import { Routes } from "@/shared/lib/router"
 
 const route = useRoute()
+
+const userRoute = computed(() => authStore.data.value ? "/user" : "/auth")
 </script>
 
 <template>
 	<div class="header" :class="{ 'header--highlighted': route.name != Routes.auth }">
 		<RouterLink to="/">
 			<p class="logo"><span class="underlining"></span></p>
+		</RouterLink>
+		<div></div>
+		<RouterLink :to="userRoute" v-if="route.name != Routes.auth">
+			<p class="user_icon" :class="{ 'user_icon--active': authStore.data.value }">A</p> <!-- TODO: иконка аккаунта -->
 		</RouterLink>
 	</div>
 </template>
@@ -60,6 +68,14 @@ const route = useRoute()
 	100% {
 		opacity: 1;
 	}
+}
+
+.user_icon {
+	font-size: 2rem;
+	color: var(--c_placeholder);
+}
+.user_icon--active {
+	color: var(--c_highlight__accent);
 }
 
 @media (max-width: 1024px) {
