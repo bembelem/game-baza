@@ -3,13 +3,14 @@ import FormField from "@/shared/ui/FormField.vue"
 import InputField from "@/shared/ui/InputField.vue"
 import PasswordField from "@/shared/ui/PasswordField.vue"
 import SubmitButton from "@/shared/ui/SubmitButton.vue"
+import { type RegistrationResponseError, registrationFetch } from "@/features/registration/api/registrationAPI"
+import { useRouter } from "vue-router"
 import { ref, computed } from "vue"
 import { useForm } from "vee-validate"
 import { usernameValidate, emailValidate, birthdateValidate, passwordValidate } from "@/widgets/registration/lib/registrationValidation"
 import { toRegistrationPayload } from "../lib/registrationTransform"
-import { registrationFetch, isRegistrationResponseError } from "@/features/registration/api/registrationAPI"
 import { authStore } from "@/entities/user/store/authStore"
-import { useRouter } from "vue-router"
+import { isAPIValidationError } from "@/shared/interface/APIError"
 
 export interface RegistrationFormFields {
 	username: string,
@@ -20,7 +21,7 @@ export interface RegistrationFormFields {
 
 const router = useRouter()
 
-const networkError = ref(false)
+const networkError = ref<string | null>(null)
 
 const { values, errors, meta, isSubmitting, handleSubmit, isFieldValid, setErrors } = useForm<RegistrationFormFields>({
 	validationSchema: {
@@ -43,7 +44,7 @@ const formatDate = (input: string) => {
 
 const onSubmit = handleSubmit(async () => {
 	authStore.isPending.value = true
-	networkError.value = false
+	networkError.value = null
 
 	try {
 		const transformedValues = toRegistrationPayload({...values})
@@ -52,13 +53,18 @@ const onSubmit = handleSubmit(async () => {
 		router.push("/games")
 	} catch (error) {
 		if (error instanceof TypeError) {
-			networkError.value = true
+			networkError.value = "Не удалось подключиться к серверу. Проверьте интернет и попробуйте снова"
 			return
 		}
 
-		if (isRegistrationResponseError(error)) {
-			const { details } = error
-			setErrors(details)
+		if (isAPIValidationError(error)) {
+			const { message, details } = error as RegistrationResponseError
+			if (Object.keys(details).length) {
+				setErrors(details)
+			} else {
+				networkError.value = message
+			}
+			return
 		}
 
 		console.error("Непредвиденная ошибка", error)

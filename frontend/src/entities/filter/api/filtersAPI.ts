@@ -16,7 +16,7 @@ const toUIFilterValue = (filterValue: FilterValue): SelectorValue<string> => ({
 export async function getGenresFilterFetch(): Promise<SelectorValue<string>[]> {
 	await new Promise(resolve => setTimeout(resolve, 2000))
 
-	const response = await fetch("http://127.0.0.1:8000/genres", { method: "GET" })
+	const response = await fetch("http://localhost:8000/genres", { method: "GET" })
 
 	if (!response.ok) {
 		throw new Error(`Ошибка getGenresFilterFetch: ${response.status}`) 
@@ -31,7 +31,7 @@ export async function getGenresFilterFetch(): Promise<SelectorValue<string>[]> {
 export async function getPlatformsFilterFetch(): Promise<SelectorValue<string>[]> {
 	await new Promise(resolve => setTimeout(resolve, 1500))
 
-	const response = await fetch("http://127.0.0.1:8000/platforms", { method: "GET" })
+	const response = await fetch("http://localhost:8000/platforms", { method: "GET" })
 
 	if (!response.ok) {
 		throw new Error(`Ошибка getPlatformsFilterFetch: ${response.status}`) 
@@ -46,7 +46,7 @@ export async function getPlatformsFilterFetch(): Promise<SelectorValue<string>[]
 export async function getPublishersFilterFetch(): Promise<SelectorValue<string>[]> {
 	await new Promise(resolve => setTimeout(resolve, 2500))
 
-	const response = await fetch("http://127.0.0.1:8000/publishers", { method: "GET" })
+	const response = await fetch("http://localhost:8000/publishers", { method: "GET" })
 
 	if (!response.ok) {
 		throw new Error(`Ошибка getPublishersFilterFetch: ${response.status}`) 
@@ -61,7 +61,7 @@ export async function getPublishersFilterFetch(): Promise<SelectorValue<string>[
 export async function getStoresFilterFetch(): Promise<SelectorValue<string>[]> {
 	await new Promise(resolve => setTimeout(resolve, 3000))
 
-	const response = await fetch("http://127.0.0.1:8000/stores", { method: "GET" })
+	const response = await fetch("http://localhost:8000/stores", { method: "GET" })
 
 	if (!response.ok) {
 		throw new Error(`Ошибка getStoresFilterFetch: ${response.status}`) 

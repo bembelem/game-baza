@@ -1,4 +1,5 @@
 import type { User } from "@/entities/user/model/User"
+import type { APIValidationError } from "@/shared/interface/APIError"
 
 
 export interface AuthPayload {
@@ -6,20 +7,11 @@ export interface AuthPayload {
 	password: string
 }
 
-export interface AuthResponseError {
-	details: Partial<Record<keyof AuthPayload, string>>
-}
-
-
-export function isAuthResponseError(error: unknown): error is AuthResponseError {
-	return error != null
-		&& typeof error == "object"
-		&& "details" in error
-}
+export type AuthResponseError = APIValidationError<Partial<AuthPayload>>
 
 
 export async function authFetch(authPayload: AuthPayload): Promise<User> {
-	const response = await fetch("http://127.0.0.1:8000/auth/login", { 
+	const response = await fetch("http://localhost:8000/auth/login", { 
 		method: "POST",
 		body: JSON.stringify(authPayload),
 		headers: { "Content-Type": "application/json" },
