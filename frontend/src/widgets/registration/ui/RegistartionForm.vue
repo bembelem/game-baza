@@ -9,6 +9,7 @@ import { usernameValidate, emailValidate, birthdateValidate, passwordValidate } 
 import { toRegistrationPayload } from "../lib/registrationTransform"
 import { registrationFetch, isRegistrationResponseError } from "@/features/registration/api/registrationAPI"
 import { authStore } from "@/entities/user/store/authStore"
+import { useRouter } from "vue-router"
 
 export interface RegistrationFormFields {
 	username: string,
@@ -16,6 +17,8 @@ export interface RegistrationFormFields {
 	birthdate: string
 	password: string,
 } 
+
+const router = useRouter()
 
 const networkError = ref(false)
 
@@ -43,9 +46,10 @@ const onSubmit = handleSubmit(async () => {
 	networkError.value = false
 
 	try {
-		const transformedValues = toRegistrationPayload(values)
+		const transformedValues = toRegistrationPayload({...values})
 		const data = await registrationFetch(transformedValues)
 		authStore.data.value = data
+		router.push("/games")
 	} catch (error) {
 		if (error instanceof TypeError) {
 			networkError.value = true
@@ -77,7 +81,7 @@ const onSubmit = handleSubmit(async () => {
 		</FormField>
 
 		<FormField
-		label="Логин"
+		label="Email"
 		:error="errors.email"
 		:is-valid="isFieldValid('email')">
 			<InputField 

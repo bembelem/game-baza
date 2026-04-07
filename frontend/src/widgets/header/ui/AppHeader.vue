@@ -87,9 +87,6 @@ const userRoute = computed(() => authStore.data.value ? "/user" : "/auth")
 	}
 }
 @media (max-width: 600px) {
-	.header {
-		grid-template-columns: 1fr 6fr;
-	}
 	.underlining::before {
 		content: "";
 	}

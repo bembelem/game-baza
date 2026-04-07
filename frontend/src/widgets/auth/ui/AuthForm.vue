@@ -8,12 +8,14 @@ import { useForm } from "vee-validate"
 import { emailValidate, passwordValidate } from "../lib/authValidation"
 import { authFetch, isAuthResponseError } from "@/features/auth/api/authAPI"
 import { authStore } from "@/entities/user/store/authStore"
-
+import { useRouter } from "vue-router"
 
 export interface AuthFormFields {
 	email: string,
 	password: string
 }
+
+const router = useRouter()
 
 const networkError = ref(false)
 
@@ -33,6 +35,7 @@ const onSubmit = handleSubmit(async () => {
 	try {
 		const data = await authFetch(values)
 		authStore.data.value = data
+		router.push("/games")
 	} catch (error) {
 		if (error instanceof TypeError) {
 			networkError.value = true
@@ -54,7 +57,7 @@ const onSubmit = handleSubmit(async () => {
 <template>
 	<form class="auth_form" @submit.prevent="onSubmit">
 		<FormField
-		label="Логин"
+		label="Email"
 		:error="errors.email"
 		:is-valid="isFieldValid('email')">
 			<InputField 
