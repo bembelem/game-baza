@@ -2,15 +2,17 @@
 import MonoSelector from "@/shared/ui/MonoSelector.vue"
 import MultiSelector from "@/shared/ui/MultiSelector.vue"
 import type { SelectorValue } from "@/shared/interface/Filters"
-import type { SearchGamesFilters } from "@/features/search_games/filters/searchGamesFilters"
+import { searchGamesFilters } from "@/features/search_games/filters/searchGamesFilters"
 import { searchGamesFiltersDefinition } from "@/features/search_games/filters/searchGamesFilters"
-import { useFilters } from "@/shared/lib/useFilters"
 import { useDataStore } from "@/shared/lib/useDataStore"
 import { fetchData } from "@/shared/lib/fetchData"
 import { getGenresFilterFetch, getPlatformsFilterFetch, getPublishersFilterFetch, getStoresFilterFetch } from "@/entities/filter/api/filtersAPI"
 import { onMounted } from "vue"
+import { searchGamesStore } from "@/features/search_games/store/gamesStore"
+import { toSearchGamesParams } from "@/features/search_games/lib/gamesFiltersTransform"
 
-const { filters, updateFilters, resetFilters } = useFilters<SearchGamesFilters>(searchGamesFiltersDefinition)
+const { searchGames, resetGames } = searchGamesStore
+const { filters, updateFilters, resetFilters } = searchGamesFilters
 
 const genresFilterValues = useDataStore<SelectorValue<string>[]>()
 const platformsFilterValues = useDataStore<SelectorValue<string>[]>()
@@ -22,6 +24,12 @@ onMounted(() => {
 	fetchData(platformsFilterValues, getPlatformsFilterFetch)
 	fetchData(publishersFilterValues, getPublishersFilterFetch)
 	fetchData(storesFilterValues, getStoresFilterFetch)
+})
+
+const onSubmit = (() => {
+	resetGames()
+	const searchGamesParams = toSearchGamesParams(filters.value)
+	searchGames(searchGamesParams)
 })
 </script>
 
@@ -68,7 +76,7 @@ onMounted(() => {
 		@value-click="updateFilters<'price'>"/>
 
 		<button class="button_reset" @click="resetFilters">Очистить</button>
-		<button class="button_apply">Применить</button>
+		<button class="button_apply" @click="onSubmit">Применить</button>
 	</div>
 </template>
 

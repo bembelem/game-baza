@@ -3,6 +3,7 @@ import {
 	type FiltersDefinition,
 	ResetBehavior 
 } from "@/shared/interface/Filters"
+import { useFilters } from "@/shared/lib/useFilters"
 
 
 export interface SearchGamesFilters {
@@ -11,7 +12,7 @@ export interface SearchGamesFilters {
 	platforms: SelectorValue<string>[],
 	publishers: SelectorValue<string>[],
 	stores: SelectorValue<string>[],
-	price: SelectorValue<[number, number] | undefined>
+	price: SelectorValue<[number, number | undefined] | undefined>
 }
 
 type SearchGamesFiltersDefinition = FiltersDefinition<SearchGamesFilters>
@@ -52,7 +53,7 @@ const sortValues = [
 	}
 ]
 
-const priceValues: SelectorValue<[number, number] | undefined>[] = [
+const priceValues: SelectorValue<[number, number | undefined] | undefined>[] = [
 	{
 		title: "все цены",
 		value: undefined
@@ -71,7 +72,7 @@ const priceValues: SelectorValue<[number, number] | undefined>[] = [
 	},
 	{
 		title: "от 6000₽", 
-		value: [6000, 0]
+		value: [6000, undefined]
 	}
 ] 
 
@@ -99,3 +100,5 @@ export const searchGamesFiltersDefinition: SearchGamesFiltersDefinition = {
 		resetBehavior: ResetBehavior.ToDefault
 	}
 }
+
+export const searchGamesFilters = useFilters<SearchGamesFilters>(searchGamesFiltersDefinition)

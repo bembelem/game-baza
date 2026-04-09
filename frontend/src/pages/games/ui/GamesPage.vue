@@ -2,7 +2,10 @@
 import LoadIndicator from "@/shared/ui/LoadIndicator.vue"
 import GamesFilters from "@/widgets/games_filters/ui/GamesFilters.vue"
 import GamesCatalog from "@/widgets/games_catalog/ui/GamesCatalog.vue"
+import { searchGamesStore } from "@/features/search_games/store/gamesStore"
 import { useTemplateRef } from "vue"
+
+const { gamesStore } = searchGamesStore
 
 const gamesCatalogRef = useTemplateRef<HTMLElement>("games_count")
 
@@ -19,7 +22,11 @@ const handleFloatedButtonClick = () => {
 		<h2 class="games_count" ref="games_count">
 			КАТАЛОГ ИГР
 			<span class="games_count--highlighted">
-				<LoadIndicator class="load" :is-short="true"/>
+				<LoadIndicator class="load" :is-short="true" v-if="gamesStore.isPending.value"/>
+
+				<template v-else>
+					{{ gamesStore.data.value?.total }}
+				</template>
 			</span>
 		</h2>
 		<GamesFilters/>
