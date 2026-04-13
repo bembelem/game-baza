@@ -1,21 +1,35 @@
 <script setup lang="ts">
 import GameCard from "./GameCard.vue"
 import LoadIndicator from "@/shared/ui/LoadIndicator.vue"
-import { mockGamesCatalog } from "@/entities/game/data/mockGames"
+import { searchGamesStore } from "@/features/search_games/store/gamesStore"
+import { toSearchGamesParams } from "@/features/search_games/lib/gamesFiltersTransform"
+import { searchGamesFilters } from "@/features/search_games/filters/searchGamesFilters"
+import { onMounted } from "vue"
+
+const { gamesStore, searchGames } = searchGamesStore
+
+const onSubmit = (() => {
+	const searchGamesParams = toSearchGamesParams(searchGamesFilters.filters.value)
+	searchGames(searchGamesParams)
+})
+
+onMounted(() => onSubmit())
 </script>
 
 <template>
 	<div class="games_gallary">
-		<GameCard v-for="game in mockGamesCatalog.items"
+		<GameCard v-for="game in gamesStore.data.value?.items"
 		:key="game.id"
 		:game="game"/>
 		
 		<div class="load_container">
-			<div class="load_indicator" v-if="false">
+			<div class="load_indicator" v-if="gamesStore.isPending.value">
 				<LoadIndicator :is-short="false"/>
 			</div>
 			
-			<button class="load_button" v-else-if="mockGamesCatalog.has_more">
+			<button class="load_button" 
+			@click="onSubmit"
+			v-else-if="gamesStore.data.value?.has_more">
 				хочу ещё!
 			</button>
 
