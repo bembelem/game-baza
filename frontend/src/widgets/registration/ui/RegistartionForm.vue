@@ -11,6 +11,7 @@ import { usernameValidate, emailValidate, birthdateValidate, passwordValidate } 
 import { toRegistrationPayload } from "../lib/registrationTransform"
 import { authStore } from "@/entities/user/store/authStore"
 import { isAPIValidationError } from "@/shared/interface/APIError"
+import { Routes } from "@/shared/lib/router"
 
 export interface RegistrationFormFields {
 	username: string,
@@ -50,7 +51,7 @@ const onSubmit = handleSubmit(async () => {
 		const transformedValues = toRegistrationPayload({...values})
 		const data = await registrationFetch(transformedValues)
 		authStore.data.value = data
-		router.push("/games")
+		router.push(Routes.games)
 	} catch (error) {
 		if (error instanceof TypeError) {
 			networkError.value = "Не удалось подключиться к серверу. Проверьте интернет и попробуйте снова"

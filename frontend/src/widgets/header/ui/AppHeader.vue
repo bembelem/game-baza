@@ -1,22 +1,43 @@
 <script setup lang="ts">
+import SearchBar from "@/shared/ui/SearchBar.vue"
 import UserIcon from "@/assets/icons/user.svg?component"
-import { computed } from "vue"
+import { useRouter, useRoute, RouterLink } from "vue-router"
+import { ref, computed } from "vue"
 import { authStore } from "@/entities/user/store/authStore"
-import { RouterLink, useRoute } from "vue-router"
+import { searchGamesStore } from "@/features/search_games/store/searchGamesStore"
 import { Routes } from "@/shared/lib/router"
 
 const route = useRoute()
+const router = useRouter()
 
-const userRoute = computed(() => authStore.data.value ? "/user" : "/auth")
+const searchInput = ref("")
+
+const isAuthRoute = computed(() => route.name != Routes.auth)
+const userRoute = computed(() => authStore.data.value ? Routes.user : Routes.auth)
+
+const handleSearch = async () => {
+	if (!searchInput.value) return
+
+	searchGamesStore.resetGames()
+	searchGamesStore.searchGames({ title: [ searchInput.value ] })
+
+	if (route.name != Routes.games) router.back()
+}
 </script>
 
 <template>
-	<div class="header" :class="{ 'header--highlighted': route.name != Routes.auth }">
+	<div class="header" :class="{ 'header--highlighted': isAuthRoute }">
 		<RouterLink to="/">
 			<p class="logo"><span class="underlining"></span></p>
 		</RouterLink>
-		<div class="search_input"></div>
-		<RouterLink :to="userRoute" v-if="route.name != Routes.auth">
+
+		<SearchBar 
+		placeholder="Игра..."
+		@search="handleSearch" 
+		v-model="searchInput"
+		v-if="isAuthRoute"/>
+
+		<RouterLink class="user_link" :to="userRoute" v-if="route.name != Routes.auth">
 			<UserIcon class="user_icon" :class="{ 'user_icon--active': authStore.data.value }"/>
 		</RouterLink>
 	</div>
@@ -27,7 +48,8 @@ const userRoute = computed(() => authStore.data.value ? "/user" : "/auth")
 	box-sizing: border-box;
 	position: fixed;
 	padding: 0 4rem;
-	display: flex;
+	display: grid;
+	grid-template-columns: 1fr minmax(auto, 40rem) 1fr;
 	align-items: center;
 	column-gap: 1rem;
 	width: 100%;
@@ -71,13 +93,12 @@ const userRoute = computed(() => authStore.data.value ? "/user" : "/auth")
 	}
 }
 
-.search_input {
-	display: flex;
-	flex: 1;
+.user_link {
+	justify-self: end;
 }
 
 .user_icon {
-	flex-shrink: 0;
+	justify-self: end;
 	width: 3rem;
 	height: 3rem;
 	color: var(--c_placeholder);

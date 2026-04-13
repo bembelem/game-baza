@@ -8,7 +8,7 @@ import { useDataStore } from "@/shared/lib/useDataStore"
 import { fetchData } from "@/shared/lib/fetchData"
 import { getGenresFilterFetch, getPlatformsFilterFetch, getPublishersFilterFetch, getStoresFilterFetch } from "@/entities/filter/api/filtersAPI"
 import { onMounted } from "vue"
-import { searchGamesStore } from "@/features/search_games/store/gamesStore"
+import { searchGamesStore } from "@/features/search_games/store/searchGamesStore"
 import { toSearchGamesParams } from "@/features/search_games/lib/gamesFiltersTransform"
 
 const { searchGames, resetGames } = searchGamesStore

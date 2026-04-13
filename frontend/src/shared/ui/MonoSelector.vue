@@ -69,6 +69,7 @@ const handleValueClick = (name: string, value: SelectorValue<T>) => {
 	padding: 0.5rem 1rem;
 	display: grid;
 	grid-template-columns: 1fr auto;
+	column-gap: 0.5rem;
 	width: 100%;
 	background-color: var(--bc_mono_selector, var(--c_bg));
 	font-size: var(--fs_mono_selector);
@@ -94,12 +95,13 @@ const handleValueClick = (name: string, value: SelectorValue<T>) => {
 }
 
 .values_container {
+	box-sizing: border-box;
 	z-index: 1;
 	overflow-x: hidden;
 	overflow-y: auto;
 	position: absolute;
 	width: 100%;
-	height: 14.5rem;
+	height: 15rem;
 	background-color: var(--c_bg);
 	border: 0.25rem solid var(--c_secondary);
   	scrollbar-color: var(--c_text) var(--c_bg);
@@ -107,6 +109,7 @@ const handleValueClick = (name: string, value: SelectorValue<T>) => {
 }
 
 .value {
+	box-sizing: border-box;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;

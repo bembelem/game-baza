@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import GameCard from "./GameCard.vue"
 import LoadIndicator from "@/shared/ui/LoadIndicator.vue"
-import { searchGamesStore } from "@/features/search_games/store/gamesStore"
+import { searchGamesStore } from "@/features/search_games/store/searchGamesStore"
 import { toSearchGamesParams } from "@/features/search_games/lib/gamesFiltersTransform"
 import { searchGamesFilters } from "@/features/search_games/filters/searchGamesFilters"
 import { onMounted } from "vue"

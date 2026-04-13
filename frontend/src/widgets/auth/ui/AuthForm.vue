@@ -10,6 +10,7 @@ import { useForm } from "vee-validate"
 import { emailValidate, passwordValidate } from "../lib/authValidation"
 import { authStore } from "@/entities/user/store/authStore"
 import { isAPIValidationError } from "@/shared/interface/APIError"
+import { Routes } from "@/shared/lib/router"
 
 export interface AuthFormFields {
 	email: string,
@@ -36,7 +37,7 @@ const onSubmit = handleSubmit(async () => {
 	try {
 		const data = await authFetch(values)
 		authStore.data.value = data
-		router.push("/games")
+		router.push(Routes.games)
 	} catch (error) {
 		if (error instanceof TypeError) {
 			networkError.value = "Не удалось подключиться к серверу. Проверьте интернет и попробуйте снова"

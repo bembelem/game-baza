@@ -111,12 +111,13 @@ const handleValueClick = (name: string, newValue: SelectorValue<T>) => {
 }
 
 .values_container {
+	box-sizing: border-box;
 	z-index: 1;
 	overflow-x: hidden;
 	overflow-y: auto;
 	position: absolute;
 	width: 100%;
-	height: 14.5rem;
+	height: 15rem;
 	background-color: var(--c_bg);
 	border: 0.25rem solid var(--c_secondary);
 	scrollbar-color: var(--c_placeholder) var(--c_bg);
@@ -124,6 +125,7 @@ const handleValueClick = (name: string, newValue: SelectorValue<T>) => {
 }
 
 .value {
+	box-sizing: border-box;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
