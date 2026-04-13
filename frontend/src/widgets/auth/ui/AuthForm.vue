@@ -3,19 +3,22 @@ import FormField from "@/shared/ui/FormField.vue"
 import InputField from "@/shared/ui/InputField.vue"
 import PasswordField from "@/shared/ui/PasswordField.vue"
 import SubmitButton from "@/shared/ui/SubmitButton.vue"
+import { type AuthResponseError, authFetch } from "@/features/auth/api/authAPI"
+import { useRouter } from "vue-router"
 import { ref, computed } from "vue"
 import { useForm } from "vee-validate"
 import { emailValidate, passwordValidate } from "../lib/authValidation"
-import { authFetch, isAuthResponseError } from "@/features/auth/api/authAPI"
 import { authStore } from "@/entities/user/store/authStore"
-
+import { isAPIValidationError } from "@/shared/interface/APIError"
 
 export interface AuthFormFields {
 	email: string,
 	password: string
 }
 
-const networkError = ref(false)
+const router = useRouter()
+
+const networkError = ref<string | null>(null)
 
 const { values, errors, meta, isSubmitting, handleSubmit, isFieldValid, setErrors } = useForm<AuthFormFields>({
   	validationSchema: {
@@ -28,20 +31,26 @@ const isFormFulfilled = computed(() => meta.value.touched && meta.value.valid)
 
 const onSubmit = handleSubmit(async () => {
 	authStore.isPending.value = true
-	networkError.value = false
+	networkError.value = null
 
 	try {
 		const data = await authFetch(values)
 		authStore.data.value = data
+		router.push("/games")
 	} catch (error) {
 		if (error instanceof TypeError) {
-			networkError.value = true
+			networkError.value = "Не удалось подключиться к серверу. Проверьте интернет и попробуйте снова"
 			return
 		}
 
-		if (isAuthResponseError(error)) {
-			const { details } = error
-			setErrors(details)
+		if (isAPIValidationError(error)) {
+			const { message, details } = error as AuthResponseError
+			if (Object.keys(details).length) {
+				setErrors(details)
+			} else {
+				networkError.value = message
+			}
+			return
 		}
 
 		console.error("Непредвиденная ошибка", error)
@@ -54,7 +63,7 @@ const onSubmit = handleSubmit(async () => {
 <template>
 	<form class="auth_form" @submit.prevent="onSubmit">
 		<FormField
-		label="Логин"
+		label="Email"
 		:error="errors.email"
 		:is-valid="isFieldValid('email')">
 			<InputField 
@@ -72,7 +81,7 @@ const onSubmit = handleSubmit(async () => {
 		</FormField>
 
 		<p class="network_error" v-if="networkError">
-			Не удалось подключиться к серверу. Проверьте интернет и попробуйте снова
+			{{ networkError }}
 		</p>
 
 		<SubmitButton

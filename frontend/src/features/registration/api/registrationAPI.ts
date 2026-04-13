@@ -1,4 +1,5 @@
 import type { User } from "@/entities/user/model/User"
+import type { APIValidationError } from "@/shared/interface/APIError"
 
 
 export interface RegistrationPayload {
@@ -8,20 +9,11 @@ export interface RegistrationPayload {
 	birthdate: string
 }
 
-export interface RegistrationResponseError {
-	details: Partial<Record<keyof RegistrationPayload, string>>
-}
-
-
-export function isRegistrationResponseError(error: unknown): error is RegistrationResponseError {
-	return error != null
-		&& typeof error == "object"
-		&& "details" in error
-}
+export type RegistrationResponseError = APIValidationError<Partial<RegistrationPayload>>
 
 
 export async function registrationFetch(registrationPayload: RegistrationPayload): Promise<User> {
-	const response = await fetch("http://127.0.0.1:8000/auth/register", {
+	const response = await fetch("http://localhost:8000/auth/register", {
 		method: "POST",
 		body: JSON.stringify(registrationPayload),
 		headers: { "Content-Type": "application/json" },

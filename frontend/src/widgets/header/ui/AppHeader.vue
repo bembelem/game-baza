@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UserIcon from "@/assets/icons/user.svg?component"
 import { computed } from "vue"
 import { authStore } from "@/entities/user/store/authStore"
 import { RouterLink, useRoute } from "vue-router"
@@ -14,23 +15,23 @@ const userRoute = computed(() => authStore.data.value ? "/user" : "/auth")
 		<RouterLink to="/">
 			<p class="logo"><span class="underlining"></span></p>
 		</RouterLink>
-		<div></div>
+		<div class="search_input"></div>
 		<RouterLink :to="userRoute" v-if="route.name != Routes.auth">
-			<p class="user_icon" :class="{ 'user_icon--active': authStore.data.value }">A</p> <!-- TODO: иконка аккаунта -->
+			<UserIcon class="user_icon" :class="{ 'user_icon--active': authStore.data.value }"/>
 		</RouterLink>
 	</div>
 </template>
 
 <style scoped>
 .header {
+	box-sizing: border-box;
 	position: fixed;
-	padding: 0 2rem;
-	display: grid;
-	grid-template-columns: 2fr 3fr 2fr;
+	padding: 0 4rem;
+	display: flex;
+	align-items: center;
 	column-gap: 1rem;
 	width: 100%;
 	height: var(--h_header);
-	place-items: center;
   	background-color: rgba(11, 13, 23, 0.7);
 	backdrop-filter: blur(4px);
   	-webkit-backdrop-filter: blur(4px); 
@@ -70,8 +71,15 @@ const userRoute = computed(() => authStore.data.value ? "/user" : "/auth")
 	}
 }
 
+.search_input {
+	display: flex;
+	flex: 1;
+}
+
 .user_icon {
-	font-size: 2rem;
+	flex-shrink: 0;
+	width: 3rem;
+	height: 3rem;
 	color: var(--c_placeholder);
 }
 .user_icon--active {
@@ -80,7 +88,7 @@ const userRoute = computed(() => authStore.data.value ? "/user" : "/auth")
 
 @media (max-width: 1024px) {
 	.header {
-		grid-template-columns: 1fr 5fr 1fr;
+		padding: 0 2rem;
 	}
 	.logo::before {
 		content: "GB";
@@ -88,7 +96,7 @@ const userRoute = computed(() => authStore.data.value ? "/user" : "/auth")
 }
 @media (max-width: 600px) {
 	.header {
-		grid-template-columns: 1fr 6fr;
+		padding: 0 1rem;
 	}
 	.underlining::before {
 		content: "";

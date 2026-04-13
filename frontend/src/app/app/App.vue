@@ -6,6 +6,7 @@ import { ref } from "vue"
 import { onMounted } from "vue"
 import { authStore } from "@/entities/user/store/authStore"
 import { getUserFetch } from "@/entities/user/api/userAPI"
+import { isAPIValidationError } from "@/shared/interface/APIError"
 import "../styles/fonts.css"
 import "../styles/main.css"
 import "../styles/reset.css"
@@ -20,8 +21,18 @@ onMounted(async () => {
 		const data = await getUserFetch() 
 		authStore.data.value = data
 	} catch (error) {
-		// TODO: обработать ошибку
-		authStore.error.value = error instanceof Error ? error.message : String(error)
+		if (error instanceof TypeError) {
+			authStore.error.value = "Не удалось подключиться к серверу. Проверьте интернет и попробуйте снова"
+			return
+		}
+
+		if (isAPIValidationError(error)) {
+			authStore.error.value = error.message
+			return
+		}
+
+		authStore.error.value = "Непредвиденная ошибка"
+		console.error("Непредвиденная ошибка", error)
 	} finally {
 		authStore.isPending.value = false
 		isLoading.value = false

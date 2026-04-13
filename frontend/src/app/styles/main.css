@@ -32,7 +32,6 @@
 #app {
 	display: flex;
 	min-height: 100vh;
-	overflow-x: hidden;
 	background-color: var(--c_bg);
 	font-family: "Press Start 2P", sans-serif;
 	color: var(--c_text);
