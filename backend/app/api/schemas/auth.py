@@ -3,6 +3,7 @@ from datetime import date
 
 from pydantic import BaseModel, field_validator, EmailStr, model_validator
 
+
 # Данные от клиента при регистрации (содержит сырой пароль)
 class UserRequestAdd(BaseModel):
     username: str
