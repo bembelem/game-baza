@@ -7,6 +7,14 @@ export interface GameBase {
     discount_percent: number
 }
 
+export interface GameFull extends GameBase {
+	description: string,
+	release_date: string,
+  	developer: string,
+	publisher: string,
+	genres: string[]
+}
+
 export interface GamesCatalog {
 	total: number,
   	last_id: number,

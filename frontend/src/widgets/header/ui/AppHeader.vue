@@ -24,6 +24,7 @@ const userRoute = computed(() => authStore.data.value ? "/user" : "/auth")
 
 <style scoped>
 .header {
+	z-index: 10;
 	box-sizing: border-box;
 	position: fixed;
 	padding: 0 4rem;
