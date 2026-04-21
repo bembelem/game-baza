@@ -2,25 +2,22 @@
 import SkeletonLoader from "@/shared/ui/SkeletonLoader.vue"
 import type { GameBase } from "@/entities/game/model/Game"
 
-const props = defineProps<{
-	gameInfo?: GameBase
-}>()
+const props = defineProps<{ gameInfo: Partial<GameBase> }>()
 </script>
-
 
 <template>
 	<div class="game_info_main">
 		<div class="image_container" :class="{ 
-		'image_container--loaded': props.gameInfo?.image_url, 
-		'image_container--skeleton': !props.gameInfo?.image_url }">
+		'image_container--loaded': props.gameInfo.image_url, 
+		'image_container--skeleton': !props.gameInfo.image_url }">
 			<img class="image" 
 			:src="props.gameInfo.image_url"
 			alt="обложка игры"
-			v-if="props.gameInfo">
+			v-if="props.gameInfo.image_url">
 		</div>
 			
-		<div class="info-main">
-			<h1 v-if="props.gameInfo">{{ props.gameInfo.title }}</h1>
+		<div class="info_main">
+			<h1 v-if="props.gameInfo.title">{{ props.gameInfo.title }}</h1>
 			
 			<template v-else>
 				<SkeletonLoader/>
@@ -28,15 +25,15 @@ const props = defineProps<{
 			</template>
 
 			<div class="min_price_container">
-				<p v-if="props.gameInfo?.min_price_discount == 0">бесплатно</p>
+				<p v-if="props.gameInfo.min_price_discount == 0">бесплатно</p>
 
 				<p v-else>
 					от
 					<span class="min_price">
-						<SkeletonLoader :is-loading="!props.gameInfo">
-							{{ props.gameInfo?.min_price_discount }}
+						<SkeletonLoader :is-loading="!props.gameInfo.min_price_discount">
+							{{ props.gameInfo.min_price_discount }}
 						</SkeletonLoader>
-						<span :class="{ currency: !props.gameInfo }">₽</span>
+						<span :class="{ currency: !props.gameInfo.min_price_discount }">₽</span>
 					</span>
 				</p>
 			</div>
@@ -121,7 +118,7 @@ const props = defineProps<{
 	object-position: center;
 }
 
-.info-main {
+.info_main {
 	--h_skeleton_loader: var(--fs_info_main);
 
 	display: flex;

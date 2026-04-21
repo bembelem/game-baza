@@ -2,12 +2,13 @@
 import type { GameBase } from "@/entities/game/model/Game"
 
 const { game } = defineProps<{ 
-	game: GameBase 
+	game: GameBase,
+	onClick: () => void
 }>()
 </script>
 
 <template>
-	<div class="game_card">
+	<div class="game_card" @click="$props.onClick">
 		<img 
 		class="game_image"
 		alt="обложка игры"

@@ -1,10 +1,24 @@
 <script lang="ts" setup>
 import GameInfo from "@/widgets/game_info/ui/GameInfo.vue"
+import type { GameBase } from "@/entities/game/model/Game";
+import { useGameInfoStore } from "@/features/game_info/store/gameInfoStore"
+import { useSearchGamesStore } from "@/features/search_games/store/searchGamesStore"
+import { onMounted } from "vue"
+
+const props = defineProps<{ gameID: GameBase["id"] }>()
+
+const { gameInfo, updateGamePreview } = useGameInfoStore()
+const { getGameByID } = useSearchGamesStore()
+
+onMounted(() => {
+	const newGamePreview = getGameByID(props.gameID)
+	updateGamePreview(newGamePreview)
+})
 </script>
 
 <template>
 	<div class="game_info_page">
-		<GameInfo/>
+		<GameInfo :game-info="gameInfo"/>
 	</div>
 </template>
 

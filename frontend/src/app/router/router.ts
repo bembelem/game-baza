@@ -9,7 +9,7 @@ const routes = [
 	{ path: "/", redirect: "/games" },
 	{ path: "/auth", name: Routes.auth, component: AuthPage },
 	{ path: "/games", name: Routes.games, component: GamesPage },
-	{ path: "/game_info", name: Routes.gameInfo, component: GameInfoPage }
+	{ path: "/game_info/:gameID", name: Routes.gameInfo, component: GameInfoPage, props: true }
 ]
 
 export const router = createRouter({

@@ -1,5 +1,5 @@
-import type { GamesCatalog } from "../model/Game"
-
+import type { GamesCatalog, GameFull } from "../model/Game"
+import type { Offer } from "@/entities/offer/model/Offer"
 
 type SearchGamesParamsNames = 
 	| "last_id"
@@ -14,6 +14,11 @@ type SearchGamesParamsNames =
 	| "price_max"
 
 export type SearchGamesParams = Partial<Record<SearchGamesParamsNames, string[]>>
+
+
+export interface GameInfoResponse extends GameFull {
+	offers: Offer[]
+}
 
 
 export const searchGamesFetch = async (
@@ -35,4 +40,21 @@ export const searchGamesFetch = async (
 	}
 
 	return await response.json()
+}
+
+
+export const gameInfoFetch = async (
+	gameID: string, 
+	abortController: AbortController
+): Promise<GameInfoResponse> => {
+	const response = await fetch(`http://127.0.0.1:8000/games/${gameID}`, { 
+		method: "GET",
+		signal: abortController.signal 
+	})
+		
+	if (!response.ok) {
+		throw new Error(`gameInfoError: ${response.status}`)
+	}
+
+	return await response.json()	
 }

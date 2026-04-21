@@ -1,17 +1,26 @@
 <script setup lang="ts">
 import GameCard from "./GameCard.vue"
 import LoadIndicator from "@/shared/ui/LoadIndicator.vue"
-import { searchGamesStore } from "@/features/search_games/store/gamesStore"
+import type { GameBase } from "@/entities/game/model/Game"
+import { useRouter } from "vue-router"
+import { useSearchGamesStore } from "@/features/search_games/store/searchGamesStore"
+import { Routes } from "@/shared/lib/router"
 import { toSearchGamesParams } from "@/features/search_games/lib/gamesFiltersTransform"
 import { searchGamesFilters } from "@/features/search_games/filters/searchGamesFilters"
 import { onMounted } from "vue"
 
-const { gamesStore, searchGames } = searchGamesStore
+const router = useRouter()
 
-const onSubmit = (() => {
+const { gamesStore, searchGames } = useSearchGamesStore()
+
+const handleGameCardClick = (gameID: GameBase["id"]) => {
+	router.push({ name: Routes.gameInfo, params: { gameID: gameID } })
+}
+
+const onSubmit = () => {
 	const searchGamesParams = toSearchGamesParams(searchGamesFilters.filters.value)
 	searchGames(searchGamesParams)
-})
+}
 
 onMounted(() => onSubmit())
 </script>
@@ -20,7 +29,8 @@ onMounted(() => onSubmit())
 	<div class="games_gallary">
 		<GameCard v-for="game in gamesStore.data.value?.items"
 		:key="game.id"
-		:game="game"/>
+		:game="game"
+		@click="() => handleGameCardClick(game.id)"/>
 		
 		<div class="load_container">
 			<div class="load_indicator" v-if="gamesStore.isPending.value">

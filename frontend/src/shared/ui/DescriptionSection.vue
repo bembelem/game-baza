@@ -90,6 +90,7 @@ const toggleExpanded = () => { isActive.value = !isActive.value }
 	display: flex;
 	flex-direction: column;
 	gap: calc(var(--fs) * var(--lh) - var(--fs));
+	width: 100%;
 }
 
 .text_skeleton {

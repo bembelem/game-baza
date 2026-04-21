@@ -2,10 +2,10 @@
 import LoadIndicator from "@/shared/ui/LoadIndicator.vue"
 import GamesFilters from "@/widgets/games_filters/ui/GamesFilters.vue"
 import GamesCatalog from "@/widgets/games_catalog/ui/GamesCatalog.vue"
-import { searchGamesStore } from "@/features/search_games/store/gamesStore"
+import { useSearchGamesStore } from "@/features/search_games/store/searchGamesStore"
 import { useTemplateRef } from "vue"
 
-const { gamesStore } = searchGamesStore
+const { gamesStore } = useSearchGamesStore()
 
 const gamesCatalogRef = useTemplateRef<HTMLElement>("games_count")
 

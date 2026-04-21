@@ -2,13 +2,15 @@
 import GameInfoMain from "./GameInfoMain.vue"
 import SkeletonLoader from "@/shared/ui/SkeletonLoader.vue"
 import DescriptionSection from "@/shared/ui/DescriptionSection.vue"
+import type { GameFull } from "@/entities/game/model/Game"
 import { computed } from "vue"
-import { mockGameInfo } from "@/entities/game/data/mockGames"
+
+const props = defineProps<{ gameInfo: Partial<GameFull> }>()
 
 const date = computed(() => {
-	if (!mockGameInfo.release_date) return
+	if (!props.gameInfo.release_date) return
 
-	const date = new Date(mockGameInfo.release_date)
+	const date = new Date(props.gameInfo.release_date)
   
 	const options: Intl.DateTimeFormatOptions = {
 		day: "numeric",
@@ -22,12 +24,12 @@ const date = computed(() => {
 
 <template>
 	<section class="game_info">
-		<GameInfoMain :game-info="mockGameInfo"/>
+		<GameInfoMain :game-info="props.gameInfo"/>
 
 		<div class="game_metadata game_metadata--genre">
 			Жанр:
-			<template v-if="mockGameInfo.genres">
-				<button class="game_metadata_button" v-for="genre in mockGameInfo.genres" :key="genre">
+			<template v-if="props.gameInfo.genres">
+				<button class="game_metadata_button" v-for="genre in props.gameInfo.genres" :key="genre">
 					{{ genre }}
 				</button>
 			</template>
@@ -47,25 +49,25 @@ const date = computed(() => {
 
 		<div class="game_metadata game_metadata--developer">
 			Разработчик: 
-			<SkeletonLoader :is-loading="!mockGameInfo.developer">
+			<SkeletonLoader :is-loading="!props.gameInfo.developer">
 				<button class="game_metadata_button">
-					{{ mockGameInfo.developer }}
+					{{ props.gameInfo.developer }}
 				</button>
 			</SkeletonLoader>
 		</div>
 
 		<div class="game_metadata game_metadata--publisher">
 			Издатель:
-			<SkeletonLoader :is-loading="!mockGameInfo.publisher">
+			<SkeletonLoader :is-loading="!props.gameInfo.publisher">
 				<button class="game_metadata_button">
-					{{ mockGameInfo.publisher }}
+					{{ props.gameInfo.publisher }}
 				</button>
 			</SkeletonLoader> 
 		</div>
 
 		<div class="game_metadata game_metadata--description">
 			Описание:
-			<DescriptionSection :description="mockGameInfo.description"/>
+			<DescriptionSection :description="props.gameInfo.description"/>
 		</div>
 	</section>
 </template>
