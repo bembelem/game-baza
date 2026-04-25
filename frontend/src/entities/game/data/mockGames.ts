@@ -107,7 +107,6 @@ export const mockGameInfo: GameFull = {
 	min_price_original: 0,
 	min_price_discount: 0,
 	discount_percent: 0,
-
 	description: "Counter-Strike 2 — это тактический командный шутер от первого лица, где две команды (террористы и спецназ) сражаются за выполнение целей или уничтожение противника. Игра является обновлённой версией CS:GO на движке Source 2.",
 	release_date: "2023-09-27",
 	developer: "Valve",

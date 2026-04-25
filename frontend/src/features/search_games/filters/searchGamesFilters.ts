@@ -1,8 +1,4 @@
-import { 
-	type SelectorValue, 
-	type FiltersDefinition,
-	ResetBehavior 
-} from "@/shared/interface/Filters"
+import { type SelectorValue, type FiltersDefinition, ResetBehavior } from "@/shared/interface/Filters"
 import { useFilters } from "@/shared/lib/useFilters"
 
 
@@ -10,6 +6,7 @@ export interface SearchGamesFilters {
  	sort: SelectorValue<string>,
 	genres: SelectorValue<string>[],
 	platforms: SelectorValue<string>[],
+	developers: SelectorValue<string>[]
 	publishers: SelectorValue<string>[],
 	stores: SelectorValue<string>[],
 	price: SelectorValue<[number, number | undefined] | undefined>
@@ -88,8 +85,11 @@ export const searchGamesFiltersDefinition: SearchGamesFiltersDefinition = {
 	platforms: {
 		resetBehavior: ResetBehavior.Clear 
 	},
+	developers: {
+		resetBehavior: ResetBehavior.Clear
+	},
 	publishers: {
-		resetBehavior: ResetBehavior.Clear,
+		resetBehavior: ResetBehavior.Clear
 	},
 	stores: {
 		resetBehavior: ResetBehavior.Clear

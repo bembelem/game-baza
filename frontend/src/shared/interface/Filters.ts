@@ -1,3 +1,7 @@
+import type { Ref } from "vue"
+import type { ToArray } from "./Helpers"
+
+
 export enum ResetBehavior {
 	None = "none",
 	ToDefault = "toDefault",
@@ -21,6 +25,14 @@ export type FiltersDefinition<T> = {
 		T[K] extends Array<unknown>
 		? MultiFilterDefinition<T[K][number]>
 		: MonoFilterDefinition<T[K]>
+}
+
+export type AvailableFiltersOptions<T> = {
+	[K in keyof T]?: Ref<ToArray<T[K]> | null>
+}
+
+export type InjectedFiltersOptions<T> = {
+	[K in keyof T]?: Ref<ToArray<T[K]>>
 }
 
 

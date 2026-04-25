@@ -2,27 +2,34 @@
 import GameCard from "./GameCard.vue"
 import LoadIndicator from "@/shared/ui/LoadIndicator.vue"
 import type { GameBase } from "@/entities/game/model/Game"
-import { useRouter } from "vue-router"
+import { useRoute, useRouter } from "vue-router"
 import { useSearchGamesStore } from "@/features/search_games/store/searchGamesStore"
 import { Routes } from "@/shared/lib/router"
 import { toSearchGamesParams } from "@/features/search_games/lib/gamesFiltersTransform"
 import { searchGamesFilters } from "@/features/search_games/filters/searchGamesFilters"
 import { onMounted } from "vue"
 
+const route = useRoute()
 const router = useRouter()
 
-const { gamesStore, searchGames } = useSearchGamesStore()
+const { gamesStore, searchGames, resetGames } = useSearchGamesStore()
 
 const handleGameCardClick = (gameID: GameBase["id"]) => {
 	router.push({ name: Routes.gameInfo, params: { gameID: gameID } })
 }
 
-const onSubmit = () => {
+const handleSearch = () => {
 	const searchGamesParams = toSearchGamesParams(searchGamesFilters.filters.value)
 	searchGames(searchGamesParams)
 }
 
-onMounted(() => onSubmit())
+onMounted(() => {
+	if (route.query.search) {
+		resetGames()
+		router.replace({ name: Routes.games }) 
+  	}	
+	handleSearch()
+})
 </script>
 
 <template>
@@ -38,7 +45,7 @@ onMounted(() => onSubmit())
 			</div>
 			
 			<button class="load_button" 
-			@click="onSubmit"
+			@click="handleSearch"
 			v-else-if="gamesStore.data.value?.has_more">
 				хочу ещё!
 			</button>

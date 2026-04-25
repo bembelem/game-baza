@@ -17,7 +17,6 @@ export const useSearchGamesStore = () => {
 
 		try {
 			const data = await searchGamesFetch(searchGamesParams, newSearchGamesController)
-
 			if (!gamesStore.data.value) {
 				gamesStore.data.value = data
 			} else {

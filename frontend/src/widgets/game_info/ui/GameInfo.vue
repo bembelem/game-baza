@@ -3,9 +3,17 @@ import GameInfoMain from "./GameInfoMain.vue"
 import SkeletonLoader from "@/shared/ui/SkeletonLoader.vue"
 import DescriptionSection from "@/shared/ui/DescriptionSection.vue"
 import type { GameFull } from "@/entities/game/model/Game"
+import { type SearchGamesFilters, searchGamesFilters } from "@/features/search_games/filters/searchGamesFilters"
+import { useRouter } from "vue-router"
 import { computed } from "vue"
+import { injectSearchGamesFilterOption } from "@/features/search_games/filters/searchGamesFiltersOptions"
+import { Routes } from "@/shared/lib/router"
+
+const router = useRouter()
 
 const props = defineProps<{ gameInfo: Partial<GameFull> }>()
+
+const { updateFilters, resetFilters } = searchGamesFilters
 
 const date = computed(() => {
 	if (!props.gameInfo.release_date) return
@@ -19,7 +27,18 @@ const date = computed(() => {
 	}
 	
 	return date.toLocaleDateString("ru-RU", options)
-})
+})  
+
+const handleMetadataClick = <K extends keyof SearchGamesFilters>(
+	name: K,
+	value: SearchGamesFilters[K]
+) => {
+	resetFilters()
+	updateFilters(name, value)
+	injectSearchGamesFilterOption(name, value)
+
+	router.push({ name: Routes.games, query: { search: "true" } })
+}
 </script>
 
 <template>
@@ -29,7 +48,13 @@ const date = computed(() => {
 		<div class="game_metadata game_metadata--genre">
 			Жанр:
 			<template v-if="props.gameInfo.genres">
-				<button class="game_metadata_button" v-for="genre in props.gameInfo.genres" :key="genre">
+				<button  v-for="genre in props.gameInfo.genres" 
+				class="game_metadata_button"
+				:key="genre"
+				@click="() => handleMetadataClick('genres', [{ 
+					title: genre, 
+					value: genre 
+				}])">
 					{{ genre }}
 				</button>
 			</template>
@@ -50,7 +75,11 @@ const date = computed(() => {
 		<div class="game_metadata game_metadata--developer">
 			Разработчик: 
 			<SkeletonLoader :is-loading="!props.gameInfo.developer">
-				<button class="game_metadata_button">
+				<button class="game_metadata_button"
+				@click="() => props.gameInfo.developer && handleMetadataClick('developers', [{ 
+					title: props.gameInfo.developer, 
+					value: props.gameInfo.developer 
+				}])">
 					{{ props.gameInfo.developer }}
 				</button>
 			</SkeletonLoader>
@@ -59,7 +88,11 @@ const date = computed(() => {
 		<div class="game_metadata game_metadata--publisher">
 			Издатель:
 			<SkeletonLoader :is-loading="!props.gameInfo.publisher">
-				<button class="game_metadata_button">
+				<button class="game_metadata_button"
+				@click="() => props.gameInfo.publisher && handleMetadataClick('publishers', [{ 
+					title: props.gameInfo.publisher, 
+					value: props.gameInfo.publisher 
+				}])">
 					{{ props.gameInfo.publisher }}
 				</button>
 			</SkeletonLoader> 
