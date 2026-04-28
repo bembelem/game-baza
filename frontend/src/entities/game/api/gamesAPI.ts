@@ -1,5 +1,8 @@
 import type { GamesCatalog, GameFull } from "../model/Game"
 import type { Offer } from "@/entities/offer/model/Offer"
+import { mockGameInfo } from "../data/mockGames"
+import { mockOffers } from "@/entities/offer/data/mockOffers"
+
 
 type SearchGamesParamsNames = 
 	| "last_id"
@@ -40,6 +43,12 @@ export const searchGamesFetch = async (
 	}
 
 	return await response.json()
+}
+
+
+const mockGameInfoResponse: GameInfoResponse = {
+	...mockGameInfo,
+	offers: [...mockOffers]
 }
 
 

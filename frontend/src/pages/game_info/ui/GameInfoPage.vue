@@ -8,12 +8,12 @@ import { onMounted } from "vue"
 
 const props = defineProps<{ gameID: GameBase["id"] }>()
 
-const { gameInfo, updateGamePreview } = useGameInfoStore()
+const { gameInfo, gameOffers, updateGamePreview } = useGameInfoStore()
 const { getGameByID } = useSearchGamesStore()
 
 onMounted(() => {
 	const newGamePreview = getGameByID(props.gameID)
-	updateGamePreview(newGamePreview)
+	updateGamePreview(props.gameID, newGamePreview)
 })
 </script>
 
@@ -25,8 +25,8 @@ onMounted(() => {
 			<h2 class="game_offers_title">
 				ПРЕДЛОЖЕНИЯ
 			</h2>
-			
-			<GameOffers/>
+
+			<GameOffers :offers="gameOffers"/>
 		</section>
 	</div>
 </template>

@@ -1,5 +1,6 @@
 import { type GameInfoResponse, gameInfoFetch } from "@/entities/game/api/gamesAPI"
 import type { GameBase, GameFull } from "@/entities/game/model/Game"
+import type { Offer } from "@/entities/offer/model/Offer"
 import { ref, computed } from "vue"
 import { useDataStore } from "@/shared/lib/useDataStore"
 import { fetchData, updateFetchDataController } from "@/shared/lib/fetchData"
@@ -22,6 +23,11 @@ export const useGameInfoStore = () => {
 		}
 	})
 
+	const gameOffers = computed((): Offer[] => gameInfoStore.data.value 
+		? gameInfoStore.data.value.offers 
+		: []
+	) 
+
 	async function fetchGameInfo(gameID: GameBase["id"]) {
 		const newGameInfoController = updateFetchDataController(gameInfoController)
 		gameInfoStore.data.value = null
@@ -30,18 +36,20 @@ export const useGameInfoStore = () => {
 		gameInfoController.value = undefined
 	}
 
-	function updateGamePreview(newGamePreview?: GameBase) {
-		if (!newGamePreview) return
-
-		if (newGamePreview.id === gamePreview.value?.id) return
-
+	function updateGamePreview(gameID: string, newGamePreview?: GameBase) {
 		gamePreview.value = newGamePreview
 
-		fetchGameInfo(newGamePreview.id)
+		const isSameGame = gameID == gameInfoStore.data.value?.id
+		const hasData = gameInfoStore.data.value != null
+
+		if (isSameGame && hasData) return
+
+		fetchGameInfo(gameID)
 	}
 	
 	return {
 		gameInfo,
+		gameOffers,
 		fetchGameInfo,
 		updateGamePreview
 	}
