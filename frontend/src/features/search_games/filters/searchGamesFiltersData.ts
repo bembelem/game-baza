@@ -1,10 +1,41 @@
 import type { SelectorValue } from "@/shared/interface/Filters"
 import { useDataStore } from "@/shared/lib/useDataStore"
-import { fetchData } from "@/shared/lib/fetchData"
-import { getGenresFilterFetch } from "@/entities/filter/api/filtersAPI"
-import { getPlatformsFilterFetch } from "@/entities/filter/api/filtersAPI"
-import { getPublishersFilterFetch } from "@/entities/filter/api/filtersAPI"
-import { getStoresFilterFetch } from "@/entities/filter/api/filtersAPI"
+
+
+export const sortValues = [
+	{
+		title: "по популярности", 
+		value: "popularity"
+	},
+	{
+		title: "по рейтингу", 
+		value: "rating"
+	},
+	{
+		title: "сначала дешевые", 
+		value: "cheap"
+	},
+	{
+		title: "сначала дорогие", 
+		value: "expensive"
+	},
+	{
+		title: "по скидке", 
+		value: "sale"
+	},
+	{
+		title: "по дате выхода", 
+		value: "release_date"
+	},
+	{
+		title: "по дате добавления", 
+		value: "addition_date"
+	},
+	{
+		title: "по алфавиту", 
+		value: "alphabet"
+	}
+]
 
 
 export const genresFilterOptions = useDataStore<SelectorValue<string>[]>()
@@ -13,9 +44,7 @@ export const publishersFilterOptions = useDataStore<SelectorValue<string>[]>()
 export const storesFilterOptions = useDataStore<SelectorValue<string>[]>()
 
 
-export function searchGamesFiltersFetch() {
-	fetchData(genresFilterOptions, getGenresFilterFetch)
-	fetchData(platformsFilterOptions, getPlatformsFilterFetch)
-	fetchData(publishersFilterOptions, getPublishersFilterFetch)
-	fetchData(storesFilterOptions, getStoresFilterFetch)
+export const availableSearchGamesFiltersOptions = {
+	genres: genresFilterOptions.data,
+	publishers: publishersFilterOptions.data
 }

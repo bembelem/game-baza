@@ -32,7 +32,7 @@ export type AvailableFiltersOptions<T> = {
 }
 
 export type InjectedFiltersOptions<T> = {
-	[K in keyof T]?: Ref<ToArray<T[K]>>
+	[K in keyof T]?: ToArray<T[K]>
 }
 
 

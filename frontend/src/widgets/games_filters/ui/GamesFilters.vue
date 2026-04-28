@@ -3,26 +3,36 @@ import MonoSelector from "@/shared/ui/MonoSelector.vue"
 import MultiSelector from "@/shared/ui/MultiSelector.vue"
 import { useRoute } from "vue-router"
 import { useSearchGamesStore } from "@/features/search_games/store/searchGamesStore"
-import { searchGamesFilters } from "@/features/search_games/filters/searchGamesFilters"
-import { searchGamesFiltersFetch } from "@/features/search_games/filters/searchGamesFiltersData"
+import { searchGamesFilters, searchGamesFiltersOptions } from "@/features/search_games/filters/searchGamesFilters"
 import { toSearchGamesParams } from "@/features/search_games/lib/gamesFiltersTransform"
 import { onMounted } from "vue"
-import { getSearchGamesFilterOptions } from "@/features/search_games/filters/searchGamesFiltersOptions"
+import { fetchData } from "@/shared/lib/fetchData"
 import { 
 	genresFilterOptions, 
 	platformsFilterOptions, 
 	publishersFilterOptions, 
 	storesFilterOptions 
 } from "@/features/search_games/filters/searchGamesFiltersData"
+import { 
+	getGenresFilterFetch, 
+	getPlatformsFilterFetch, 
+	getPublishersFilterFetch, 
+	getStoresFilterFetch
+} from "@/entities/filter/api/filtersAPI"
 
 const route = useRoute()
 
 const { searchGames, resetGames } = useSearchGamesStore()
 const { filters, updateFilters, resetFilters } = searchGamesFilters
+const { getFilterOptions } = searchGamesFiltersOptions
 
 onMounted(() => {
-	if (route.query.search) return	
-	searchGamesFiltersFetch()
+	if (route.query.search) return
+
+	fetchData(genresFilterOptions, getGenresFilterFetch)
+	fetchData(platformsFilterOptions, getPlatformsFilterFetch)
+	fetchData(publishersFilterOptions, getPublishersFilterFetch)
+	fetchData(storesFilterOptions, getStoresFilterFetch)
 })
 
 const onSubmit = (() => {
@@ -37,13 +47,13 @@ const onSubmit = (() => {
 		<MonoSelector
 		name="sort"
 		:selected-option="filters.sort"
-		:options="getSearchGamesFilterOptions('sort')"
+		:options="getFilterOptions('sort')"
 		@option-click="updateFilters<'sort'>"/>
 
 		<MultiSelector
 		name="genres"
 		:selected-options="filters.genres"
-		:options="getSearchGamesFilterOptions('genres')"
+		:options="getFilterOptions('genres')"
 		:is-loading="genresFilterOptions.isPending.value"
 		label="жанры"
 		@option-click="updateFilters<'genres'>"/>
@@ -51,7 +61,7 @@ const onSubmit = (() => {
 		<MultiSelector
 		name="platforms"
 		:selected-options="filters.platforms"
-		:options="getSearchGamesFilterOptions('platforms')"
+		:options="getFilterOptions('platforms')"
 		:is-loading="platformsFilterOptions.isPending.value"
 		label="платформы"
 		@option-click="updateFilters<'platforms'>"/>
@@ -59,7 +69,7 @@ const onSubmit = (() => {
 		<MultiSelector
 		name="publishers"
 		:selected-options="filters.publishers"
-		:options="getSearchGamesFilterOptions('publishers')"
+		:options="getFilterOptions('publishers')"
 		:is-loading="publishersFilterOptions.isPending.value"
 		label="издатели"
 		@option-click="updateFilters<'publishers'>"/>
@@ -67,7 +77,7 @@ const onSubmit = (() => {
 		<MultiSelector
 		name="stores"
 		:selected-options="filters.stores"
-		:options="getSearchGamesFilterOptions('stores')"
+		:options="getFilterOptions('stores')"
 		:is-loading="storesFilterOptions.isPending.value"
 		label="магазины"
 		@option-click="updateFilters<'stores'>"/>
@@ -75,7 +85,7 @@ const onSubmit = (() => {
 		<MonoSelector
 		name="price"
 		:selected-option="filters.price"
-		:options="getSearchGamesFilterOptions('price')"
+		:options="getFilterOptions('price')"
 		@option-click="updateFilters<'price'>"/>
 
 		<button class="button_reset" @click="resetFilters">Очистить</button>

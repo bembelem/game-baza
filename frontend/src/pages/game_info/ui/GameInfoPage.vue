@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import GameInfo from "@/widgets/game_info/ui/GameInfo.vue"
 import GameOffers from "@/widgets/game_offers/ui/GameOffers.vue"
+import GameOffersFilters from "@/widgets/game_offers_filters/ui/GameOffersFilters.vue"
 import type { GameBase } from "@/entities/game/model/Game"
 import { useGameInfoStore } from "@/features/game_info/store/gameInfoStore"
 import { useSearchGamesStore } from "@/features/search_games/store/searchGamesStore"
@@ -26,6 +27,7 @@ onMounted(() => {
 				ПРЕДЛОЖЕНИЯ
 			</h2>
 
+			<GameOffersFilters/>
 			<GameOffers :offers="gameOffers"/>
 		</section>
 	</div>

@@ -3,10 +3,9 @@ import GameInfoMain from "./GameInfoMain.vue"
 import SkeletonLoader from "@/shared/ui/SkeletonLoader.vue"
 import DescriptionSection from "@/shared/ui/DescriptionSection.vue"
 import type { GameFull } from "@/entities/game/model/Game"
-import { type SearchGamesFilters, searchGamesFilters } from "@/features/search_games/filters/searchGamesFilters"
+import { type SearchGamesFilters, searchGamesFilters, searchGamesFiltersOptions } from "@/features/search_games/filters/searchGamesFilters"
 import { useRouter } from "vue-router"
 import { computed } from "vue"
-import { injectSearchGamesFilterOption } from "@/features/search_games/filters/searchGamesFiltersOptions"
 import { Routes } from "@/shared/lib/router"
 
 const router = useRouter()
@@ -14,6 +13,7 @@ const router = useRouter()
 const props = defineProps<{ gameInfo: Partial<GameFull> }>()
 
 const { updateFilters, resetFilters } = searchGamesFilters
+const { injectFilterOption } = searchGamesFiltersOptions
 
 const date = computed(() => {
 	if (!props.gameInfo.release_date) return
@@ -35,7 +35,7 @@ const handleMetadataClick = <K extends keyof SearchGamesFilters>(
 ) => {
 	resetFilters()
 	updateFilters(name, value)
-	injectSearchGamesFilterOption(name, value)
+	injectFilterOption(name, value)
 
 	router.push({ name: Routes.games, query: { search: "true" } })
 }
