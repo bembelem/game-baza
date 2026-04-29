@@ -5,6 +5,7 @@ import type {
 } from "../interface/Filters"
 import type { ToArray } from "../interface/Helpers"
 import { reactive } from "vue"
+import equal from "fast-deep-equal"
 
 
 export function useFiltersOptions<T>(
@@ -24,7 +25,7 @@ export function useFiltersOptions<T>(
 		const combined = [...availableOptions, ...injectedOptions]
 	
 		return combined.filter((item, index) => 
-			[...availableOptions, ...injectedOptions].findIndex((i) => i === item) === index
+			[...availableOptions, ...injectedOptions].findIndex((i) => equal(i, item)) == index
 		) as ToArray<T[K]>
 	}
 

@@ -5,12 +5,25 @@ import GameOffersFilters from "@/widgets/game_offers_filters/ui/GameOffersFilter
 import type { GameBase } from "@/entities/game/model/Game"
 import { useGameInfoStore } from "@/features/game_info/store/gameInfoStore"
 import { useSearchGamesStore } from "@/features/search_games/store/searchGamesStore"
-import { onMounted } from "vue"
+import { useTemplateRef, provide, onMounted } from "vue"
 
 const props = defineProps<{ gameID: GameBase["id"] }>()
 
 const { gameInfo, gameOffers, updateGamePreview } = useGameInfoStore()
 const { getGameByID } = useSearchGamesStore()
+
+const gameOffersTemplateRef = useTemplateRef("gameOffers")
+
+const handleScrollToGameOffers = () => {
+	if (!gameOffersTemplateRef.value) return
+
+	gameOffersTemplateRef.value.scrollIntoView({
+		behavior: "smooth",
+		block: "nearest"
+	})
+}
+
+provide("scrollToGameOffers", handleScrollToGameOffers)
 
 onMounted(() => {
 	const newGamePreview = getGameByID(props.gameID)
@@ -19,10 +32,12 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="game_info_page">
-		<GameInfo :game-info="gameInfo"/>
+	<div class="game_info_page" >
+		<GameInfo 
+		:game-info="gameInfo"
+		@scroll-to-game-offers="handleScrollToGameOffers"/>
 
-		<section class="game_offers_section">
+		<section class="game_offers_section" ref="gameOffers">
 			<h2 class="game_offers_title">
 				ПРЕДЛОЖЕНИЯ
 			</h2>

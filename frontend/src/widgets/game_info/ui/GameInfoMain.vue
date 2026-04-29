@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import SkeletonLoader from "@/shared/ui/SkeletonLoader.vue"
 import type { GameBase } from "@/entities/game/model/Game"
+import { inject } from "vue"
 
 const props = defineProps<{ gameInfo: Partial<GameBase> }>()
+
+const scrollToGameOffers = inject<() => void>("scrollToGameOffers")
 </script>
 
 <template>
@@ -38,7 +41,7 @@ const props = defineProps<{ gameInfo: Partial<GameBase> }>()
 				</p>
 			</div>
 
-			<button class="button_scroll">
+			<button class="button_scroll" @click="scrollToGameOffers">
 				Смотреть предложения ↓
 			</button>
 		</div>

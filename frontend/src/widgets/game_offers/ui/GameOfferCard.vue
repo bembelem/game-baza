@@ -1,14 +1,37 @@
 <script setup lang="ts">
 import type { Offer } from "@/entities/offer/model/Offer"
+import { type SearchGamesFilters, searchGamesFilters } from "@/features/search_games/filters/searchGamesFilters"
+import { useRouter } from "vue-router"
+import { searchGamesFiltersOptions } from "@/features/search_games/filters/searchGamesFilters"
+import { Routes } from "@/shared/lib/router"
+
+const router = useRouter()
 
 const props = defineProps<{ offer: Offer }>()
 
 const handleBuyClick = () => window.open(props.offer.store_game_link)
+
+const { resetFilters, updateFilters } = searchGamesFilters
+const { injectFilterOption } = searchGamesFiltersOptions
+
+const handleMetadataClick = <K extends keyof SearchGamesFilters>(
+	name: K,
+	value: SearchGamesFilters[K]
+) => {
+	resetFilters()
+	updateFilters(name, value)
+	injectFilterOption(name, value)
+
+	router.push({ name: Routes.games, query: { search: "true" } })
+}
 </script>
 
 <template>
 	<div class="game_offer_card">
-		<button class="button_store">
+		<button class="button_store" @click="() => handleMetadataClick('stores', [{ 
+			title: props.offer.store, 
+			value: props.offer.store 
+		}])">
 			{{ props.offer.store }}
 		</button>
 
@@ -26,6 +49,7 @@ const handleBuyClick = () => window.open(props.offer.store_game_link)
 .game_offer_card {
 	--fs_game_offer_card: 1.1rem;
 
+	box-sizing: border-box;
 	display: grid;
 	justify-items: center;
 	text-align: center;
