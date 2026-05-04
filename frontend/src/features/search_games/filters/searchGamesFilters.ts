@@ -1,15 +1,15 @@
-import { 
-	type SelectorValue, 
-	type FiltersDefinition,
-	ResetBehavior 
-} from "@/shared/interface/Filters"
+import { type SelectorValue, type FiltersDefinition, ResetBehavior } from "@/shared/interface/Filters"
+import { availableGameOffersFiltersOptions, sortValues } from "@/features/game_info/filters/gameOffersFiltersData"
+import { priceValues } from "@/shared/data/filtersValues"
 import { useFilters } from "@/shared/lib/useFilters"
+import { useFiltersOptions } from "@/shared/lib/useFiltersOptions"
 
 
 export interface SearchGamesFilters {
  	sort: SelectorValue<string>,
 	genres: SelectorValue<string>[],
 	platforms: SelectorValue<string>[],
+	developers: SelectorValue<string>[]
 	publishers: SelectorValue<string>[],
 	stores: SelectorValue<string>[],
 	price: SelectorValue<[number, number | undefined] | undefined>
@@ -17,64 +17,6 @@ export interface SearchGamesFilters {
 
 type SearchGamesFiltersDefinition = FiltersDefinition<SearchGamesFilters>
 
-
-const sortValues = [
-	{
-		title: "по популярности", 
-		value: "popularity"
-	},
-	{
-		title: "по рейтингу", 
-		value: "rating"
-	},
-	{
-		title: "сначала дешевые", 
-		value: "cheap"
-	},
-	{
-		title: "сначала дорогие", 
-		value: "expensive"
-	},
-	{
-		title: "по скидке", 
-		value: "sale"
-	},
-	{
-		title: "по дате выхода", 
-		value: "release_date"
-	},
-	{
-		title: "по дате добавления", 
-		value: "addition_date"
-	},
-	{
-		title: "по алфавиту", 
-		value: "alphabet"
-	}
-]
-
-const priceValues: SelectorValue<[number, number | undefined] | undefined>[] = [
-	{
-		title: "все цены",
-		value: undefined
-	},
-	{
-		title: "до 1000₽", 
-		value: [0, 1000]
-	},
-	{
-		title: "1000-3000₽", 
-		value: [1000, 3000]
-	},
-	{
-		title: "3000-6000₽", 
-		value: [3000, 6000]
-	},
-	{
-		title: "от 6000₽", 
-		value: [6000, undefined]
-	}
-] 
 
 export const searchGamesFiltersDefinition: SearchGamesFiltersDefinition = {
 	sort: {
@@ -88,8 +30,11 @@ export const searchGamesFiltersDefinition: SearchGamesFiltersDefinition = {
 	platforms: {
 		resetBehavior: ResetBehavior.Clear 
 	},
+	developers: {
+		resetBehavior: ResetBehavior.Clear
+	},
 	publishers: {
-		resetBehavior: ResetBehavior.Clear,
+		resetBehavior: ResetBehavior.Clear
 	},
 	stores: {
 		resetBehavior: ResetBehavior.Clear
@@ -101,4 +46,6 @@ export const searchGamesFiltersDefinition: SearchGamesFiltersDefinition = {
 	}
 }
 
-export const searchGamesFilters = useFilters<SearchGamesFilters>(searchGamesFiltersDefinition)
+export const searchGamesFilters = useFilters(searchGamesFiltersDefinition)
+
+export const searchGamesFiltersOptions = useFiltersOptions(searchGamesFiltersDefinition, availableGameOffersFiltersOptions)

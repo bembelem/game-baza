@@ -7,33 +7,44 @@ import { searchGamesFetch } from "@/entities/game/api/gamesAPI"
 
 
 const searchGamesController = ref<AbortController>()
+const gamesStore = useDataStore<GamesCatalog>()
 
 
-export const searchGamesStore = {
-	gamesStore: useDataStore<GamesCatalog>(),
-
-	searchGames: async (searchGamesParams: SearchGamesParams) => {
+export const useSearchGamesStore = () => {
+	async function searchGames(searchGamesParams: SearchGamesParams) {
 		const newSearchGamesController = updateFetchDataController(searchGamesController)
-		searchGamesStore.gamesStore.isPending.value = true
+		gamesStore.isPending.value = true
 
 		try {
 			const data = await searchGamesFetch(searchGamesParams, newSearchGamesController)
-
-			if (!searchGamesStore.gamesStore.data.value) {
-				searchGamesStore.gamesStore.data.value = data
+			if (!gamesStore.data.value) {
+				gamesStore.data.value = data
 			} else {
-				data.items = [...searchGamesStore.gamesStore.data.value.items, ...data.items]
-				searchGamesStore.gamesStore.data.value = data
+				data.items = [...gamesStore.data.value.items, ...data.items]
+				gamesStore.data.value = data
 			}
 		} catch (error) {
-			searchGamesStore.gamesStore.error.value = error instanceof Error 
+			gamesStore.error.value = error instanceof Error 
 				? error.message 
 				: String(error)
 		} finally {
 			searchGamesController.value = undefined
-			searchGamesStore.gamesStore.isPending.value = false
+			gamesStore.isPending.value = false
 		}
-	},
+	}
 
-	resetGames: () => searchGamesStore.gamesStore.data.value = null
+	function getGameByID(gameID: string) {
+		return gamesStore.data.value?.items.find((game) => game.id == gameID)
+	} 
+
+	function resetGames() {
+		gamesStore.data.value = null
+	}
+
+	return {
+		gamesStore,
+		searchGames,
+		getGameByID,
+		resetGames
+	}
 }

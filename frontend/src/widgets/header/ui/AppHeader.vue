@@ -45,6 +45,7 @@ const handleSearch = async () => {
 
 <style scoped>
 .header {
+	z-index: 10;
 	box-sizing: border-box;
 	position: fixed;
 	padding: 0 4rem;

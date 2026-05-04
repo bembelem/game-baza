@@ -1,5 +1,6 @@
 export const Routes = {
 	auth: "Auth",
 	games: "Games",
-	user: "User"
+	user: "User",
+	gameInfo: "GameInfo"
 } as const

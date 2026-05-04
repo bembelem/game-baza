@@ -1,29 +1,38 @@
 <script setup lang="ts">
 import MonoSelector from "@/shared/ui/MonoSelector.vue"
 import MultiSelector from "@/shared/ui/MultiSelector.vue"
-import type { SelectorValue } from "@/shared/interface/Filters"
-import { searchGamesFilters } from "@/features/search_games/filters/searchGamesFilters"
-import { searchGamesFiltersDefinition } from "@/features/search_games/filters/searchGamesFilters"
-import { useDataStore } from "@/shared/lib/useDataStore"
-import { fetchData } from "@/shared/lib/fetchData"
-import { getGenresFilterFetch, getPlatformsFilterFetch, getPublishersFilterFetch, getStoresFilterFetch } from "@/entities/filter/api/filtersAPI"
-import { onMounted } from "vue"
-import { searchGamesStore } from "@/features/search_games/store/searchGamesStore"
+import { useRoute } from "vue-router"
+import { useSearchGamesStore } from "@/features/search_games/store/searchGamesStore"
+import { searchGamesFilters, searchGamesFiltersOptions } from "@/features/search_games/filters/searchGamesFilters"
 import { toSearchGamesParams } from "@/features/search_games/lib/gamesFiltersTransform"
+import { onMounted } from "vue"
+import { fetchData } from "@/shared/lib/fetchData"
+import { 
+	genresFilterOptions, 
+	platformsFilterOptions, 
+	publishersFilterOptions, 
+	storesFilterOptions 
+} from "@/features/search_games/filters/searchGamesFiltersData"
+import { 
+	getGenresFilterFetch, 
+	getPlatformsFilterFetch, 
+	getPublishersFilterFetch, 
+	getStoresFilterFetch
+} from "@/entities/filter/api/filtersAPI"
 
-const { searchGames, resetGames } = searchGamesStore
+const route = useRoute()
+
+const { searchGames, resetGames } = useSearchGamesStore()
 const { filters, updateFilters, resetFilters } = searchGamesFilters
-
-const genresFilterValues = useDataStore<SelectorValue<string>[]>()
-const platformsFilterValues = useDataStore<SelectorValue<string>[]>()
-const publishersFilterValues = useDataStore<SelectorValue<string>[]>()
-const storesFilterValues = useDataStore<SelectorValue<string>[]>()
+const { getFilterOptions } = searchGamesFiltersOptions
 
 onMounted(() => {
-	fetchData(genresFilterValues, getGenresFilterFetch)
-	fetchData(platformsFilterValues, getPlatformsFilterFetch)
-	fetchData(publishersFilterValues, getPublishersFilterFetch)
-	fetchData(storesFilterValues, getStoresFilterFetch)
+	if (route.query.search) return
+
+	fetchData(genresFilterOptions, getGenresFilterFetch)
+	fetchData(platformsFilterOptions, getPlatformsFilterFetch)
+	fetchData(publishersFilterOptions, getPublishersFilterFetch)
+	fetchData(storesFilterOptions, getStoresFilterFetch)
 })
 
 const onSubmit = (() => {
@@ -37,43 +46,47 @@ const onSubmit = (() => {
 	<div class="games_filters">
 		<MonoSelector
 		name="sort"
-		:value="filters.sort"
-		:values="searchGamesFiltersDefinition.sort.values"
-		@value-click="updateFilters<'sort'>"/>
+		:selected-option="filters.sort"
+		:options="getFilterOptions('sort')"
+		@option-click="updateFilters<'sort'>"/>
 
 		<MultiSelector
 		name="genres"
-		:selected-values="filters.genres"
-		:values="genresFilterValues.data.value"
+		:selected-options="filters.genres"
+		:options="getFilterOptions('genres')"
+		:is-loading="genresFilterOptions.isPending.value"
 		label="жанры"
-		@value-click="updateFilters<'genres'>"/>
+		@option-click="updateFilters<'genres'>"/>
 
 		<MultiSelector
 		name="platforms"
-		:selected-values="filters.platforms"
-		:values="platformsFilterValues.data.value"
+		:selected-options="filters.platforms"
+		:options="getFilterOptions('platforms')"
+		:is-loading="platformsFilterOptions.isPending.value"
 		label="платформы"
-		@value-click="updateFilters<'platforms'>"/>
+		@option-click="updateFilters<'platforms'>"/>
 
 		<MultiSelector
 		name="publishers"
-		:selected-values="filters.publishers"
-		:values="publishersFilterValues.data.value"
+		:selected-options="filters.publishers"
+		:options="getFilterOptions('publishers')"
+		:is-loading="publishersFilterOptions.isPending.value"
 		label="издатели"
-		@value-click="updateFilters<'publishers'>"/>
+		@option-click="updateFilters<'publishers'>"/>
 
 		<MultiSelector
 		name="stores"
-		:selected-values="filters.stores"
-		:values="storesFilterValues.data.value"
+		:selected-options="filters.stores"
+		:options="getFilterOptions('stores')"
+		:is-loading="storesFilterOptions.isPending.value"
 		label="магазины"
-		@value-click="updateFilters<'stores'>"/>
+		@option-click="updateFilters<'stores'>"/>
 
 		<MonoSelector
 		name="price"
-		:value="filters.price"
-		:values="searchGamesFiltersDefinition.price.values"
-		@value-click="updateFilters<'price'>"/>
+		:selected-option="filters.price"
+		:options="getFilterOptions('price')"
+		@option-click="updateFilters<'price'>"/>
 
 		<button class="button_reset" @click="resetFilters">Очистить</button>
 		<button class="button_apply" @click="onSubmit">Применить</button>

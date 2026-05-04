@@ -1,4 +1,4 @@
-import type { GameBase, GamesCatalog } from "../model/Game"
+import type { GameBase, GameFull, GamesCatalog } from "../model/Game"
 
 
 export const mockGames: GameBase[] = [
@@ -99,6 +99,20 @@ export const mockGames: GameBase[] = [
 		discount_percent: 55
 	}
 ]
+
+export const mockGameInfo: GameFull = {
+	id: "5693a916-b56f-4a9e-bf37-9f9661e0eb32",
+	image_url: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/730/header.jpg?t=1749053861",
+	title: "Counter-Strike 2",
+	min_price_original: 0,
+	min_price_discount: 0,
+	discount_percent: 0,
+	description: "Counter-Strike 2 — это тактический командный шутер от первого лица, где две команды (террористы и спецназ) сражаются за выполнение целей или уничтожение противника. Игра является обновлённой версией CS:GO на движке Source 2.",
+	release_date: "2023-09-27",
+	developer: "Valve",
+	publisher: "Valve",
+	genres: ["Action", "Shooter", "Multiplayer", "FPS"]
+}
 
 export const mockGamesCatalog: GamesCatalog = {
 	total: 924,
