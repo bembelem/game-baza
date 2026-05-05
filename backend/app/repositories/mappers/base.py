@@ -2,7 +2,7 @@ from typing import TypeVar, Type
 
 from pydantic import BaseModel
 
-from app.database import Base
+from database.database import Base
 
 SchemaType = TypeVar("SchemaType", bound=BaseModel)
 

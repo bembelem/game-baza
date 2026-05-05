@@ -1,28 +1,19 @@
+import logging
+
 import scrapy
 import json
 import re
 from urllib.parse import urlencode
 from scrapy.exceptions import CloseSpider
 
-
 class SteamSpider(scrapy.Spider):
     name = "steam_spider"
 
-    custom_settings = {
-        "CONCURRENT_REQUESTS": 32,
-        "DOWNLOAD_DELAY": 0.1,
-        "COOKIES_ENABLED": True,
-        "ROBOTSTXT_OBEY": False,
-        "LOG_LEVEL": "DEBUG",
-        "FEED_EXPORT_ENCODING": "utf-8",
-        "FEEDS": {
-            "../../steam_games.jsonl": {
-                "format": "jsonlines",
-                "encoding": "utf-8",
-                "overwrite": True,
-            },
-        },
-    }
+    def __init__(self, *args, **kwargs):
+        logging.getLogger("scrapy").setLevel(logging.DEBUG)
+        logging.getLogger("twisted").setLevel(logging.DEBUG)
+        self.seen_links = set()
+        super().__init__(*args, **kwargs)
 
     base_url = "https://store.steampowered.com/search/results/?"
 
@@ -72,8 +63,8 @@ class SteamSpider(scrapy.Spider):
 
         for game in games:
             item = self.parse_search_result(game)
-            if item:
-                # идём на страницу игры
+            if item and item["link"] not in self.seen_links:
+                self.seen_links.add(item["link"])
                 yield scrapy.Request(
                     url=item["link"],
                     callback=self.parse_game_page,
@@ -120,7 +111,7 @@ class SteamSpider(scrapy.Spider):
 
         yield item
 
-    # === Вспомогательные функции ===
+    # Вспомогательные функции
     def parse_reviews_data(self, game):
         reviews_score = game.css('span.search_review_summary::attr(data-tooltip-html)').get()
         if not reviews_score:

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Response, Body
 
 from app.api.controllers.examples.examples import REGISTER_EXAMPLES, LOGIN_EXAMPLES
 from app.api.controllers.examples.responses import REGISTER_RESPONSES, LOGIN_RESPONSES, MessageResponse
-from app.api.schemas.auth import UserRequestAdd, UserRequestLogin
+from app.api.schemas.auth import UserRequestRegister, UserRequestLogin
 from app.api.schemas.users import User
 from app.services.auth import AuthService
 
@@ -18,7 +18,7 @@ auth_service = AuthService()
 )
 async def register(
         response: Response,
-        data: UserRequestAdd = Body(openapi_examples=REGISTER_EXAMPLES)
+        data: UserRequestRegister = Body(openapi_examples=REGISTER_EXAMPLES)
 ):
     user = await auth_service.register_user(data)
     access_token = auth_service.create_access_token({"user_id": user.id})

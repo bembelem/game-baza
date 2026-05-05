@@ -6,7 +6,7 @@ from sqlalchemy import select, insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database import Base
+from database.database import Base
 from app.exceptions import ObjectAlreadyExistsError
 from app.repositories.mappers.base import DataMapper
 

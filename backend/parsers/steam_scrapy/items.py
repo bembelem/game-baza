@@ -1,8 +1,8 @@
-from dataclasses import dataclass
+from pydantic import BaseModel
 
-@dataclass
-class SteamGameItem:
+class OfferItem(BaseModel):
     title: str
+    normalized_title: str | None
     price_original: str | None
     discount_percent: str| None
     price_discount: str| None

@@ -22,3 +22,4 @@ class OfferPrice(BaseModel):
 class OfferPrices(BaseModel):
     offer_id: int
     prices_list: list[OfferPrice] = []
+
