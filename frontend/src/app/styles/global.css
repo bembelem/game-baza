@@ -1,0 +1,50 @@
+html {
+	font-size: 62.5%;
+}
+
+body {
+	background-color: var(--c_bg__primary);
+	font-family: var(--ff_retro);
+	font-size: var(--fs_md);
+	color: var(--c_text__primary);
+}
+
+:root {
+	scrollbar-gutter: stable;
+	scrollbar-width: thin;
+	scrollbar-color: var(--c_text__muted) var(--c_bg__primary);
+}
+
+#app {
+	display: flex;
+	height: 100%;
+}
+
+input {
+	outline: none;
+	border: none;
+	font-size: var(--fs_md);
+	font-family: var(--ff_retro);
+	color: var(--c_text__primary);
+	transition: background-color 5000s ease-in-out 0s;
+}
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  	-webkit-box-shadow: 0 0 0px 100vh var(--c_bg__surface) inset;
+  	-webkit-text-fill-color: var(--c_text__primary);
+}
+input:-moz-autofill {
+  	background-color: var(--c_bg__surface) !important;
+  	color: var(--c_text__primary) !important;
+}
+
+button {
+	border: none;
+	font-family: var(--ff_retro);
+	font-size: var(--fs_md);
+}
+
+a {
+	text-decoration: none;
+}

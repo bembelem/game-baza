@@ -1,19 +1,15 @@
 <script setup lang="ts">
-import LoadIndicator from "@/shared/ui/LoadIndicator.vue"
+import { useTemplateRef } from "vue"
 import GamesFilters from "@/widgets/games_filters/ui/GamesFilters.vue"
 import GamesCatalog from "@/widgets/games_catalog/ui/GamesCatalog.vue"
-<<<<<<< HEAD
-import { searchGamesStore } from "@/features/search_games/store/searchGamesStore"
-=======
+import LoadIndicator from "@/shared/ui/LoadIndicator.vue"
 import { useSearchGamesStore } from "@/features/search_games/store/searchGamesStore"
->>>>>>> feature/game_info_page
-import { useTemplateRef } from "vue"
 
 const { gamesStore } = useSearchGamesStore()
 
 const gamesCatalogRef = useTemplateRef<HTMLElement>("games_count")
 
-const handleFloatedButtonClick = () => {
+function handleFloatedButtonClick() {
 	gamesCatalogRef.value?.scrollIntoView({
 		behavior: "smooth",
 		block: "center"
@@ -23,10 +19,15 @@ const handleFloatedButtonClick = () => {
 
 <template>
 	<section class="games_catalog">
-		<h2 class="games_count" ref="games_count">
+		<h2
+		ref="games_count"
+		class="games_count">
 			КАТАЛОГ ИГР
 			<span class="games_count--highlighted">
-				<LoadIndicator class="load" :is-short="true" v-if="gamesStore.isPending.value"/>
+				<LoadIndicator
+				v-if="gamesStore.isPending.value"
+				class="load"
+				:is-short="true"/>
 
 				<template v-else>
 					{{ gamesStore.data.value?.total }}
@@ -36,67 +37,47 @@ const handleFloatedButtonClick = () => {
 		<GamesFilters/>
 		<GamesCatalog/>
 	</section>
-	
-	<button class="floated_button" @click="handleFloatedButtonClick">↑</button>
+
+	<button
+	class="floated_button"
+	@click="handleFloatedButtonClick">
+		↑
+	</button>
 </template>
 
 <style scoped>
 .games_catalog {
-	margin-top: var(--h_header);
-	padding: 4rem;
 	display: flex;
 	flex-direction: column;
-	flex: 1;
+	gap: var(--space__2xl);
+	padding: var(--space__3xl) 0;
 }
 
 .games_count {
-	font-size: 2rem;
-	color: var(--c_text);
+	--fs_load: var(--fs__2xl);
+
+	font-size: var(--fs__2xl);
+	color: var(--c_text__primary);
 }
 .games_count--highlighted {
-	color: var(--c_highlight__accent);
+  	color: var(--c_brand__gold_bright);
 }
 
 .load {
-	--c_load: var(--c_highlight__accent);
-	--c_load__accent: var(--c_highlight__accent); 
+	--c_load: var(--c_brand__gold_bright);
+	--c_load__accent: var(--c_brand__gold_bright);
 }
 
 .floated_button {
-	--fs_floated_button: 2rem;
-
 	position: fixed;
-	bottom: calc(var(--fs_floated_button) * 1.5);
-	right: calc(var(--fs_floated_button) * 1.5);
-	padding: calc(var(--fs_floated_button) / 2);
-	background-color: var(--c_bg);
-	box-shadow:
-		0 0 0.375rem var(--c_secondary__accent),
-		0 0 0.75rem var(--c_secondary__accent),
-		0 0 1.125rem var(--c_secondary__accent),
-		0 0 1.5rem var(--c_secondary__accent),
-		0 0 1.875rem rgba(102, 0, 153, 0.4);
-	font-size: var(--fs_floated_button);
-	color: var(--c_secondary__accent);
-	transition: color 0.1s ease-out,
-				box-shadow 0.1s ease-out;
+	bottom: var(--p_layout);
+	right: var(--p_layout);
+	width: var(--space__3xl);
+	height: var(--space__3xl);
+	background-color: var(--c_bg__primary);
+	box-shadow: var(--neon__purple);
+	font-size: var(--fs__2xl);
+	color: var(--c_brand__purple_bright);
 	cursor: pointer;
-}
-
-@media (max-width: 1024px) {
-	.games_catalog {
-		padding: 2rem;
-	}
-}
-@media (max-width: 600px) {
-	.games_catalog {
-		padding: 1rem;
-	}
-	.games_count {
-		font-size: 1.5rem;
-	}
-	.floated_button {
-		--fs_floated_button: 1.5rem;
-	}
 }
 </style>

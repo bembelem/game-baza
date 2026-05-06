@@ -1,0 +1,130 @@
+:root {
+	/* Spacing */
+	--space__xs: 0.4rem;   /* 4px */
+	--space__sm: 0.8rem;   /* 8px */
+	--space__md: 1.6rem;   /* 16px */
+	--space__lg: 2.4rem;   /* 24px */
+	--space__xl: 3.2rem;   /* 32px */
+	--space__2xl: 4rem;    /* 40px */
+	--space__3xl: 6.4rem;  /* 64px */
+
+	/* Borders */
+	--border__sm: 0.2rem;  /* 2px */
+	--border__md: 0.4rem;  /* 4px */
+
+	/* Font family */
+	--ff_retro: "Press Start 2P", monospace;
+	--ff_brand: "Sixtyfour", monospace;
+
+	/* Font sizes */
+	--fs__xs: 1.2rem;   /* 12px */
+	--fs__sm: 1.4rem;   /* 14px */
+	--fs__md: 1.6rem;   /* 16px */
+	--fs__lg: 2rem;     /* 20px */
+	--fs__xl: 2.4rem;   /* 24px */
+	--fs__2xl: 3.2rem;  /* 32px */
+	--fs__3xl: 4rem;    /* 40px */
+
+	/* Backgrounds */
+	--c_bg__primary: #0B0D17;
+	--c_bg__surface: #1A1D2E;
+	--c_bg__accent: #2C3046;
+
+	/* Brand */
+	--c_brand__purple: #4B0077;
+	--c_brand__purple_bright: #AA33EE;
+	--c_brand__cyan: #004D77;
+	--c_brand__cyan_bright: #00BBEE;
+	--c_brand__gold: #996600;
+	--c_brand__gold_bright: #FFDD00;
+
+	/* Semantic */
+	--c_error: #CC2255;
+	--c_error_bright: #FF3366;
+
+	/* Text */
+	--c_text__primary: #F5F5F5;
+	--c_text__secondary: #C7C7C7;
+	--c_text__muted: #7F7F7F;
+	--c_text__error: #FF3366;
+
+	/* Neon shadows — purple */
+	--neon__purple: 
+		0 0 0.375rem var(--c_brand__purple_bright),
+		0 0 0.75rem var(--c_brand__purple_bright),
+		0 0 1.125rem var(--c_brand__purple_bright),
+		0 0 1.5rem var(--c_brand__purple_bright),
+		0 0 1.875rem rgba(170, 51, 238, 0.4);
+
+  	/* Neon shadows — cyan */
+	--neon__cyan:
+		0 0 0.375rem var(--c_brand__cyan_bright),
+		0 0 0.75rem var(--c_brand__cyan_bright),
+		0 0 1.125rem var(--c_brand__cyan_bright),
+		0 0 1.5rem var(--c_brand__cyan_bright),
+		0 0 1.875rem rgba(0, 187, 238, 0.4);
+
+  	/* Neon shadows — gold */
+	--neon__gold:
+		0 0 0.375rem var(--c_brand__gold_bright),
+		0 0 0.75rem var(--c_brand__gold_bright),
+		0 0 1.125rem var(--c_brand__gold_bright),
+		0 0 1.5rem var(--c_brand__gold_bright),
+		0 0 1.875rem rgba(255, 221, 0, 0.4);
+
+	/* Layout */
+  	--h_header: 9.6rem; /* 96px */
+	
+	--p_layout: var(--space__3xl);
+}
+
+@media (max-width: 1024px) {
+  	:root {
+		/* Spacing */
+		--space__lg: 2rem;    /* 20px */
+		--space__xl: 2.4rem;  /* 24px */
+		--space__2xl: 3.2rem; /* 32px */
+		--space__3xl: 4.8rem; /* 48px */
+		
+		/* Font sizes */
+		--fs__lg: 1.8rem;   /* 18px */
+		--fs__xl: 2rem;     /* 20px */
+		--fs__2xl: 2.4rem;  /* 24px */
+		--fs__3xl: 3.2rem;  /* 32px */
+
+		/* Layout */
+		--h_header: 8rem; /* 80px */
+
+		--p_layout: var(--space__2xl);
+	}
+}
+
+@media (max-width: 600px) {
+	:root {
+		/* Spacing */
+		--space__xs: 0.4rem;  /* 4px */
+		--space__sm: 0.8rem;  /* 8px */
+		--space__md: 1.2rem;  /* 12px */
+		--space__lg: 1.6rem;  /* 16px */
+		--space__xl: 2rem;    /* 20px */
+		--space__2xl: 2.4rem; /* 24px */
+		--space__3xl: 3.2rem; /* 32px */
+
+		/* Borders */
+		--border__md: 0.3rem; /* 3px */
+
+		/* Font sizes */
+		--fs__xs: 1rem;     /* 10px */
+		--fs__sm: 1.2rem;   /* 12px */
+		--fs__md: 1.4rem;   /* 14px */
+		--fs__lg: 1.6rem;   /* 16px */
+		--fs__xl: 1.8rem;   /* 18px */
+		--fs__2xl: 2rem;    /* 20px */
+		--fs__3xl: 2.4rem;  /* 24px */
+
+		/* Layout */
+		--h_header: 6.4rem; /* 64px */ 
+
+		--p_layout: var(--space__xl);
+	}
+}

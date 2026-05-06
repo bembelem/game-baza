@@ -1,15 +1,11 @@
 <script setup lang="ts">
-import LoadIndicator from "@/shared/ui/LoadIndicator.vue"
-import AppHeader from "@/widgets/header/ui/AppHeader.vue"
+import { ref, onMounted } from "vue"
 import { RouterView } from "vue-router"
-import { ref } from "vue"
-import { onMounted } from "vue"
+import AppHeader from "@/widgets/header/ui/AppHeader.vue"
+import LoadIndicator from "@/shared/ui/LoadIndicator.vue"
 import { authStore } from "@/entities/user/store/authStore"
 import { getUserFetch } from "@/entities/user/api/userAPI"
 import { isAPIValidationError } from "@/shared/interface/APIError"
-import "../styles/fonts.css"
-import "../styles/main.css"
-import "../styles/reset.css"
 
 const isLoading = ref(false)
 
@@ -18,7 +14,7 @@ onMounted(async () => {
 	isLoading.value = true
 
 	try {
-		const data = await getUserFetch() 
+		const data = await getUserFetch()
 		authStore.data.value = data
 	} catch (error) {
 		if (error instanceof TypeError) {
@@ -41,17 +37,29 @@ onMounted(async () => {
 </script>
 
 <template>
-	<div class="load_container" v-if="isLoading">
-		<LoadIndicator :is-short="false" />
+	<div
+	v-if="isLoading"
+	class="load_container">
+		<LoadIndicator :is-short="false"/>
 	</div>
+
 	<template v-else>
 		<AppHeader/>
-		<RouterView/>
+		<div class="router_view">
+			<RouterView/>
+		</div>
 	</template>
 </template>
 
 <style scoped>
 .load_container {
-	margin: auto;
+	--fs_load: var(--fs__2xl);
+	
+  	margin: auto;
+}
+
+.router_view {
+	margin-top: var(--h_header);
+	padding: 0 var(--p_layout);;
 }
 </style>

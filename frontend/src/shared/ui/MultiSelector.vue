@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="T">
+import { ref } from "vue"
 import LoadIndicator from "@/shared/ui/LoadIndicator.vue"
 import type { SelectorValue } from "../interface/Filters"
-import { ref } from "vue"
 
 const props = defineProps<{
 	name: string,
@@ -15,7 +15,7 @@ const props = defineProps<{
 
 const isOpen = ref(false)
 
-const handleOptionClick = (name: string, newOption: SelectorValue<T>) => {
+function handleOptionClick(name: string, newOption: SelectorValue<T>) {
 	const newOptions = props.selectedOptions ? [...props.selectedOptions] : []
 	const optionIndex = newOptions.findIndex((option) => option.title == newOption.title)
 
@@ -24,7 +24,7 @@ const handleOptionClick = (name: string, newOption: SelectorValue<T>) => {
 	} else {
 		newOptions.splice(optionIndex, 1)
 	}
-	
+
 	props.onOptionClick(name, newOptions)
 	isOpen.value = !props.isAutoClose
 }
@@ -32,7 +32,10 @@ const handleOptionClick = (name: string, newOption: SelectorValue<T>) => {
 
 <template>
 	<div class="multi_selector">
-		<button class="label_button" @click="isOpen = !isOpen" @blur="isOpen = false">
+		<button
+		class="label_button"
+		@click="isOpen = !isOpen"
+		@blur="isOpen = false">
 			<div class="label_container">
 				<span class="label">{{ props.label }}</span>
 				<span v-if="props.selectedOptions?.length">
@@ -40,29 +43,38 @@ const handleOptionClick = (name: string, newOption: SelectorValue<T>) => {
 					<span class="selected_count">{{ props.selectedOptions.length }}</span>
 				</span>
 			</div>
-			<span class="arrow" :class="{ 'arrow--active': isOpen }">↓</span>
+			<span
+			class="arrow"
+			:class="{ 'arrow--active': isOpen }">
+				↓
+			</span>
 		</button>
 
 		<div class="separator">
-			<div class="options_container" v-show="isOpen">
+			<div
+			v-show="isOpen"
+			class="options_container">
 				<template v-if="!props.isLoading && props.options.length">
-					<div class="option"
-					:class="{ 'option--active': props.selectedOptions?.some((selectedOption) => selectedOption.title == option.title) }"
-					v-for="option in props.options" 
+					<div
+					v-for="option in props.options"
 					:key="option.title"
+					class="option"
+					:class="{ 'option--active': props.selectedOptions?.some((selectedOption) => selectedOption.title == option.title) }"
 					@mousedown.prevent="() => handleOptionClick(props.name, option)">
 						{{ option.title }}
 					</div>
 				</template>
 
-				<div class="load_container" v-else-if="props.isLoading" >
+				<div
+				v-else-if="props.isLoading"
+				class="load_container">
 					<LoadIndicator :is-short="true"/>
 				</div>
 
-				<div class="load_container" v-else>
-					<p class="load_message">
-						NO SIGNAL
-					</p>
+				<div
+				v-else
+				class="load_container">
+					<p class="load_message">NO SIGNAL</p>
 				</div>
 			</div>
 		</div>
@@ -71,114 +83,92 @@ const handleOptionClick = (name: string, newOption: SelectorValue<T>) => {
 
 <style scoped>
 .multi_selector {
-	--fs_multi_selector: 1rem;
-
 	display: flex;
 	flex-direction: column;
-	width: 100%;
+	font-size: var(--fs__md);
 	user-select: none;
 }
 
 .label_button {
-	padding: 0.5rem 1rem;
 	display: grid;
 	grid-template-columns: 1fr auto;
-	column-gap: calc(var(--fs_multi_selector) / 2);
-	width: 100%;
-	background-color: var(--bc_multi_selector, var(--c_bg));
-	font-size: var(--fs_multi_selector);
-	color: var(--c_multi_selector, var(--c_text));
+	gap: var(--space__sm);
+	padding: var(--space__sm);
+	background-color: var(--bc_multi_selector, var(--c_bg__primary));
+	font-size: inherit;
+	color: var(--c_multi_selector, var(--c_text__primary));
 }
 
 .label_container {
-	display: grid;
-	grid-template-columns: 1fr auto;
+  	display: grid;
+  	grid-template-columns: 1fr auto;
 }
 
 .label {
+	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	overflow: hidden;
 }
 
 .selected_count {
-	color: var(--c_highlight__accent)
+  	color: var(--c_brand__gold_bright);
 }
 
 .arrow {
-	transition: transform 0.2s ease-out;
+  	transition: transform 0.2s ease-out;
 }
 .arrow--active {
-	transform: rotateX(-180deg)
+  	transform: rotateX(-180deg);
 }
 
 .separator {
 	position: relative;
-	border-bottom: 0.25rem solid var(--c_secondary);
+	border-bottom: var(--border__md) solid var(--c_brand__purple);
 }
 
 .options_container {
-	box-sizing: border-box;
+	position: absolute;
 	z-index: 1;
 	overflow-x: hidden;
 	overflow-y: auto;
-	position: absolute;
 	width: 100%;
-	height: 15rem;
-	background-color: var(--c_bg);
-	border: 0.25rem solid var(--c_secondary);
-	scrollbar-color: var(--c_placeholder) var(--c_bg);
+	height: calc((var(--lh_global) * var(--fs__sm) + var(--space__sm) * 2) * 5 + var(--border__md) * 2);
+	border: var(--border__md) solid var(--c_brand__purple);
+	background-color: var(--c_bg__primary);
+	scrollbar-color: var(--c_text__muted) var(--c_bg__primary);
 	scrollbar-width: thin;
 }
 
 .option {
-	box-sizing: border-box;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	padding: 0.5rem 1rem;
 	width: 100%;
-	font-size: calc(var(--fs_multi_selector) - 0.2rem);
-	color: var(--c_text);
+	padding: var(--space__sm);
+	font-size: var(--fs__sm);
+	color: var(--c_text__primary);
 }
 .option:hover {
-	background-color: var(--c_bg__surface);
+  	background-color: var(--c_bg__surface);
 }
 .option--active {
-	color: var(--c_secondary__accent);
+  	color: var(--c_brand__purple_bright);
 }
 
 .load_container {
-	--c_load: var(--c_secondary);
-	--c_load__accent: var(--c_secondary);
+	--fs_load: var(--fs_md);
+	--c_load: var(--c_brand__purple);
+	--c_load__accent: var(--c_brand__purple);
 
 	display: flex;
-	width: 100%;
-	height: 100%;
 	justify-content: center;
 	align-items: center;
+	height: 100%;
+	font-size: var(--fs__md);
 }
 
 .load_message {
-	font-size: var(--fs_multi_selector);
+	color: var(--c_text__muted);
 	text-decoration: underline;
-	color: var(--c_placeholder);
-	user-select: none;
-}
-
-@media (max-width: 1024px) {
-	.label_button,
-	.option {
-		padding: 0.5rem 0.5rem;
-	}
-}
-@media (max-width: 600px) {
-	.multi_selector {
-		--fs_multi_selector: 0.8rem;
-	}
-	.label_button,
-	.option {
-		padding: 0.5rem 0.25rem;
-	}
 }
 </style>
