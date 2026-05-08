@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { inject } from "vue"
 import SkeletonLoader from "@/shared/ui/SkeletonLoader.vue"
 import type { GameBase } from "@/entities/game/model/Game"
-import { inject } from "vue"
 
 const props = defineProps<{ gameInfo: Partial<GameBase> }>()
 
@@ -10,21 +10,25 @@ const scrollToGameOffers = inject<() => void>("scrollToGameOffers")
 
 <template>
 	<div class="game_info_main">
-		<div class="image_container" :class="{ 
-		'image_container--loaded': props.gameInfo.image_url, 
-		'image_container--skeleton': !props.gameInfo.image_url }">
-			<img class="image" 
+		<div
+		class="image_container"
+		:class="{
+			'image_container--loaded': props.gameInfo.image_url,
+			'image_container--skeleton': !props.gameInfo.image_url,
+		}">
+			<img
+			v-if="props.gameInfo.image_url"
+			class="image"
 			:src="props.gameInfo.image_url"
-			alt="обложка игры"
-			v-if="props.gameInfo.image_url">
+			alt="обложка игры"/>
 		</div>
-			
+
 		<div class="info_main">
 			<h1 v-if="props.gameInfo.title">{{ props.gameInfo.title }}</h1>
-			
+
 			<template v-else>
 				<SkeletonLoader/>
-				<SkeletonLoader class="skeleton_loader"/>	
+				<SkeletonLoader class="skeleton_loader"/>
 			</template>
 
 			<div class="min_price_container">
@@ -41,7 +45,9 @@ const scrollToGameOffers = inject<() => void>("scrollToGameOffers")
 				</p>
 			</div>
 
-			<button class="button_scroll" @click="scrollToGameOffers">
+			<button
+			class="button_scroll"
+			@click="scrollToGameOffers">
 				Смотреть предложения ↓
 			</button>
 		</div>
@@ -50,17 +56,20 @@ const scrollToGameOffers = inject<() => void>("scrollToGameOffers")
 
 <style scoped>
 .game_info_main {
+	--fs_info_main: var(--fs__3xl);
+
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
-	gap: 2rem;
+	gap: var(--space__md);
 }
 
 .image_container {
 	position: relative;
 	aspect-ratio: 2.14 / 1;
-	border: 0.25rem solid var(--c_bg__surface);
-	transition: border-color 2s ease-in-out,
-				box-shadow 2s ease-in-out;
+	border: var(--border__md) solid var(--c_bg__surface);
+	transition:
+		border-color 2s ease-in-out,
+		box-shadow 2s ease-in-out;
 }
 
 .image_container::before {
@@ -78,6 +87,7 @@ const scrollToGameOffers = inject<() => void>("scrollToGameOffers")
 	background-size: 400% 400%;
 	background-repeat: no-repeat;
 	filter: blur(20px);
+	opacity: 1;
 	animation: image_skeleton 4s ease-in-out infinite;
 	transition: opacity 0.2s ease-in-out;
 }
@@ -97,13 +107,8 @@ const scrollToGameOffers = inject<() => void>("scrollToGameOffers")
 	opacity: 0;
 }
 .image_container--loaded {
-	border-color: var(--c_highlight__accent);
-	box-shadow:
-		0 0 0.375rem var(--c_highlight__accent),
-		0 0 0.75rem var(--c_highlight__accent),
-		0 0 1.125rem var(--c_highlight__accent),
-		0 0 1.5rem var(--c_highlight__accent),
-		0 0 1.875rem rgba(255, 221, 0, 0.4);
+	border-color: var(--c_brand__gold_bright);
+	box-shadow: var(--neon__gold);
 }
 @keyframes border_skeleton {
 	50% {
@@ -126,9 +131,9 @@ const scrollToGameOffers = inject<() => void>("scrollToGameOffers")
 
 	display: flex;
 	flex-direction: column;
-	row-gap: var(--fs_info_main);
-	text-wrap: wrap;
+	gap: calc(var(--fs_info_main) * (var(--lh_global) - 1));
 	font-size: var(--fs_info_main);
+	text-wrap: wrap;
 }
 
 .skeleton_loader {
@@ -137,15 +142,15 @@ const scrollToGameOffers = inject<() => void>("scrollToGameOffers")
 
 .min_price_container {
 	margin-top: calc(var(--fs_info_main) / 2);
-	font-size: calc(var(--fs_info_main) - 0.2rem);
+	font-size: var(--fs__lg);
 }
 
 .min_price {
+	--h_skeleton_loader:  var(--fs__lg);
 	--w_skeleton_loader: calc(var(--fs_info_main) * 3);
 
 	display: inline-flex;
-	gap: 0.5rem;
-	font-size: var(--fs_info_main);
+	gap: var(--space__xs);
 }
 
 .currency {
@@ -161,21 +166,20 @@ const scrollToGameOffers = inject<() => void>("scrollToGameOffers")
 }
 
 .button_scroll {
-	padding: 0.5rem;
+	padding: var(--space__md) var(--space__xl);
 	width: fit-content;
-	background-color: var(--c_highlight__accent);
+	background-color: var(--c_brand__gold_bright);
 	font-size: var(--fs_subtitle);
 	transition: color 0.1s ease-out;
 }
 
 .button_scroll:active {
-	color: var(--c_text);
+	color: var(--c_text__primary);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 1024px) {
 	.game_info_main {
 		grid-template-columns: 1fr;
-		gap: 1rem;
 	}
 
 	.button_scroll {

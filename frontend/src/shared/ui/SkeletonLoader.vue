@@ -11,11 +11,10 @@ const { isLoading = true } = defineProps<{ isLoading?: boolean }>()
 .text_skeleton {
 	display: inline-block;
 	width: var(--w_skeleton_loader, 100%);
-	height: var(--h_skeleton_loader, 1rem);
+	height: var(--h_skeleton_loader, var(--fs__md));
 	background-color: var(--c_bg__surface);
 	animation: skeleton 1s infinite;
 }
-
 @keyframes skeleton {
 	50% {
 		background-color: var(--c_bg__accent);

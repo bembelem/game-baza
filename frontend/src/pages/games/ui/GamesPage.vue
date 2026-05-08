@@ -50,7 +50,6 @@ function handleFloatedButtonClick() {
 	display: flex;
 	flex-direction: column;
 	gap: var(--space__2xl);
-	padding: var(--space__3xl) 0;
 }
 
 .games_count {

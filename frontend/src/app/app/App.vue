@@ -59,7 +59,8 @@ onMounted(async () => {
 }
 
 .router_view {
+	width: 100%;
 	margin-top: var(--h_header);
-	padding: 0 var(--p_layout);;
+	padding: var(--space__3xl) var(--p_layout);
 }
 </style>

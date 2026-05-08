@@ -1,20 +1,24 @@
 <script setup lang="ts">
-import SkeletonLoader from "./SkeletonLoader.vue"
 import { ref, onMounted, nextTick, watch } from "vue"
+import SkeletonLoader from "./SkeletonLoader.vue"
 
-const { skeletonLines = 5, ...props } = defineProps<{ 
+const { skeletonLines = 4, ...props } = defineProps<{
 	skeletonLines?: number
-	description?: string,
+	description?: string
 }>()
 
 const isActive = ref(false)
 const isOverflow = ref(false)
 const textRef = ref<HTMLElement>()
 
-const checkOverflow = () => {
+function checkOverflow() {
 	if (!textRef.value) return
 
 	isOverflow.value = textRef.value.scrollHeight > textRef.value.clientHeight
+}
+
+function toggleExpanded() {
+	isActive.value = !isActive.value
 }
 
 onMounted(async () => {
@@ -26,24 +30,32 @@ watch(() => props.description, async () => {
 	await nextTick()
 	checkOverflow()
 })
-
-const toggleExpanded = () => { isActive.value = !isActive.value }
 </script>
 
 <template>
 	<div class="description">
 		<template v-if="props.description">
-			<p class="text" :class="{ 'text--active': isActive }" ref="textRef">
+			<p
+			ref="textRef"
+			class="text"
+			:class="{ 'text--active': isActive }">
 				{{ props.description }}
 			</p>
 
-			<button class="button_read_all" @click="toggleExpanded" v-if="isOverflow || isActive">
+			<button
+			v-if="isOverflow || isActive"
+			class="button_read_all"
+			@click="toggleExpanded">
 				{{ isActive ? "скрыть" : "читать полностью" }}
 			</button>
 		</template>
 
-		<div v-else class="skeleton_container">
-			<SkeletonLoader v-for="i in skeletonLines" :key="i"
+		<div
+		v-else
+		class="skeleton_container">
+			<SkeletonLoader
+			v-for="i in skeletonLines"
+			:key="i"
 			class="text_skeleton"
 			:style="{ '--i': i }"/>
 		</div>
@@ -52,16 +64,16 @@ const toggleExpanded = () => { isActive.value = !isActive.value }
 
 <style scoped>
 .description {
-	--fs: var(--fs_description_section, 1rem);
-	--lh: var(--lh_description_section, 1.6);
+	--fs: var(--fs_description_section, var(--fs__md));
+	--lh: var(--lh_description_section, var(--lh_global));
 
 	display: flex;
 	flex-direction: column;
-	width: 100%;
-	padding: 1.25rem 1.5rem;
 	align-items: flex-start;
-	border: 0.25rem solid var(--c_bg__surface);
-	color: var(--c_text__muted);
+	padding: var(--space__sm) var(--space__lg);
+	width: 100%;
+	border: var(--border__md) solid var(--c_bg__surface);
+	color: var(--c_text__primary);
 	font-size: var(--fs);
 	line-height: var(--lh);
 }
@@ -80,8 +92,8 @@ const toggleExpanded = () => { isActive.value = !isActive.value }
 .button_read_all {
 	padding: 0;
 	background-color: transparent;
-	color: var(--c_secondary__accent);
 	font-size: calc(var(--fs) - 0.1rem);
+	color: var(--c_brand__purple_bright);
 	cursor: pointer;
 	user-select: none;
 }
@@ -89,12 +101,13 @@ const toggleExpanded = () => { isActive.value = !isActive.value }
 .skeleton_container {
 	display: flex;
 	flex-direction: column;
-	gap: calc(var(--fs) * var(--lh) - var(--fs));
+	gap: calc(var(--fs) * (var(--lh) - 1));
 	width: 100%;
 }
 
 .text_skeleton {
-	--h_skeleton_loader: var(--fs);
+	--h_skeleton_loader: calc(var(--fs));
+
 	animation-duration: var(--ad_description_section, 1.5s);
 	animation-delay: calc(var(--i, 1) * var(--skeleton_step, 0.15s));
 }

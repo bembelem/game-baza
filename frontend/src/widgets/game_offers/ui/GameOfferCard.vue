@@ -1,23 +1,24 @@
 <script setup lang="ts">
-import type { Offer } from "@/entities/offer/model/Offer"
-import { type SearchGamesFilters, searchGamesFilters } from "@/features/search_games/filters/searchGamesFilters"
 import { useRouter } from "vue-router"
-import { searchGamesFiltersOptions } from "@/features/search_games/filters/searchGamesFilters"
 import { Routes } from "@/shared/lib/router"
-
-const router = useRouter()
+import type { Offer } from "@/entities/offer/model/Offer"
+import { type SearchGamesFilters, searchGamesFilters, searchGamesFiltersOptions } from "@/features/search_games/filters/searchGamesFilters"
 
 const props = defineProps<{ offer: Offer }>()
 
-const handleBuyClick = () => window.open(props.offer.store_game_link)
+const router = useRouter()
 
 const { resetFilters, updateFilters } = searchGamesFilters
 const { injectFilterOption } = searchGamesFiltersOptions
 
-const handleMetadataClick = <K extends keyof SearchGamesFilters>(
+function handleBuyClick() {
+	window.open(props.offer.store_game_link)
+}
+
+function handleMetadataClick<K extends keyof SearchGamesFilters>(
 	name: K,
 	value: SearchGamesFilters[K]
-) => {
+) {
 	resetFilters()
 	updateFilters(name, value)
 	injectFilterOption(name, value)
@@ -28,18 +29,24 @@ const handleMetadataClick = <K extends keyof SearchGamesFilters>(
 
 <template>
 	<div class="game_offer_card">
-		<button class="button_store" @click="() => handleMetadataClick('stores', [{ 
-			title: props.offer.store, 
-			value: props.offer.store 
+		<button
+		class="button_store"
+		@click="() => handleMetadataClick('stores', [{
+			title: props.offer.store,
+			value: props.offer.store,
 		}])">
 			{{ props.offer.store }}
 		</button>
 
-		<button class="button_price" @click="handleBuyClick">
+		<button
+		class="button_price"
+		@click="handleBuyClick">
 			{{ props.offer.price_discount }}<span class="price--highlight">₽</span>
 		</button>
 
-		<button class="button_buy" @click="handleBuyClick">
+		<button
+		class="button_buy"
+		@click="handleBuyClick">
 			купить
 		</button>
 	</div>
@@ -47,59 +54,57 @@ const handleMetadataClick = <K extends keyof SearchGamesFilters>(
 
 <style scoped>
 .game_offer_card {
-	--fs_game_offer_card: 1.1rem;
+	--fs_game_offer_card: var(--fs__sm);
 
-	box-sizing: border-box;
 	display: grid;
-	justify-items: center;
-	text-align: center;
 	grid-template-columns: repeat(3, 1fr);
-	grid-template-rows: 5rem;
+	justify-items: center;
+	flex-shrink: 0;
 	width: 100%;
-	border: 0.25rem solid var(--c_bg__surface);
+	height: var(--h_card);
+	border: var(--border__sm) solid var(--c_bg__surface);
 	background-color: var(--c_bg__surface);
 	font-size: var(--fs_game_offer_card);
+	text-align: center;
 }
 
 .button_store,
 .button_buy {
-	align-self: stretch;
 	width: 100%;
-	height: 100%;
 	font-size: var(--fs_game_offer_card);
 	cursor: pointer;
 }
 
 .button_store {
 	overflow: hidden;
+	background-color: transparent;
+	color: var(--c_brand__purple_bright);
 	white-space: nowrap;
 	text-overflow: ellipsis;
-	background-color: transparent;
-	color: var(--c_secondary__accent);
 }
 
 .button_price {
 	display: flex;
-	width: 100%;
-	height: 100%;
 	justify-content: center;
 	align-items: center;
+	width: 100%;
+	background-color: var(--c_bg__primary);
+	color: var(--c_text__primary);
 	pointer-events: none;
-	color: var(--c_text);
-	background-color: var(--c_bg);
 }
+
 .price--highlight {
 	margin-left: calc(var(--fs_game_offer_card) / 2);
 }
 
 .button_buy {
-	background-color: var(--c_highlight__accent);
+	background-color: var(--c_brand__gold_bright);
 	transition: color 0.1s ease-out;
 }
 
 .button_buy:active,
 .button_price:active {
-	color: var(--c_text);
+	color: var(--c_text__primary);
 }
 
 @media (max-width: 1024px) {
@@ -107,19 +112,14 @@ const handleMetadataClick = <K extends keyof SearchGamesFilters>(
 		grid-template-columns: repeat(2, 1fr);
 	}
 	.button_buy {
-		display: none
+		display: none;
 	}
 	.button_price {
-		pointer-events: all;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		width: 100%;
-		height: 100%;
-		background-color: var(--c_highlight__accent);
-		color: var(--c_bg);
-		transition: color 0.1s ease-out;
+		background-color: var(--c_brand__gold_bright);
+		color: var(--c_bg__primary);
 		cursor: pointer;
+		pointer-events: all;
+		transition: color 0.1s ease-out;
 	}
 	.price--highlight {
 		padding: 0;
