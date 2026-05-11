@@ -101,12 +101,11 @@ watch(() => props.description, async () => {
 .skeleton_container {
 	display: flex;
 	flex-direction: column;
-	gap: calc(var(--fs) * (var(--lh) - 1));
 	width: 100%;
 }
 
 .text_skeleton {
-	--h_skeleton_loader: calc(var(--fs));
+	--h_skeleton_loader: calc(var(--fs) * var(--lh));
 
 	animation-duration: var(--ad_description_section, 1.5s);
 	animation-delay: calc(var(--i, 1) * var(--skeleton_step, 0.15s));

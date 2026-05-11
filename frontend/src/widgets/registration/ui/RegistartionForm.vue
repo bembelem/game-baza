@@ -113,7 +113,7 @@ const onSubmit = handleSubmit(async () => {
 		label="Пароль"
 		:error="errors.password"
 		:is-valid="isFieldValid('password')">
-			<PasswordField name="password" />
+			<PasswordField name="password"/>
 		</FormField>
 
 		<p

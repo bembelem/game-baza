@@ -127,11 +127,10 @@ const scrollToGameOffers = inject<() => void>("scrollToGameOffers")
 }
 
 .info_main {
-	--h_skeleton_loader: var(--fs_info_main);
+	--h_skeleton_loader: calc(var(--fs_info_main) * var(--lh_global));
 
 	display: flex;
 	flex-direction: column;
-	gap: calc(var(--fs_info_main) * (var(--lh_global) - 1));
 	font-size: var(--fs_info_main);
 	text-wrap: wrap;
 }
@@ -141,12 +140,12 @@ const scrollToGameOffers = inject<() => void>("scrollToGameOffers")
 }
 
 .min_price_container {
-	margin-top: calc(var(--fs_info_main) / 2);
+	margin-top: var(--fs_info_main);
 	font-size: var(--fs__lg);
 }
 
 .min_price {
-	--h_skeleton_loader:  var(--fs__lg);
+	--h_skeleton_loader:  calc(var(--fs__lg) * var(--lh_global));
 	--w_skeleton_loader: calc(var(--fs_info_main) * 3);
 
 	display: inline-flex;
@@ -166,6 +165,7 @@ const scrollToGameOffers = inject<() => void>("scrollToGameOffers")
 }
 
 .button_scroll {
+	margin-top: var(--space__md);
 	padding: var(--space__md) var(--space__xl);
 	width: fit-content;
 	background-color: var(--c_brand__gold_bright);
@@ -183,6 +183,7 @@ const scrollToGameOffers = inject<() => void>("scrollToGameOffers")
 	}
 
 	.button_scroll {
+		padding: var(--space__md);
 		width: 100%;
 	}
 }

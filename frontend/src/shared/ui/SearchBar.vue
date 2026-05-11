@@ -34,10 +34,9 @@ const searchInput = defineModel()
 
 .search_input {
 	width: 100%;
-	padding: var(--space__sm);
+	padding: var(--space__xs) var(--space__md);
 	border: var(--border__md) solid var(--c_brand__purple);
 	border-right: none;
-	font-size: var(--fs__xs);
 	background-color: var(--c_bg__surface);
 	transition: border-color 0.2s ease-in-out;
 }

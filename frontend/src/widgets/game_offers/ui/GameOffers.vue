@@ -37,7 +37,6 @@ const gameOffersFiltered = computed(() => useGameOffersFiltered(props.offers, fi
 	display: flex;
 	flex-direction: column;
 	overflow: auto;
-	width: 100%;
 	height: calc(var(--h_card) * 4 + 5 * var(--p_game_offers) + var(--border__md) * 2);
 	padding: var(--p_game_offers);
 	gap: var(--p_game_offers);

@@ -85,7 +85,6 @@ function handleOptionClick(name: string, newOption: SelectorValue<T>) {
 .multi_selector {
 	display: flex;
 	flex-direction: column;
-	font-size: var(--fs__md);
 	user-select: none;
 }
 
@@ -95,7 +94,6 @@ function handleOptionClick(name: string, newOption: SelectorValue<T>) {
 	gap: var(--space__sm);
 	padding: var(--space__sm);
 	background-color: var(--bc_multi_selector, var(--c_bg__primary));
-	font-size: inherit;
 	color: var(--c_multi_selector, var(--c_text__primary));
 }
 
@@ -156,7 +154,6 @@ function handleOptionClick(name: string, newOption: SelectorValue<T>) {
 }
 
 .load_container {
-	--fs_load: var(--fs_md);
 	--c_load: var(--c_brand__purple);
 	--c_load__accent: var(--c_brand__purple);
 
@@ -164,7 +161,6 @@ function handleOptionClick(name: string, newOption: SelectorValue<T>) {
 	justify-content: center;
 	align-items: center;
 	height: 100%;
-	font-size: var(--fs__md);
 }
 
 .load_message {

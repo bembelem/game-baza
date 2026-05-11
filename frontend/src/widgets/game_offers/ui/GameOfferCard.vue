@@ -60,7 +60,6 @@ function handleMetadataClick<K extends keyof SearchGamesFilters>(
 	grid-template-columns: repeat(3, 1fr);
 	justify-items: center;
 	flex-shrink: 0;
-	width: 100%;
 	height: var(--h_card);
 	border: var(--border__sm) solid var(--c_bg__surface);
 	background-color: var(--c_bg__surface);
