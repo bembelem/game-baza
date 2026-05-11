@@ -5,7 +5,7 @@ html {
 body {
 	background-color: var(--c_bg__primary);
 	font-family: var(--ff_retro);
-	font-size: var(--fs_md);
+	font-size: var(--fs__md);
 	color: var(--c_text__primary);
 }
 
@@ -21,9 +21,10 @@ body {
 }
 
 input {
+	padding: var(--space__xs);
 	outline: none;
 	border: none;
-	font-size: var(--fs_md);
+	font-size: var(--fs__md);
 	font-family: var(--ff_retro);
 	color: var(--c_text__primary);
 	transition: background-color 5000s ease-in-out 0s;
@@ -42,7 +43,7 @@ input:-moz-autofill {
 button {
 	border: none;
 	font-family: var(--ff_retro);
-	font-size: var(--fs_md);
+	font-size: var(--fs__md);
 }
 
 a {

@@ -1,48 +1,56 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import LoadIndicator from "./LoadIndicator.vue"
 
 const props = defineProps<{
-	label: string,
-	isSubmitting?: boolean,
+	label: string
+	isSubmitting?: boolean
 	isAvailable?: boolean
 }>()
 </script>
 
 <template>
-	<button class="submit_button" 
-	:class="{ 'submit_button--fulfilled': props.isAvailable, 'submit_button--submitted': props.isSubmitting }" 
-	type="submit"
-	:disabled="!props.isAvailable || props.isSubmitting">
-		<LoadIndicator class="load" :is-short="true" v-if="props.isSubmitting"/>
+	<button
+		class="submit_button"
+		:class="{
+			'submit_button--fulfilled': props.isAvailable,
+			'submit_button--submitted': props.isSubmitting
+		}"
+		type="submit"
+		:disabled="!props.isAvailable || props.isSubmitting">
+
+		<LoadIndicator
+		v-if="props.isSubmitting"
+		class="load"
+		is-short/>
+
 		<p v-else>{{ props.label }}</p>
 	</button>
 </template>
 
 <style scoped>
 .submit_button {
-	margin-top: 1.75rem;
-	padding: 0.5rem;
-	border: 0.25rem solid var(--bc_submit_button, var(--c_secondary));
-	background-color: var(--bc_submit_button, var(--c_secondary));
-	transition: background-color 0.2s ease-in-out,
-				border-color 0.2s ease-in-out;
+	padding: var(--space__xs);
+	border: var(--border__md) solid var(--bc_submit_button, var(--c_brand__purple));
+	background-color: var(--bc_submit_button, var(--c_brand__purple));
+	transition:
+		background-color 0.2s ease-in-out,
+		border-color 0.2s ease-in-out;
 }
 .submit_button:disabled {
-	color: var(--c_bg);
+	color: var(--c_bg__primary);
 }
 .submit_button--fulfilled {
-	border-color: var(--bc_submit_button__accent, var(--c_secondary__accent));
-	background-color: var(--bc_submit_button__accent, var(--c_secondary__accent));
+	border-color: var(--bc_submit_button__accent, var(--c_brand__purple_bright));
+	background-color: var(--bc_submit_button__accent, var(--c_brand__purple_bright));
 }
 .submit_button--submitted:disabled {
-	border-color: var(--c_placeholder);
+	border-color: var(--c_text__muted);
 	background-color: transparent;
-	color: var(--c_placeholder);
+	color: var(--c_text__muted);
 }
 
 .load {
-	--fs_load: 1rem;
-  	--c_load: var(--c_placeholder);
-	--c_load__accent: var(--c_placeholder);
+	--c_load: var(--c_text__muted);
+	--c_load__accent: var(--c_text__muted);
 }
 </style>

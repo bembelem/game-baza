@@ -1,20 +1,24 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 const props = defineProps<{
-	label?: string,
-	error?: string,
-	isValid?: boolean,
+	label?: string
+	error?: string
+	isValid?: boolean
 	onBlur?: () => void
 }>()
 </script>
 
 <template>
-	<div class="form_field" 
-	:class="{ 'form_field--fulfilled': props.isValid, 'form_field--error': props.error }">
+	<div
+	class="form_field"
+	:class="{
+		'form_field--fulfilled': isValid,
+		'form_field--error': error
+	}">
 		<label @blur="props.onBlur">
-			<p class="label">{{ props.label }}</p>
-			<slot></slot>
+			{{ label }}
+			<slot/>
 		</label>
-		<p class="error">{{ props.error }}</p>
+		<p class="error">{{ error }}</p>
 	</div>
 </template>
 
@@ -22,6 +26,8 @@ const props = defineProps<{
 .form_field {
 	display: flex;
 	flex-direction: column;
+	gap: var(--space__xs);
+	font-size: var(--fs__sm);
 }
 .form_field--error {
 	--bc_input_field: var(--c_error);
@@ -32,15 +38,8 @@ const props = defineProps<{
 	--bc_password_field: var(--bc_password_field__focus);
 }
 
-.label {
-	margin-bottom: 0.25rem;
-	font-size: 0.875rem;
-}
-
 .error {
-	margin-top: 0.25rem;
-	min-height: 1.5rem;
-	font-size: 0.75rem;
+	min-height: calc(var(--fs__sm) * var(--lh_global));
 	color: var(--c_text__error);
 }
 </style>
