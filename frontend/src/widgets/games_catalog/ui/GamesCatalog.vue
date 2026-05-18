@@ -19,7 +19,11 @@ function handleGameCardClick(gameID: GameBase["id"]) {
 }
 
 function handleSearch() {
-	const searchGamesParams = toSearchGamesParams(searchGamesFilters.filters.value)
+	const searchGamesParams = toSearchGamesParams(
+		searchGamesFilters.filters.value,
+		gamesStore.data.value?.last_id,
+		gamesStore.data.value?.per_page
+	)
 	searchGames(searchGamesParams)
 }
 

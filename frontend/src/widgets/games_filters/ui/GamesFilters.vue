@@ -22,13 +22,17 @@ import { fetchData } from "@/shared/lib/fetchData"
 
 const route = useRoute()
 
-const { searchGames, resetGames } = useSearchGamesStore()
+const { gamesStore, searchGames, resetGames } = useSearchGamesStore()
 const { filters, updateFilters, resetFilters } = searchGamesFilters
 const { getFilterOptions } = searchGamesFiltersOptions
 
 function onSubmit() {
 	resetGames()
-	const searchGamesParams = toSearchGamesParams(filters.value)
+	const searchGamesParams = toSearchGamesParams(
+		searchGamesFilters.filters.value,
+		gamesStore.data.value?.last_id,
+		gamesStore.data.value?.per_page
+	)
 	searchGames(searchGamesParams)
 }
 

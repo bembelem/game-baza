@@ -1,11 +1,18 @@
 import type { SearchGamesFilters } from "@/features/search_games/filters/searchGamesFilters"
 import type { SearchGamesParams } from "@/entities/game/api/gamesAPI"
+import type { GamesCatalog } from "@/entities/game/model/Game"
 
 
-export function toSearchGamesParams(searchGamesFilters: Partial<SearchGamesFilters>): SearchGamesParams {
+export function toSearchGamesParams(
+	searchGamesFilters: Partial<SearchGamesFilters>,
+	lastID: GamesCatalog["last_id"] | undefined,
+	perPage: GamesCatalog["per_page"] | undefined
+): SearchGamesParams {
 	const  { sort, price, ...filters } = searchGamesFilters
 
 	return {
+		last_id: lastID ? [String(lastID)] : undefined,
+		per_page: perPage ? [String(perPage)] : undefined,
 		sort: sort?.value ? [sort.value] : undefined,
 	 	genres: filters.genres?.map(value => value.value),
 	 	platforms: filters.platforms?.map(value => value.value),
