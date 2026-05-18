@@ -1,0 +1,15 @@
+extends:
+  - spectral:oas
+
+rules:
+  # Каждая операция должна иметь operationId
+  operation-operationId: error
+
+  # Каждая операция должна иметь описание
+  operation-description: warn
+
+  # Все теги должны иметь описание
+  openapi-tags: warn
+
+  # Параметры пути должны быть описаны
+  oas3-unused-component: warn

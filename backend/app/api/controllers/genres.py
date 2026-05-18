@@ -17,8 +17,7 @@ router = APIRouter(prefix="/genres", tags=["Genres"])
 async def list_genres():
     async with async_session_maker() as session:
         items = await GenreRepository(session).list_all()
-    # БД хранит поле name, контракт API — title.
-    return GenresResponse(genres=[Genre(id=g.id, title=g.name) for g in items])
+    return GenresResponse(genres=[Genre(id=g.id, name=g.name) for g in items])
 
 
 @router.get(
@@ -33,4 +32,4 @@ async def get_genre(genre_id: int):
         genre = await GenreRepository(session).get_by_id(genre_id)
     if genre is None:
         raise GenreNotFoundHTTPException()
-    return Genre(id=genre.id, title=genre.name)
+    return Genre(id=genre.id, name=genre.name)

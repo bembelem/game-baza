@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 class Genre(BaseModel):
     id: int
-    title: str
+    name: str
 
 class GenresResponse(BaseModel):
     genres: list[Genre]
