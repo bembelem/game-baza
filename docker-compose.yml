@@ -17,10 +17,19 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env
+    environment:
+      DB_HOST: my_postgres   # ← перебивает .env только внутри docker
+      DB_PORT: 5432
     depends_on:
       - my_postgres
     ports:
       - "8000:8000"
+    volumes:
+      - ./backend:/app          # исходники подменяем live
+      - /app/.venv              # анонимный volume — не затирать .venv из образа
+    command: >
+      sh -c "uv run alembic upgrade head &&
+             uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
 
   frontend:
     build:
@@ -28,7 +37,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5173:5173"
+    volumes:
+      - ./frontend:/app          # исходники и .env*, live reload
+      - /app/node_modules        # анонимный volume — не затирать node_modules из контейнера
 
 volumes:
   postgres_data:
-
