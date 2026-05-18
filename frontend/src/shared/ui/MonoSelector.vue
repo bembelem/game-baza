@@ -1,15 +1,16 @@
 <script setup lang="ts" generic="T">
+import { ref } from "vue"
 import LoadIndicator from "@/shared/ui/LoadIndicator.vue"
 import type { SelectorValue } from "../interface/Filters"
-import { ref } from "vue"
 
 const props = withDefaults(defineProps<{
 	name: string,
-	value: SelectorValue<T> | undefined,
-	values?: SelectorValue<T>[] | null,
+	selectedOption: SelectorValue<T> | undefined,
+	options: SelectorValue<T>[],
 	label?: string,
+	isLoading?: boolean,
 	isAutoClose?: boolean,
-	onValueClick: (name: string, value: SelectorValue<T>) => void
+	onOptionClick: (name: string, option: SelectorValue<T>) => void
 }>(), {
 	label: "выбрать",
 	isAutoClose: true
@@ -17,33 +18,51 @@ const props = withDefaults(defineProps<{
 
 const isOpen = ref(false)
 
-const handleValueClick = (name: string, value: SelectorValue<T>) => {
-	props.onValueClick(name, value)
+function handleOptionClick(name: string, option: SelectorValue<T>) {
+	props.onOptionClick(name, option)
 	isOpen.value = !props.isAutoClose
 }
 </script>
 
 <template>
 	<div class="mono_selector">
-		<button class="label_button" @click="isOpen = !isOpen" @blur="isOpen = false">
-			<span class="label">{{ props.value?.title ?? props.label }}</span>
-			<span class="arrow" :class="{ 'arrow--active': isOpen }">↓</span>
+		<button
+		class="label_button"
+		@click="isOpen = !isOpen"
+		@blur="isOpen = false">
+			<span class="label">{{ props.selectedOption?.title ?? props.label }}</span>
+			<span
+			class="arrow"
+			:class="{ 'arrow--active': isOpen }">
+				↓
+			</span>
 		</button>
 
 		<div class="separator">
-			<div class="values_container" v-show="isOpen">
-				<template v-if="props.values">
-					<div class="value" 
-					:class="{ 'value--active': props.value?.title == value.title }"
-					v-for="value in props.values" 
-					:key="value.title"
-					@mousedown.prevent="() => handleValueClick(props.name, value)">
-						{{ value.title }}
+			<div
+			v-show="isOpen"
+			class="options_container">
+				<template v-if="!props.isLoading && props.options.length">
+					<div
+					v-for="option in props.options"
+					:key="option.title"
+					class="option"
+					:class="{ 'option--active': props.selectedOption?.title == option.title }"
+					@mousedown.prevent="() => handleOptionClick(props.name, option)">
+						{{ option.title }}
 					</div>
 				</template>
 
-				<div v-else class="load_container">
+				<div
+				v-else-if="props.isLoading"
+				class="load_container">
 					<LoadIndicator :is-short="true"/>
+				</div>
+
+				<div
+				v-else
+				class="load_container">
+					<p class="load_message">NO SIGNAL</p>
 				</div>
 			</div>
 		</div>
@@ -52,100 +71,82 @@ const handleValueClick = (name: string, value: SelectorValue<T>) => {
 
 <style scoped>
 .mono_selector {
-	--fs_mono_selector: 1rem;
-
 	display: flex;
 	flex-direction: column;
 	width: 100%;
 	user-select: none;
 }
 
-.mock_selector {
-	position: absolute;
-	opacity: 0;
-}
-
 .label_button {
-	padding: 0.5rem 1rem;
 	display: grid;
 	grid-template-columns: 1fr auto;
+	gap: var(--space__sm);
 	width: 100%;
-	background-color: var(--bc_mono_selector, var(--c_bg));
-	font-size: var(--fs_mono_selector);
-	color: var(--c_mono_selector, var(--c_text));
+	padding: var(--space__sm);
+	background-color: var(--bc_mono_selector, var(--c_bg__primary));
+	color: var(--c_mono_selector, var(--c_text__primary));
 }
 
 .label {
+	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	overflow: hidden;
 }
 
 .arrow {
-	transition: transform 0.2s ease-out;
+  	transition: transform 0.2s ease-out;
 }
 .arrow--active {
-	transform: rotateX(-180deg);
+  	transform: rotateX(-180deg);
 }
 
 .separator {
 	position: relative;
-	border-bottom: 0.25rem solid var(--c_secondary);
+	border-bottom: var(--border__md) solid var(--c_brand__purple);
 }
 
-.values_container {
+.options_container {
+	position: absolute;
 	z-index: 1;
 	overflow-x: hidden;
 	overflow-y: auto;
-	position: absolute;
 	width: 100%;
-	height: 14.5rem;
-	background-color: var(--c_bg);
-	border: 0.25rem solid var(--c_secondary);
-  	scrollbar-color: var(--c_text) var(--c_bg);
+	height: calc((var(--lh_global) * var(--fs__sm) + var(--space__sm) * 2) * 5 + var(--border__md) * 2);
+	border: var(--border__md) solid var(--c_brand__purple);
+	background-color: var(--c_bg__primary);
+	scrollbar-color: var(--c_text__primary) var(--c_bg__primary);
 	scrollbar-width: thin;
 }
 
-.value {
+.option {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	padding: 0.5rem 1rem;
 	width: 100%;
-	font-size: calc(var(--fs_mono_selector) - 0.2rem);
-	color: var(--c_text);
+	padding: var(--space__sm);
+	font-size: var(--fs__sm);
+	color: var(--c_text__primary);
 }
-.value:hover {
-	background-color: var(--c_bg__surface);
+.option:hover {
+  	background-color: var(--c_bg__surface);
 }
-.value--active {
-	color: var(--c_secondary__accent);
+.option--active {
+  	color: var(--c_brand__purple_bright);
 }
 
 .load_container {
-	--c_load: var(--c_secondary);
-	--c_load__accent: var(--c_secondary);
+	--c_load: var(--c_brand__purple);
+	--c_load__accent: var(--c_brand__purple);
 
 	display: flex;
-	width: 100%;
-	height: 100%;
 	justify-content: center;
 	align-items: center;
+	height: 100%;
 }
 
-@media (max-width: 1024px) {
-	.label_button,
-	.value {
-		padding: 0.5rem 0.5rem;
-	}
-}
-@media (max-width: 600px) {
-	.mono_selector {
-		--fs_mono_selector: 0.8rem;
-	}
-	.label_button,
-	.value {
-		padding: 0.5rem 0.25rem;
-	}
+.load_message {
+	color: var(--c_text__muted);
+	text-decoration: underline;
+	user-select: none;
 }
 </style>

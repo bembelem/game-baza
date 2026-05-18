@@ -1,5 +1,4 @@
 import { useField } from "vee-validate"
-import { reactive } from "vue"
 
 
 export function useFormField (name: string) {
@@ -7,11 +6,11 @@ export function useFormField (name: string) {
 		validateOnValueUpdate: false
 	})
 	
-	return reactive({
+	return {
 		value,
 		onBlur: () => {
 			handleBlur()
 			validate()
 		}
-	})
+	}
 }

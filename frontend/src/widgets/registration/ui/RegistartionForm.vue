@@ -1,23 +1,24 @@
-<script setup lang="ts">
+<script lang="ts" setup>
+import { ref, computed } from "vue"
+import { useRouter } from "vue-router"
+import { useForm } from "vee-validate"
 import FormField from "@/shared/ui/FormField.vue"
 import InputField from "@/shared/ui/InputField.vue"
 import PasswordField from "@/shared/ui/PasswordField.vue"
 import SubmitButton from "@/shared/ui/SubmitButton.vue"
 import { type RegistrationResponseError, registrationFetch } from "@/features/registration/api/registrationAPI"
-import { useRouter } from "vue-router"
-import { ref, computed } from "vue"
-import { useForm } from "vee-validate"
 import { usernameValidate, emailValidate, birthdateValidate, passwordValidate } from "@/widgets/registration/lib/registrationValidation"
 import { toRegistrationPayload } from "../lib/registrationTransform"
 import { authStore } from "@/entities/user/store/authStore"
 import { isAPIValidationError } from "@/shared/interface/APIError"
+import { Routes } from "@/shared/lib/router"
 
 export interface RegistrationFormFields {
-	username: string,
-	email: string,
+	username: string
+	email: string
 	birthdate: string
-	password: string,
-} 
+	password: string
+}
 
 const router = useRouter()
 
@@ -28,13 +29,13 @@ const { values, errors, meta, isSubmitting, handleSubmit, isFieldValid, setError
 		username: usernameValidate,
 		email: emailValidate,
 		birthdate: birthdateValidate,
-		password: passwordValidate
-	}
+		password: passwordValidate,
+	},
 })
 
 const isFormFulfilled = computed(() => meta.value.touched && meta.value.valid)
 
-const formatDate = (input: string) => {
+function formatDate(input: string) {
 	const digits = input.replace(/\D/g, "").slice(0, 8)
 
 	if (digits.length <= 2) return digits
@@ -47,10 +48,10 @@ const onSubmit = handleSubmit(async () => {
 	networkError.value = null
 
 	try {
-		const transformedValues = toRegistrationPayload({...values})
+		const transformedValues = toRegistrationPayload({ ...values })
 		const data = await registrationFetch(transformedValues)
 		authStore.data.value = data
-		router.push("/games")
+		router.push(Routes.games)
 	} catch (error) {
 		if (error instanceof TypeError) {
 			networkError.value = "Не удалось подключиться к серверу. Проверьте интернет и попробуйте снова"
@@ -75,12 +76,14 @@ const onSubmit = handleSubmit(async () => {
 </script>
 
 <template>
-	<form class="registration_form" @submit.prevent="onSubmit">
+	<form
+	class="registration_form"
+	@submit.prevent="onSubmit">
 		<FormField
 		label="Никнейм"
 		:error="errors.username"
 		:is-valid="isFieldValid('username')">
-			<InputField 
+			<InputField
 			name="username"
 			:max-length="20"
 			auto-complete="username"/>
@@ -90,7 +93,7 @@ const onSubmit = handleSubmit(async () => {
 		label="Email"
 		:error="errors.email"
 		:is-valid="isFieldValid('email')">
-			<InputField 
+			<InputField
 			name="email"
 			auto-complete="email"/>
 		</FormField>
@@ -105,20 +108,21 @@ const onSubmit = handleSubmit(async () => {
 			:max-length="10"
 			:format-input="formatDate"/>
 		</FormField>
-		
+
 		<FormField
 		label="Пароль"
 		:error="errors.password"
 		:is-valid="isFieldValid('password')">
-			<PasswordField 
-			name="password"/>
+			<PasswordField name="password"/>
 		</FormField>
 
-		<p class="network_error" v-if="networkError">
-			Не удалось подключиться к серверу. Проверьте интернет и попробуйте снова
+		<p
+		v-if="networkError"
+		class="network_error">
+			{{ networkError }}
 		</p>
 
-		<SubmitButton 
+		<SubmitButton
 		label="зарегистрироваться"
 		:is-available="isFormFulfilled"
 		:is-submitting="isSubmitting"/>
@@ -127,18 +131,16 @@ const onSubmit = handleSubmit(async () => {
 
 <style scoped>
 .registration_form {
-	--bc_input_field: var(--c_tertiary);
-	--bc_input_field__focus: var(--c_tertiary__accent);
-	--bc_password_field: var(--c_tertiary);
-	--bc_password_field__focus: var(--c_tertiary__accent);
-	--bc_submit_button: var(--c_tertiary);
-	--bc_submit_button__accent: var(--c_tertiary__accent);
+	--bc_input_field: var(--c_brand__gold);
+	--bc_input_field__focus: var(--c_brand__gold_bright);
+	--bc_password_field: var(--c_brand__gold);
+	--bc_password_field__focus: var(--c_brand__gold_bright);
+	--bc_submit_button: var(--c_brand__gold);
+	--bc_submit_button__accent: var(--c_brand__gold_bright);
 
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
-	width: 100%;
-	flex: 1;
-	row-gap: 1rem;
+	gap: var(--space__sm);
 }
 </style>

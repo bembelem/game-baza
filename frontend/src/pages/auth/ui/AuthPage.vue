@@ -1,33 +1,43 @@
-<script setup lang="ts">
+<script lang="ts" setup>
+import { ref } from "vue"
+
 import AuthForm from "@/widgets/auth/ui/AuthForm.vue"
 import RegistartionForm from "@/widgets/registration/ui/RegistartionForm.vue"
-import { ref } from "vue"
 
 const isAuth = ref(true)
 
-const handleSwitchForm = () => { isAuth.value = !isAuth.value }
+function handleSwitchForm() {
+	isAuth.value = !isAuth.value
+}
 </script>
 
 <template>
 	<div class="auth_page">
-		<div class="forms_container" :class="{ 'forms_container--registration': !isAuth }">
-			<section class="form" v-if="isAuth">
+		<div
+		class="forms_container"
+		:class="{ 'forms_container--registration': !isAuth }">
+			<section
+			v-if="isAuth"
+			class="form">
 				<h2 class="title">Вход</h2>
-				<AuthForm/>
+				<AuthForm />
 			</section>
 
 			<div class="form_switcher">
-				{{ isAuth ? "Новенький? Тогда тебе сюда" : "Мы знакомы? Давай проверим"}}
-				<button class="switch_button" 
-				:class="{ 'switch_button--registration': !isAuth}" 
+				{{ isAuth ? "Новенький? Тогда тебе сюда" : "Мы знакомы? Давай проверим" }}
+				<button
+				class="switch_button"
+				:class="{ 'switch_button--registration': !isAuth }"
 				@click="handleSwitchForm">
-					{{ isAuth ? "Регистрация" :  "Вход"}}
+					{{ isAuth ? "Регистрация" : "Вход" }}
 				</button>
 			</div>
 
-			<section class="form" v-if="!isAuth">
+			<section
+			v-if="!isAuth"
+			class="form">
 				<h2 class="title">Регистрация</h2>
-				<RegistartionForm/>
+				<RegistartionForm />
 			</section>
 		</div>
 	</div>
@@ -36,91 +46,71 @@ const handleSwitchForm = () => { isAuth.value = !isAuth.value }
 <style scoped>
 .auth_page {
 	display: flex;
-	width: 100%;
 }
 
 .forms_container {
-	margin: auto;
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
-	max-width: 55rem;
-	width: 100%;
-	min-height: 35rem;
-	box-shadow:
-		0 0 0.375rem var(--c_secondary__accent),
-		0 0 0.75rem var(--c_secondary__accent),
-		0 0 1.125rem var(--c_secondary__accent),
-		0 0 1.5rem var(--c_secondary__accent),
-		0 0 1.875rem rgba(102, 0, 153, 0.4);
+	margin: auto;
+	max-width: 80rem;
+	box-shadow: var(--neon__purple);
 }
 .forms_container--registration {
-	box-shadow:
-		0 0 0.375rem var(--c_tertiary__accent),
-		0 0 0.75rem var(--c_tertiary__accent),
-		0 0 1.125rem var(--c_tertiary__accent),
-		0 0 1.5rem var(--c_tertiary__accent),
-		0 0 1.875rem rgba(204, 153, 0, 0.4);
+	box-shadow: var(--neon__gold);
 }
 
 .form {
-	padding: 2.5rem;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	padding: var(--space__xl);
+	gap: var(--space__lg);
 }
 
 .title {
-	margin-bottom: 1.75rem;
-	font-size: 1.5rem;
+	font-size: var(--fs__xl);
 	text-decoration: underline;
 }
 
 .form_switcher {
-	padding: 2.5rem;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	padding: var(--space__xl);
+	gap: var(--space__sm);
+	background-color: var(--c_bg__surface);
 	text-align: center;
 	text-wrap: balance;
-	row-gap: 1rem;
-	background-color: var(--c_bg__surface);
 }
 
 .switch_button {
-	background-color: transparent;	
-	color: var(--c_tertiary__accent);
+	background-color: transparent;
+	color: var(--c_brand__gold_bright);
 	cursor: pointer;
 }
 .switch_button--registration {
-	color: var(--c_secondary__accent);
+	color: var(--c_brand__purple_bright);
 }
 
-@media (max-width: 1024px) {
-	.auth_page {
-		padding: 2rem;
-	}
-	.forms_container {
-		width: 100%;
-	}
-}
 @media (max-width: 600px) {
 	.auth_page {
-		margin-top: var(--h_header);
-		padding: 0;
+		height: 100%;
 	}
+
 	.forms_container {
-		margin: 0;
-		padding: 1rem;
+		display: grid;
 		grid-template-columns: 1fr;
 		grid-template-rows: auto 1fr;
-		row-gap: 2rem;
+		margin: 0;
 		min-height: unset;
 	}
+
 	.form,
 	.form_switcher {
-		padding: 0;
+		order: 1;
 	}
+
 	.form_switcher {
 		order: 2;
 		background-color: transparent;
