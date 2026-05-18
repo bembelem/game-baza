@@ -46,5 +46,7 @@ export const storesFilterOptions = useDataStore<SelectorValue<string>[]>()
 
 export const availableSearchGamesFiltersOptions = {
 	genres: genresFilterOptions.data,
-	publishers: publishersFilterOptions.data
+	platforms: platformsFilterOptions.data,
+	publishers: publishersFilterOptions.data,
+	stores: storesFilterOptions.data
 }

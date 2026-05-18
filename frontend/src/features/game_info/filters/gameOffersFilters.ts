@@ -1,10 +1,9 @@
 import type { SelectorValue, FiltersDefinition } from "@/shared/interface/Filters"
-import { sortValues } from "./gameOffersFiltersData"
+import { sortValues, availableGameOffersFiltersOptions } from "./gameOffersFiltersData"
 import { ResetBehavior } from "@/shared/interface/Filters"
 import { priceValues } from "@/shared/data/filtersValues"
 import { useFilters } from "@/shared/lib/useFilters"
 import { useFiltersOptions } from "@/shared/lib/useFiltersOptions"
-import { availableGameOffersFiltersOptions } from "./gameOffersFiltersData"
 
 
 export interface GameOffersFilters {

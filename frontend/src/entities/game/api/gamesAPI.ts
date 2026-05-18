@@ -33,7 +33,7 @@ export const searchGamesFetch = async (
 		paramValues?.forEach(value => queryParams.append(paramName, value))
 	})
 
-	const response = await fetch(`http://127.0.0.1:8000/games?${queryParams.toString()}`, { 
+	const response = await fetch(`http://localhost:8000/games?${queryParams.toString()}`, { 
 		method: "GET",
 		signal: abortController.signal 
 	}) 
@@ -56,7 +56,7 @@ export const gameInfoFetch = async (
 	gameID: string, 
 	abortController: AbortController
 ): Promise<GameInfoResponse> => {
-	const response = await fetch(`http://127.0.0.1:8000/games/${gameID}`, { 
+	const response = await fetch(`http://localhost:8000/games/${gameID}`, { 
 		method: "GET",
 		signal: abortController.signal 
 	})
