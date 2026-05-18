@@ -1,5 +1,5 @@
 import { type SelectorValue, type FiltersDefinition, ResetBehavior } from "@/shared/interface/Filters"
-import { availableGameOffersFiltersOptions, sortValues } from "@/features/game_info/filters/gameOffersFiltersData"
+import { sortValues, availableSearchGamesFiltersOptions } from "./searchGamesFiltersData"
 import { priceValues } from "@/shared/data/filtersValues"
 import { useFilters } from "@/shared/lib/useFilters"
 import { useFiltersOptions } from "@/shared/lib/useFiltersOptions"
@@ -48,4 +48,4 @@ export const searchGamesFiltersDefinition: SearchGamesFiltersDefinition = {
 
 export const searchGamesFilters = useFilters(searchGamesFiltersDefinition)
 
-export const searchGamesFiltersOptions = useFiltersOptions(searchGamesFiltersDefinition, availableGameOffersFiltersOptions)
+export const searchGamesFiltersOptions = useFiltersOptions(searchGamesFiltersDefinition, availableSearchGamesFiltersOptions)
