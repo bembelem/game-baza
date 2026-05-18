@@ -1,5 +1,7 @@
 import uuid
+
 from fastapi import HTTPException
+
 
 class AppHTTPException(HTTPException):
     status_code: int = 500

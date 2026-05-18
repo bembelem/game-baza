@@ -1,10 +1,9 @@
-import logging
 from typing import Any
 
 from asyncpg.exceptions import UniqueViolationError
-from sqlalchemy.exc import IntegrityError
 from pydantic import BaseModel
 from sqlalchemy import select, insert
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import Base

@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from app.api.schemas.users import User
 
 
 class ErrorDetailResponse(BaseModel):
@@ -8,6 +7,8 @@ class ErrorDetailResponse(BaseModel):
     details: dict
     traceId: str
 
+class MessageResponse(BaseModel):
+    message: str
 
 _422_register = {
     "error": "2020_VALIDATION_ERROR",

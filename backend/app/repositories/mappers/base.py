@@ -1,7 +1,6 @@
 from typing import TypeVar, Type
 
 from pydantic import BaseModel
-from sqlalchemy import Row, RowMapping
 
 from app.database import Base
 

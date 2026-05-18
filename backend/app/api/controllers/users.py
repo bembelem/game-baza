@@ -1,6 +1,6 @@
 from typing import Any
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
 
 from app.api.controllers.examples.responses import ME_RESPONSES
 from app.api.dependencies import UserIdDep
@@ -8,7 +8,6 @@ from app.api.schemas.auth import UserAdd
 from app.api.schemas.users import UserPatch, Wishlist, UserPublic, User
 from app.database import async_session_maker
 from app.repositories.users import UsersRepository
-from app.services.auth import AuthService
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
