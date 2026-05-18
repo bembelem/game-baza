@@ -5,7 +5,7 @@ from pydantic import BaseModel, field_validator, EmailStr, model_validator
 
 
 # Данные от клиента при регистрации (содержит сырой пароль)
-class UserRequestAdd(BaseModel):
+class UserRequestRegister(BaseModel):
     username: str
     email: EmailStr
     birthdate: date
@@ -49,7 +49,7 @@ class UserRequestAdd(BaseModel):
         return value
 
 
-# Данные для записи в БД (пароль уже захеширован)
+# Данные для записи в БД
 class UserAdd(BaseModel):
     username: str
     email: EmailStr
@@ -65,7 +65,7 @@ class UserWithHashedPassword(BaseModel):
     username: str
     created_at: date
 
-# Данные от клиента при логине (можно войти через email или username)
+# Данные от клиента при логине
 class UserRequestLogin(BaseModel):
     username: str | None = None
     email: EmailStr | None = None
