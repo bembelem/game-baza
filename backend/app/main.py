@@ -1,4 +1,3 @@
-# app/main.py
 import sys
 from pathlib import Path
 
@@ -15,6 +14,7 @@ from app.api.controllers.genres import router as genres_router
 from app.api.controllers.platforms import router as platforms_router
 from app.api.controllers.stores import router as stores_router
 from app.api.controllers.publishers import router as publishers_router
+from app.api.controllers.developers import router as developers_router
 from app.api.controllers.users import router as users_router
 from app.exception_handlers import (
     app_http_exception_handler,
@@ -22,6 +22,10 @@ from app.exception_handlers import (
     unhandled_exception_handler,
 )
 from app.exceptions import AppHTTPException
+from app.logging_config import setup_logging
+from app.middleware.request_id import RequestIdMiddleware
+
+setup_logging(level="INFO")
 
 app = FastAPI()
 
@@ -31,7 +35,9 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-Request-ID"],  # чтобы фронт мог прочитать заголовок
 )
+app.add_middleware(RequestIdMiddleware)
 
 app.add_exception_handler(AppHTTPException, app_http_exception_handler)
 app.add_exception_handler(RequestValidationError, request_validation_handler)
@@ -44,6 +50,7 @@ app.include_router(offers_router)
 app.include_router(stores_router)
 app.include_router(platforms_router)
 app.include_router(publishers_router)
+app.include_router(developers_router)
 app.include_router(genres_router)
 
 if __name__ == "__main__":

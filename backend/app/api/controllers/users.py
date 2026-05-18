@@ -6,8 +6,8 @@ from app.api.controllers.examples.responses import ME_RESPONSES
 from app.api.dependencies import UserIdDep
 from app.api.schemas.auth import UserAdd
 from app.api.schemas.users import UserPatch, Wishlist, UserPublic, User
-from app.database import async_session_maker
-from app.repositories.users import UsersRepository
+from database.database import async_session_maker
+from app.repositories.users import UserRepository
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -24,7 +24,7 @@ async def me(
         user_id: UserIdDep
 ):
     async with async_session_maker() as session:
-        user = await UsersRepository(session).get_one_or_none(id=user_id)
+        user = await UserRepository(session).get_one_or_none(id=user_id)
     return user
 
 @router.get(

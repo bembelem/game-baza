@@ -2,14 +2,14 @@ from pydantic import EmailStr
 from sqlalchemy import select
 
 from app.api.schemas.auth import UserWithHashedPassword
-from app.models.users import UsersOrm
+from database.models.users import UserOrm
 from app.repositories.base import BaseRepository
-from app.repositories.mappers.mappers import UsersDataMapper
+from app.repositories.mappers.mappers import UserDataMapper
 
 
-class UsersRepository(BaseRepository):
-    model = UsersOrm
-    mapper = UsersDataMapper
+class UserRepository(BaseRepository):
+    model = UserOrm
+    mapper = UserDataMapper
 
     async def get_user_with_hashed_password(self, email: EmailStr = None, username: str = None):
         if not (email or username):

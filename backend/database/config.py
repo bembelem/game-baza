@@ -13,8 +13,12 @@ class Settings(BaseSettings):
 
     # dsn = "postgresql+asyncpg://postgres:mypassword@localhost:5432/mydb"
     @property
-    def DB_URL(self):
+    def DB_URL_ASYNC(self):
         return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+
+    @property
+    def DB_URL_SYNC(self):
+        return f"postgresql+psycopg2://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     JWT_SECRET_KEY: str
     JWT_ALGORITHM: str
