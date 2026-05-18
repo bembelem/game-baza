@@ -41,3 +41,17 @@ class BaseRepository:
             if isinstance(ex.orig.__cause__, UniqueViolationError):
                 constraint = getattr(ex.orig.__cause__, "constraint_name", None)
                 raise ObjectAlreadyExistsError(constraint=constraint) from ex
+
+    async def get_or_create(self, name: str | None, data: BaseModel | None) -> BaseModel:
+        result = await self.session.execute(
+            select(BaseModel).where(BaseModel.name == name)
+        )
+        dev = result.scalar_one_or_none()
+        if not dev:
+            dev = DeveloperOrm(name=name)
+            self.session.add(dev)
+            await self.session.flush()
+        return dev
+
+# TODO: создать get_or_create(**filters) (перенести)
+# TODO: создать add_batch() (перенести)

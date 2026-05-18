@@ -46,7 +46,6 @@ class GameFilters:
                 Optional[str],
                 Query(
                     description="Поиск по названию игры",
-                    min_length=2,
                     max_length=100,
                 )
             ] = None,
@@ -113,12 +112,12 @@ class GameFilters:
 
 
 class GameDetails(Game):
-    description: str | None
-    release_date: date
-    developer: str
-    publisher: str
-    genres: List[str]
-    offers: List[Offer]
+    description: str | None = None
+    release_date: date | None = None
+    developer: str | None = None
+    publisher: str | None = None
+    genres: List[str] = []
+    offers: List[Offer] = []
 
 class Review(BaseModel):
     id: int

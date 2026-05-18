@@ -28,3 +28,5 @@ class OfferRepository(BaseRepository):
         stmt = select(GameOrm.id).where(GameOrm.normalized_title == normalized_title)
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
+
+# TODO: get_id_by_normalized_title - можно использовать get one or none из base
