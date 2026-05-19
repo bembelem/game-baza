@@ -1,7 +1,4 @@
-"""Реализованные эндпоинты пользователя.
-
-Не реализованные пока живут в `stubs.py` — переноси сюда по мере готовности.
-"""
+"""Реализованные эндпоинты пользователя."""
 from fastapi import APIRouter, Response
 
 from app.api.controllers.examples.responses import ME_RESPONSES, MessageResponse
