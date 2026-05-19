@@ -9,13 +9,18 @@ from starlette.middleware.cors import CORSMiddleware
 
 from app.api.controllers.auth import router as auth_router
 from app.api.controllers.games import router as games_router
-from app.api.controllers.offers import router as offers_router
-from app.api.controllers.genres import router as genres_router
-from app.api.controllers.platforms import router as platforms_router
-from app.api.controllers.stores import router as stores_router
-from app.api.controllers.publishers import router as publishers_router
-from app.api.controllers.developers import router as developers_router
+from app.api.controllers.catalogs import (
+    router_developers,
+    router_genres,
+    router_platforms,
+    router_publishers,
+    router_stores,
+)
 from app.api.controllers.users import router as users_router
+from app.api.controllers.stubs import (
+    router_offers as stub_offers_router,
+    router_users as stub_users_router,
+)
 from app.exception_handlers import (
     app_http_exception_handler,
     request_validation_handler,
@@ -45,13 +50,14 @@ app.add_exception_handler(Exception, unhandled_exception_handler)
 
 app.include_router(auth_router)
 app.include_router(users_router)
+app.include_router(stub_users_router)   # незавершённые users-эндпоинты (см. stubs.py)
 app.include_router(games_router)
-app.include_router(offers_router)
-app.include_router(stores_router)
-app.include_router(platforms_router)
-app.include_router(publishers_router)
-app.include_router(developers_router)
-app.include_router(genres_router)
+app.include_router(stub_offers_router)  # все offers-эндпоинты пока заглушки
+app.include_router(router_stores)
+app.include_router(router_platforms)
+app.include_router(router_publishers)
+app.include_router(router_developers)
+app.include_router(router_genres)
 
 if __name__ == "__main__":
     import uvicorn

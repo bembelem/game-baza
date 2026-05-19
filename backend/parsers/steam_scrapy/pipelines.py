@@ -1,13 +1,6 @@
-import asyncio
-
-from sqlalchemy import select
-
-from app.repositories.offers import OfferRepository
 from app.repositories.raw_offers import RawOfferRepository
-from app.schemas.offers import OfferCreate
 from database.database import async_session_maker
-from database.models.catalogs import StoreOrm
-from utils.normalizers import normalize_title, normalize_date
+from utils.normalizers import normalize_date, normalize_title
 
 STEAM_STORE_NAME = "steam"
 

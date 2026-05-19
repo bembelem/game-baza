@@ -5,6 +5,7 @@ from jwt import ExpiredSignatureError, DecodeError
 from pwdlib import PasswordHash
 
 from app.api.schemas.auth import UserRequestRegister, UserAdd, UserRequestLogin
+from app.api.schemas.users import User, UserPatch
 from database.config import settings
 from database.database import async_session_maker
 from app.exceptions import EmailAlreadyExistsHTTPException, UsernameAlreadyExistsHTTPException, \
@@ -63,6 +64,43 @@ class AuthService:
                 raise AppHTTPException()
             await session.commit()
             return user
+
+    async def update_user(self, user_id: int, data: UserPatch) -> User:
+        """Частичное обновление профиля. Пароль хешируется, если передан.
+
+        Пустой PATCH (без полей) — просто возвращает текущего юзера.
+        На дубликате email/username бросает соответствующее 409.
+        """
+        fields = data.model_dump(exclude_unset=True, exclude_none=True)
+        if "password" in fields:
+            fields["hashed_password"] = self.hash_password(fields.pop("password"))
+
+        async with async_session_maker() as session:
+            repo = UserRepository(session)
+            if not fields:
+                # клиент прислал пустой PATCH — просто отдаём текущего
+                return await repo.get_one_or_none(id=user_id)
+
+            try:
+                user = await repo.update_by_id(user_id, fields)
+                await session.commit()
+            except ObjectAlreadyExistsError as ex:
+                if ex.constraint == "users_email_key":
+                    raise EmailAlreadyExistsHTTPException()
+                if ex.constraint == "users_username_key":
+                    raise UsernameAlreadyExistsHTTPException()
+                raise AppHTTPException()
+
+            if user is None:
+                # юзера с таким id уже нет — токен битый/устаревший
+                raise IncorrectTokenHTTPException()
+            return user
+
+    async def delete_user(self, user_id: int) -> None:
+        """Удаляет пользователя. Идемпотентно: если уже удалён — ничего страшного."""
+        async with async_session_maker() as session:
+            await UserRepository(session).delete_by_id(user_id)
+            await session.commit()
 
     def decode_token(self, token) -> dict:
         try:

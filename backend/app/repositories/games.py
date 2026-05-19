@@ -3,7 +3,7 @@ from sqlalchemy.orm import selectinload
 
 from app.api.schemas.games import GameFilters
 from app.repositories.base import BaseRepository
-from app.repositories.mappers.mappers import GameDataMapper
+from app.repositories.mappers import GameDataMapper
 from database.models.catalogs import (
     DeveloperOrm,
     GenreOrm,
@@ -63,7 +63,7 @@ class GameRepository(BaseRepository):
         await self.session.flush()
         return game
 
-    # ----- list / page -----------------------------------------------------
+    # list / page
 
     async def list_page(
         self, filters: GameFilters, last_id: int, per_page: int
@@ -172,7 +172,7 @@ class GameRepository(BaseRepository):
         ]
         return items, total
 
-    # ----- details ---------------------------------------------------------
+    # Details
 
     async def get_details(self, game_id: int) -> GameOrm | None:
         stmt = (
@@ -181,7 +181,8 @@ class GameRepository(BaseRepository):
                 selectinload(GameOrm.developer),
                 selectinload(GameOrm.publisher),
                 selectinload(GameOrm.genres),
-                selectinload(GameOrm.offers),
+                # offers + store одним loader-цепочкой → store.name доступен в сервисе
+                selectinload(GameOrm.offers).selectinload(OfferOrm.store),
             )
             .where(GameOrm.id == game_id)
         )

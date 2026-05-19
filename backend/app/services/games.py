@@ -85,16 +85,19 @@ def _aggregate_min_prices(offers: list[OfferOrm]) -> tuple[int, int]:
 
 
 def _offer_to_schema(offer: OfferOrm) -> Offer:
+    # offer.store подгружено через selectinload в GameRepository.get_details
     return Offer(
         id=offer.id,
         game_id=offer.game_id,
         store_id=offer.store_id or 0,
+        store=offer.store.name.capitalize() if offer.store else "",
         store_game_link=offer.store_game_link or offer.link or "",
         price_original=offer.price_original or 0,
         price_discount=offer.price_discount or 0,
         discount_percent=_percent_to_int(offer.discount_percent),
         positive_percent=offer.positive_percent or 0,
     )
+
 
 
 def _percent_to_int(value: str | None) -> int:
