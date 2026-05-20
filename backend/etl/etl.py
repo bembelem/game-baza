@@ -40,8 +40,6 @@ async def run_etl() -> None:
                 break
 
             for raw in batch:
-                # SAVEPOINT — при ошибке откатится только этот raw,
-                # а не весь батч и не уже отмеченные is_processed соседи.
                 try:
                     async with session.begin_nested():
                         await _process_one(session, raw)
@@ -62,7 +60,7 @@ async def run_etl() -> None:
     )
 
 
-# ----- batch fetch ----------------------------------------------------------
+# batch fetch
 
 async def _fetch_unprocessed(session: AsyncSession, limit: int) -> list[RawOfferOrm]:
     result = await session.execute(
@@ -74,7 +72,7 @@ async def _fetch_unprocessed(session: AsyncSession, limit: int) -> list[RawOffer
     return list(result.scalars().all())
 
 
-# ----- основной конвейер ----------------------------------------------------
+# основной конвейер
 
 async def _process_one(session: AsyncSession, raw: RawOfferOrm) -> None:
     """Нормализует один raw_offer в Game + Offer (+ справочники)."""
@@ -98,7 +96,7 @@ async def _process_one(session: AsyncSession, raw: RawOfferOrm) -> None:
     await _upsert_offer(session, raw=raw, game=game, store=store)
 
 
-# ----- справочники ----------------------------------------------------------
+# справочники
 
 async def _get_or_create_store(session: AsyncSession, name: str) -> StoreOrm:
     return await _get_or_create_named(session, StoreOrm, name)
@@ -146,7 +144,7 @@ async def _get_or_create_named(session: AsyncSession, model, name: str):
     return obj
 
 
-# ----- games ----------------------------------------------------------------
+# games
 
 async def _get_or_create_game(
     session: AsyncSession,
@@ -217,7 +215,7 @@ def _merge_m2m(existing: list, incoming: Iterable) -> None:
             existing.append(obj)
 
 
-# ----- offers ---------------------------------------------------------------
+# offers
 
 async def _upsert_offer(
     session: AsyncSession,
@@ -292,7 +290,7 @@ def _join_or_none(values: list[str] | None) -> str | None:
     return ", ".join(values)
 
 
-# ----- entry point ----------------------------------------------------------
+# entry point
 
 if __name__ == "__main__":
     logging.basicConfig(

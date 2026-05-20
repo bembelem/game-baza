@@ -13,8 +13,8 @@ class GameOrm(Base):
     __tablename__ = 'games'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[str] = mapped_column(String(100), unique=True)
-    normalized_title: Mapped[str] = mapped_column(String(100), unique=True)
+    title: Mapped[str] = mapped_column(String(500), unique=True)
+    normalized_title: Mapped[str] = mapped_column(String(500), unique=True)
     description: Mapped[str | None] = mapped_column(Text)
     release_date: Mapped[date | None] = mapped_column(index=True)
     image_url: Mapped[str | None] = mapped_column(String(1000))
@@ -45,8 +45,8 @@ class OfferOrm(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[str] = mapped_column(String(100))
-    normalized_title: Mapped[str] = mapped_column(String(100))
+    title: Mapped[str] = mapped_column(String(500))
+    normalized_title: Mapped[str] = mapped_column(String(500))
     description: Mapped[str | None] = mapped_column(Text)
     released: Mapped[date | None]
     image_url: Mapped[str | None] = mapped_column(String(1000))
@@ -78,9 +78,9 @@ class RawOfferOrm(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[str] = mapped_column(String(100))
+    title: Mapped[str] = mapped_column(String(500))
     store: Mapped[str] = mapped_column(String(100))
-    normalized_title: Mapped[str] = mapped_column(String(100))
+    normalized_title: Mapped[str] = mapped_column(String(500))
     description: Mapped[str | None] = mapped_column(Text)
     released: Mapped[date | None]
     image_url: Mapped[str | None] = mapped_column(String(1000))

@@ -103,29 +103,33 @@ class GameRepository(BaseRepository):
         # Фильтры
         conditions = []
         if filters.title:
-            conditions.append(GameOrm.title.ilike(f"%{filters.title}%"))
+            # ILIKE с % в конце — prefix match, case-insensitive ('c' → 'Cyberpunk', 'Counter-Strike')
+            conditions.append(GameOrm.title.ilike(f"{filters.title}%"))
 
         if filters.genres:
-            conditions.append(
-                exists().where(
-                    and_(
-                        genres_games.c.game_id == GameOrm.id,
-                        genres_games.c.genre_id == GenreOrm.id,
-                        GenreOrm.name.in_(filters.genres),
+            for genre_name in filters.genres:
+                conditions.append(
+                    exists().where(
+                        and_(
+                            genres_games.c.game_id == GameOrm.id,
+                            genres_games.c.genre_id == GenreOrm.id,
+                            GenreOrm.name == genre_name,
+                        )
                     )
                 )
-            )
 
+        # игра должна поддерживать ВСЕ выбранные платформы.
         if filters.platforms:
-            conditions.append(
-                exists().where(
-                    and_(
-                        platforms_games.c.game_id == GameOrm.id,
-                        platforms_games.c.platform_id == PlatformOrm.id,
-                        PlatformOrm.name.in_(filters.platforms),
+            for platform_name in filters.platforms:
+                conditions.append(
+                    exists().where(
+                        and_(
+                            platforms_games.c.game_id == GameOrm.id,
+                            platforms_games.c.platform_id == PlatformOrm.id,
+                            PlatformOrm.name == platform_name,
+                        )
                     )
                 )
-            )
 
         if filters.price_min is not None:
             conditions.append(offer_sub.c.min_disc >= filters.price_min)

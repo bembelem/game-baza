@@ -121,7 +121,7 @@ class BaseRepository:
         constraint: str,
         skip_cols: tuple[str, ...] = ("id",),
     ) -> None:
-        """Bulk INSERT ... ON CONFLICT DO UPDATE для PostgreSQL.
+        """Bulk INSERT ... ON CONFLICT DO UPDATE.
 
         Принимает список dict'ов (или Pydantic-схем — но тогда нужно
         заранее вызвать .model_dump()). На конфликте по `constraint`

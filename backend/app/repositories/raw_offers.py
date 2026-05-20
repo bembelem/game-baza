@@ -3,15 +3,11 @@ from database.models.games import RawOfferOrm
 
 
 class RawOfferRepository(BaseRepository):
-    """Хранилище сырых офферов от скрапера.
-
-    `add_batch` — тонкая обёртка над `BaseRepository.upsert_batch`
-    с зашитым UNIQUE-constraint'ом и полями, которые не перезаписываем.
-    """
+    """Хранилище сырых офферов от скрапера."""
     model = RawOfferOrm
 
     async def add_batch(self, raw_offers: list[dict]) -> None:
-        """Тонкая обёртка над `BaseRepository.upsert_batch` с зашитым UNIQUE-constraint'ом и полями,
+        """Обёртка над `BaseRepository.upsert_batch` с зашитым UNIQUE-constraint'ом и полями,
         которые не перезаписываем."""
 
         await self.upsert_batch(
