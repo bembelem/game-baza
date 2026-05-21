@@ -3,7 +3,7 @@ import SearchIcon from "@/assets/icons/interface-essential-search-1--Streamline-
 
 const props = defineProps<{
 	placeholder: string,
-	onSearch: () => void
+	onSearch?: () => void
 }>()
 
 const searchInput = defineModel()
@@ -19,7 +19,8 @@ const searchInput = defineModel()
 
 		<button
 		class="search_button"
-		@click="props.onSearch">
+		@click="props.onSearch"
+		:disabled="!props.onSearch">
 			<SearchIcon class="icon"/>
 		</button>
 	</div>
@@ -34,9 +35,10 @@ const searchInput = defineModel()
 
 .search_input {
 	width: 100%;
-	padding: var(--space__xs) var(--space__md);
-	border: var(--border__md) solid var(--c_brand__purple);
+	padding: var(--p_search_input, var(--space__xs) var(--space__md));
+	border: var(--b_search_input, var(--border__md) solid var(--c_brand__purple));
 	border-right: none;
+	font-size: var(--fs_search_input, var(--fs__md));
 	background-color: var(--c_bg__surface);
 	transition: border-color 0.2s ease-in-out;
 }
@@ -48,12 +50,13 @@ const searchInput = defineModel()
 }
 
 .search_button {
-	border: var(--border__md) solid var(--c_brand__purple_bright);
+	flex-shrink: 0;
+	border: var(--b_search_button, var(--border__md) solid var(--c_brand__purple_bright));
 	background-color: var(--c_brand__purple_bright);
 	color: var(--c_bg__primary);
 	transition: color 0.2s ease-out;
 }
-.search_button:active {
+.search_button:not(:disabled):active {
   	color: var(--c_text__primary);
 }
 
