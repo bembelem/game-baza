@@ -1,5 +1,6 @@
 <script setup lang="ts" generic="T">
-import { ref } from "vue"
+import { ref, computed } from "vue"
+import SearchBar from "./SearchBar.vue"
 import LoadIndicator from "@/shared/ui/LoadIndicator.vue"
 import type { SelectorValue } from "../interface/Filters"
 
@@ -10,13 +11,22 @@ const props = withDefaults(defineProps<{
 	label?: string,
 	isLoading?: boolean,
 	isAutoClose?: boolean,
+	hasSearch?: boolean,
 	onOptionClick: (name: string, option: SelectorValue<T>) => void
 }>(), {
 	label: "выбрать",
-	isAutoClose: true
+	isAutoClose: true,
+	hasSearch: false
 })
 
 const isOpen = ref(false)
+const searchValue = ref("")
+
+const filteredOptions = computed(() => {
+	if (!searchValue.value) return props.options
+
+	return props.options.filter((option) => option.title.toLowerCase().includes(searchValue.value.toLowerCase()))
+})
 
 function handleOptionClick(name: string, option: SelectorValue<T>) {
 	props.onOptionClick(name, option)
@@ -25,11 +35,13 @@ function handleOptionClick(name: string, option: SelectorValue<T>) {
 </script>
 
 <template>
-	<div class="mono_selector">
+	<div 
+	class="mono_selector"
+	tabindex="-1"
+	@focusout="(e) => { if (!$el.contains(e.relatedTarget)) isOpen = false }">
 		<button
 		class="label_button"
-		@click="isOpen = !isOpen"
-		@blur="isOpen = false">
+		@click="isOpen = !isOpen">
 			<span class="label">{{ props.selectedOption?.title ?? props.label }}</span>
 			<span
 			class="arrow"
@@ -43,27 +55,42 @@ function handleOptionClick(name: string, option: SelectorValue<T>) {
 			v-show="isOpen"
 			class="options_container">
 				<template v-if="!props.isLoading && props.options.length">
-					<div
-					v-for="option in props.options"
-					:key="option.title"
-					class="option"
-					:class="{ 'option--active': props.selectedOption?.title == option.title }"
-					@mousedown.prevent="() => handleOptionClick(props.name, option)">
-						{{ option.title }}
+					<div 
+					v-if="props.hasSearch"
+					class="search_bar">
+						<SearchBar 
+						v-model="searchValue"
+						placeholder="Поиск..."/>
 					</div>
+
+					<template v-if="filteredOptions.length">
+						<button
+						v-for="option in filteredOptions"
+						:key="option.title"
+						class="option"
+						:class="{ 'option--active': props.selectedOption?.title == option.title }"
+						@click="() => handleOptionClick(props.name, option)">
+							{{ option.title }}
+						</button>
+					</template>
+					
+					<p 
+					v-else 
+					class="data_message data_message--text">
+						NO RESULTS
+					</p>
 				</template>
 
-				<div
+				<LoadIndicator 
 				v-else-if="props.isLoading"
-				class="load_container">
-					<LoadIndicator :is-short="true"/>
-				</div>
+				class="data_message" 
+				:is-short="true"/>
 
-				<div
-				v-else
-				class="load_container">
-					<p class="load_message">NO SIGNAL</p>
-				</div>
+				<p 
+				v-else 
+				class="data_message data_message--text">
+					NO SIGNAL
+				</p>
 			</div>
 		</div>
 	</div>
@@ -106,19 +133,35 @@ function handleOptionClick(name: string, option: SelectorValue<T>) {
 }
 
 .options_container {
+	--b_search_input: none;
+	--b_search_button: none;
+	--p_search_input: var(--space__sm);
+	--fs_search_input: var(--fs__sm);
+	--c_load: var(--c_brand__purple);
+	--c_load__accent: var(--c_brand__purple);
+
 	position: absolute;
 	z-index: 1;
+	display: flex;
+	flex-direction: column;
 	overflow-x: hidden;
 	overflow-y: auto;
 	width: 100%;
 	height: calc((var(--lh_global) * var(--fs__sm) + var(--space__sm) * 2) * 5 + var(--border__md) * 2);
 	border: var(--border__md) solid var(--c_brand__purple);
 	background-color: var(--c_bg__primary);
-	scrollbar-color: var(--c_text__primary) var(--c_bg__primary);
+	scrollbar-gutter: stable;
 	scrollbar-width: thin;
+	scrollbar-color: var(--c_text__primary) var(--c_bg__primary);
+}
+
+.search_bar {
+	position: sticky;
+	top: 0;
 }
 
 .option {
+	flex-shrink: 0;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -126,6 +169,8 @@ function handleOptionClick(name: string, option: SelectorValue<T>) {
 	padding: var(--space__sm);
 	font-size: var(--fs__sm);
 	color: var(--c_text__primary);
+	background-color: transparent;
+	text-align: left;
 }
 .option:hover {
   	background-color: var(--c_bg__surface);
@@ -134,19 +179,11 @@ function handleOptionClick(name: string, option: SelectorValue<T>) {
   	color: var(--c_brand__purple_bright);
 }
 
-.load_container {
-	--c_load: var(--c_brand__purple);
-	--c_load__accent: var(--c_brand__purple);
-
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	height: 100%;
+.data_message {
+	margin: auto;
 }
-
-.load_message {
+.data_message--text {
 	color: var(--c_text__muted);
 	text-decoration: underline;
-	user-select: none;
 }
 </style>

@@ -42,7 +42,8 @@ function handleOptionClick(name: string, newOption: SelectorValue<T>) {
 </script>
 
 <template>
-	<div class="multi_selector"
+	<div 
+	class="multi_selector"
 	tabindex="-1"
 	@focusout="(e) => { if (!$el.contains(e.relatedTarget)) isOpen = false }">
 		<button
@@ -92,7 +93,6 @@ function handleOptionClick(name: string, newOption: SelectorValue<T>) {
 						NO RESULTS
 					</p>
 				</template>
-
 				
 				<LoadIndicator 
 				v-else-if="props.isLoading"
