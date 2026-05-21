@@ -1,10 +1,10 @@
 """Эндпоинты-заглушки"""
 from typing import Any
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Path
 
-from app.api.schemas.offers import Offer, OfferPrices
-from app.api.schemas.users import UserPublic, Wishlist
+from app.services.schemas.offers import Offer, OfferPrices
+from app.services.schemas.users import UserPublic, Wishlist
 
 UNAUTHORIZED: dict[int | str, dict[str, Any]] = {
     401: {"description": "Не авторизован, токен отсутствует или недействителен"}
@@ -19,13 +19,23 @@ NOT_FOUND_USER: dict[int | str, dict[str, Any]] = {
 router_offers = APIRouter(prefix="/offers", tags=["Offers"])
 
 
-@router_offers.get("/{offer_id}", response_model=Offer)
-def get_offer(offer_id: int):
+@router_offers.get(
+    "/{offer_id}",
+    response_model=Offer,
+    summary="Оффер магазина",
+    description="Возвращает информацию о конкретном оффере по его ID.",
+)
+def get_offer(offer_id: int = Path(description="ID оффера")):
     ...
 
 
-@router_offers.get("/{offer_id}/price-history", response_model=OfferPrices)
-def get_offer_price_history(offer_id: int):
+@router_offers.get(
+    "/{offer_id}/price-history",
+    response_model=OfferPrices,
+    summary="История цен оффера",
+    description="Возвращает историю изменения цены для конкретного оффера.",
+)
+def get_offer_price_history(offer_id: int = Path(description="ID оффера")):
     ...
 
 
@@ -41,7 +51,7 @@ router_users = APIRouter(prefix="/users", tags=["Users"])
     description="Возвращает публичный профиль пользователя по его ID.",
     responses={**NOT_FOUND_USER},
 )
-async def get_user(user_id: int):
+async def get_user(user_id: int = Path(description="ID пользователя")):
     ...
 
 
@@ -52,7 +62,7 @@ async def get_user(user_id: int):
     description="Возвращает список игр в вишлисте пользователя по его ID.",
     responses={**NOT_FOUND_USER},
 )
-async def get_user_wishlist(user_id: int):
+async def get_user_wishlist(user_id: int = Path(description="ID пользователя")):
     ...
 
 
@@ -66,7 +76,7 @@ async def get_user_wishlist(user_id: int):
         409: {"description": "Игра уже в вишлисте"},
     },
 )
-async def add_to_wishlist(game_id: int):
+async def add_to_wishlist(game_id: int = Path(description="ID игры")):
     ...
 
 
@@ -79,5 +89,5 @@ async def add_to_wishlist(game_id: int):
         404: {"description": "Игра не найдена в вишлисте"},
     },
 )
-async def remove_from_wishlist(game_id: int):
+async def remove_from_wishlist(game_id: int = Path(description="ID игры")):
     ...

@@ -1,9 +1,9 @@
-"""Реализованные эндпоинты пользователя."""
 from fastapi import APIRouter, Response
 
 from app.api.controllers.examples.responses import ME_RESPONSES, MessageResponse
 from app.api.dependencies import UserIdDep
-from app.api.schemas.users import User, UserPatch
+from app.services.schemas.users import UserPrivate
+from app.api.schemas.users import UserPatch
 from app.repositories.users import UserRepository
 from app.services.auth import AuthService
 from database.database import async_session_maker
@@ -14,9 +14,10 @@ auth_service = AuthService()
 
 @router.get(
     "/me",
-    response_model=User,
+    response_model=UserPrivate,
     status_code=200,
     summary="Мой профиль",
+    description="Возвращает полный профиль авторизованного пользователя.",
     responses=ME_RESPONSES,
 )
 async def me(user_id: UserIdDep):
@@ -27,7 +28,7 @@ async def me(user_id: UserIdDep):
 
 @router.patch(
     "/me",
-    response_model=User,
+    response_model=UserPrivate,
     status_code=200,
     summary="Изменить профиль",
     description="Частично обновляет профиль авторизованного пользователя. "

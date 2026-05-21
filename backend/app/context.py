@@ -1,10 +1,11 @@
-"""Контекст текущего запроса (request-scoped storage)."""
+"""Контекст текущего запроса (request-scoped storage).
+
+Хранит trace_id текущего HTTP-запроса. Заполняется RequestIdMiddleware
+на входе, читается отовсюду: логгером, exception handlers, бизнес-кодом.
+"""
 import uuid
 from contextvars import ContextVar
 
-# Хранит trace_id текущего HTTP-запроса.
-# Заполняется RequestIdMiddleware на входе, читается отовсюду:
-# логгером, exception handlers, бизнес-кодом.
 _request_id_var: ContextVar[str | None] = ContextVar("request_id", default=None)
 
 

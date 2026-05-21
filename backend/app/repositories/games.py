@@ -1,9 +1,8 @@
 from sqlalchemy import select, func, and_, exists
 from sqlalchemy.orm import selectinload
 
-from app.api.schemas.games import GameFilters
+from app.services.schemas.games import GameFilters
 from app.repositories.base import BaseRepository
-from app.repositories.mappers import GameDataMapper
 from database.models.catalogs import (
     DeveloperOrm,
     GenreOrm,
@@ -18,7 +17,8 @@ from database.models.games import GameOrm, OfferOrm, RawOfferOrm
 
 class GameRepository(BaseRepository):
     model = GameOrm
-    mapper = GameDataMapper
+    # mapper не задан — методы из base возвращают ORM напрямую.
+    # Конвертация в GameCard / GameDetails делается в сервисе с агрегатами.
 
     async def get_or_create_batch(self, titles: list[str]) -> dict[str, int]:
         stmt = select(GameOrm.id, GameOrm.normalized_title).where(

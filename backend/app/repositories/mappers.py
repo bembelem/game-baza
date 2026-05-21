@@ -1,18 +1,25 @@
+"""Мапперы между ORM-моделями и Pydantic-схемами.
+
+GameDataMapper намеренно отсутствует: response-схема GameCard содержит
+агрегаты (min_price_*, discount_percent), которых нет в GameOrm.
+Тривиальный mapper.model_validate() бы упал. Конвертация GameOrm → GameCard
+делается вручную в GameRepository.list_page() с подсчётом агрегатов в SQL.
+"""
 from typing import Type, TypeVar
 
 from pydantic import BaseModel
 
-from app.api.schemas.games import Game
-from app.api.schemas.offers import Offer
-from app.api.schemas.users import User
+from app.services.schemas.offers import Offer
+from app.services.schemas.users import UserPrivate
 from database.database import Base
-from database.models.games import GameOrm, OfferOrm
+from database.models.games import OfferOrm
 from database.models.users import UserOrm
 
 SchemaType = TypeVar("SchemaType", bound=BaseModel)
 
 
 class DataMapper:
+    """Общий базовый mapper: ORM ↔ Pydantic через `model_validate`."""
     db_model: Type[Base]
     schema: Type[SchemaType]
 
@@ -27,12 +34,7 @@ class DataMapper:
 
 class UserDataMapper(DataMapper):
     db_model = UserOrm
-    schema = User
-
-
-class GameDataMapper(DataMapper):
-    db_model = GameOrm
-    schema = Game
+    schema = UserPrivate
 
 
 class OfferDataMapper(DataMapper):

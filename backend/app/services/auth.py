@@ -4,8 +4,10 @@ import jwt
 from jwt import ExpiredSignatureError, DecodeError
 from pwdlib import PasswordHash
 
-from app.api.schemas.auth import UserRequestRegister, UserAdd, UserRequestLogin
-from app.api.schemas.users import User, UserPatch
+from app.api.schemas.auth import UserRegisterRequest, UserLoginRequest
+from app.api.schemas.users import UserPatch
+from app.services.schemas.auth import UserAdd
+from app.services.schemas.users import UserPrivate
 from database.config import settings
 from database.database import async_session_maker
 from app.exceptions import EmailAlreadyExistsHTTPException, UsernameAlreadyExistsHTTPException, \
@@ -29,7 +31,7 @@ class AuthService:
     def hash_password(self, password):
         return self.password_hash.hash(password)
 
-    async def login_user(self, data: UserRequestLogin):
+    async def login_user(self, data: UserLoginRequest):
         async with async_session_maker() as session:
             if data.email:
                 user = await UserRepository(session).get_user_with_hashed_password(email=data.email)
@@ -43,7 +45,7 @@ class AuthService:
                 raise IncorrectPasswordHTTPException()
             return user
 
-    async def register_user(self, data: UserRequestRegister):
+    async def register_user(self, data: UserRegisterRequest):
         async with async_session_maker() as session:
 
             hashed_password = self.hash_password(data.password)
@@ -65,7 +67,7 @@ class AuthService:
             await session.commit()
             return user
 
-    async def update_user(self, user_id: int, data: UserPatch) -> User:
+    async def update_user(self, user_id: int, data: UserPatch) -> UserPrivate:
         """Частичное обновление профиля. Пароль хешируется, если передан.
 
         Пустой PATCH (без полей) — просто возвращает текущего юзера.
