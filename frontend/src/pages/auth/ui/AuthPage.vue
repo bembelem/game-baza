@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-
 import AuthForm from "@/widgets/auth/ui/AuthForm.vue"
 import RegistartionForm from "@/widgets/registration/ui/RegistartionForm.vue"
 

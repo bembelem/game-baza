@@ -7,11 +7,12 @@ import InputField from "@/shared/ui/InputField.vue"
 import PasswordField from "@/shared/ui/PasswordField.vue"
 import SubmitButton from "@/shared/ui/SubmitButton.vue"
 import { type RegistrationResponseError, registrationFetch } from "@/features/registration/api/registrationAPI"
-import { usernameValidate, emailValidate, birthdateValidate, passwordValidate } from "@/widgets/registration/lib/registrationValidation"
+import { usernameValidate, emailValidate, birthdateValidate, passwordValidate } from "@/entities/user/lib/userValidation"
 import { toRegistrationPayload } from "../lib/registrationTransform"
 import { authStore } from "@/entities/user/store/authStore"
 import { isAPIValidationError } from "@/shared/interface/APIError"
 import { Routes } from "@/shared/lib/router"
+import { formatDateInput } from "@/shared/lib/date"
 
 export interface RegistrationFormFields {
 	username: string
@@ -34,14 +35,6 @@ const { values, errors, meta, isSubmitting, handleSubmit, isFieldValid, setError
 })
 
 const isFormFulfilled = computed(() => meta.value.touched && meta.value.valid)
-
-function formatDate(input: string) {
-	const digits = input.replace(/\D/g, "").slice(0, 8)
-
-	if (digits.length <= 2) return digits
-	if (digits.length <= 4) return `${digits.slice(0, 2)}.${digits.slice(2)}`
-	return `${digits.slice(0, 2)}.${digits.slice(2, 4)}.${digits.slice(4)}`
-}
 
 const onSubmit = handleSubmit(async () => {
 	authStore.isPending.value = true
@@ -106,7 +99,7 @@ const onSubmit = handleSubmit(async () => {
 			name="birthdate"
 			placeholder="дд.мм.гггг"
 			:max-length="10"
-			:format-input="formatDate"/>
+			:format-input="formatDateInput"/>
 		</FormField>
 
 		<FormField

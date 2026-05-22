@@ -1,10 +1,7 @@
-import type { RegistrationFormFields } from "../ui/RegistartionForm.vue"
-
-
-export function usernameValidate(value: RegistrationFormFields["username"]) {
+export function usernameValidate(value: string) {
 	if (!value) 
 		return "Никнейм обязателен"
-  	if (value.length < 3) 
+	if (value.length < 3) 
 		return "Минимум 3 символа"
 	if (!/^[a-zA-Z0-9]+$/.test(value)) 
 		return "Только латиница и цифры"
@@ -13,7 +10,7 @@ export function usernameValidate(value: RegistrationFormFields["username"]) {
 }
 
 
-export function emailValidate(value: RegistrationFormFields["email"]) {
+export function emailValidate(value: string) {
 	if (!value) 
 		return "Логин обязателен"
 	if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) 
@@ -22,14 +19,14 @@ export function emailValidate(value: RegistrationFormFields["email"]) {
 	return true
 }
 
-
-export function birthdateValidate(value: RegistrationFormFields["birthdate"]) {
+// accepts string instead of Date - UI compromise for masked input (dd.mm.yyyy)
+export function birthdateValidate(value: string) {
 	if (!value) 
 		return "День рождения обязателен"
 	if (value.length < 10) 
 		return "Введите полную дату"
 	
-  	const [day, month, year] = value.split(".").map(Number) as [number, number, number]
+	const [day, month, year] = value.split(".").map(Number) as [number, number, number]
 	const birthday = new Date(year, month -1, day)
 
 	if (birthday.getFullYear() !== year 
@@ -44,7 +41,7 @@ export function birthdateValidate(value: RegistrationFormFields["birthdate"]) {
 }
 
 
-export function passwordValidate(value: RegistrationFormFields["password"]) {
+export function passwordValidate(value: string) {
 	if (!value) 
 		return "Пароль обязателен"
 	if (value.length < 6) 

@@ -41,12 +41,15 @@
 	/* Semantic */
 	--c_error: #CC2255;
 	--c_error_bright: #FF3366;
+	--c_success: #006633;
+	--c_success_bright: #00CC66;
 
 	/* Text */
 	--c_text__primary: #F5F5F5;
 	--c_text__secondary: #C7C7C7;
 	--c_text__muted: #7F7F7F;
 	--c_text__error: #FF3366;
+	--c_text__success: #00CC66;
 
 	/* Neon shadows — purple */
 	--neon__purple: 
