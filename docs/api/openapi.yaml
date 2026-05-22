@@ -694,7 +694,7 @@ components:
       type: object
       title: UserPrivate
       description: Полный профиль пользователя — отдаётся только владельцу (/users/me).
-      required: [ id, username, created_at ]
+      required: [ id, username, email, birthdate, avatar_img, description, created_at ]
       properties:
         id:
           type: integer
@@ -711,6 +711,12 @@ components:
           nullable: true
           description: URL аватара пользователя
           example: 'https://cdn.game-baza.example.com/avatars/42.jpg'
+        email:
+          type: string
+          format: email
+        birthdate:
+          type: date
+          format: date
         created_at:
           type: string
           format: date
