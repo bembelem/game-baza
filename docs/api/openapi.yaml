@@ -65,12 +65,6 @@ paths:
                     details:
                       username: Пользователь с таким username уже существует.
                     traceId: 9696004a-6866-4a79-bc53-f4383040cba1
-        '422':
-          description: Ошибка валидации
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetailResponse'
 
   /auth/login:
     post:
@@ -131,6 +125,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
 
+  /users/{user_id}:
+    get:
+      tags: [ Users ]
+      summary: Публичные данные пользователя
+      description: Возвращает публичные данные пользователя.
+      operationId: getUserById
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: ID пользователя
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Данные профиля
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPublic'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
   /users/me:
     get:
       tags: [Users]
@@ -171,7 +190,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserPrivate'
+                $ref: '#/components/schemas/UserPublic'
         '401':
           description: Токен не передан или не действителен
           content:
@@ -645,45 +664,86 @@ components:
 
     # ----- Users -----
 
-    UserPrivate:
+    UserPublic:
       type: object
-      title: UserPrivate
-      description: Полный профиль пользователя — отдаётся только владельцу (/users/me).
-      required: [id, email, birthdate, username, created_at]
+      title: UserPublic
+      description: Публичный профиль пользователя — безопасные поля, отдаётся другим.
+      required: [id, username, description, avatar_img, created_at]
       properties:
         id:
           type: integer
-        email:
-          type: string
-          format: email
-        birthdate:
-          type: string
-          format: date
         username:
           type: string
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: 'О себе (текст, до 500 символов)'
+        avatar_img:
+          type: string
+          format: uri
+          nullable: true
+          description: URL аватара пользователя
+          example: 'https://cdn.game-baza.example.com/avatars/42.jpg'
         created_at:
           type: string
           format: date
 
+
+    UserPrivate:
+      type: object
+      title: UserPrivate
+      description: Полный профиль пользователя — отдаётся только владельцу (/users/me).
+      required: [ id, username, created_at ]
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: 'О себе (текст, до 500 символов)'
+        avatar_img:
+          type: string
+          format: uri
+          nullable: true
+          description: URL аватара пользователя
+          example: 'https://cdn.game-baza.example.com/avatars/42.jpg'
+        created_at:
+          type: string
+          format: date
+
+
     UserPatch:
       type: object
       title: UserPatch
-      description: Частичное обновление профиля. Все поля опциональны.
+      description: |
+        Частичное обновление профиля. Все поля опциональны.
+        Аватар обновляется отдельно через POST /users/me/avatar.
       properties:
         username:
           type: string
-          nullable: true
+          minLength: 3
+          maxLength: 50
+          pattern: '^[a-zA-Z0-9_ ]+$'
         email:
           type: string
           format: email
-          nullable: true
         password:
           type: string
-          nullable: true
+          minLength: 6
+          maxLength: 50
+          pattern: '^(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{};:''\",.<>/?\\|`~]).+$'
         birthdate:
           type: string
           format: date
+        description:
+          type: string
+          maxLength: 500
           nullable: true
+          description: 'О себе. Передай null чтобы очистить.'
 
     # ----- Games -----
 
@@ -978,6 +1038,44 @@ components:
         traceId:
           type: string
           description: ID трассировки запроса (X-Request-ID), для дебага
+
+  # ----- Error Responses -----
+
+  responses:
+    ValidationError:
+      description: Ошибка валидации параметров или тела
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDetailResponse'
+
+    Unauthorized:
+      description: Не авторизован, токен отсутствует или недействителен
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDetailResponse'
+
+    NotFound:
+      description: Ресурс не найден
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDetailResponse'
+
+    Conflict:
+      description: Конфликт (например, email уже занят)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDetailResponse'
+
+    InternalError:
+      description: Внутренняя ошибка сервера
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDetailResponse'
 
 tags:
   - name: Auth
