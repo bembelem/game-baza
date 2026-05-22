@@ -9,6 +9,10 @@ export function formatDateInput(input: string) {
 	return `${digits.slice(0, 2)}.${digits.slice(2, 4)}.${digits.slice(4)}`
 }
 
+export function parseISOToDate(iso: string) {
+	return iso.split("-").reverse().join(".")
+}
+
 export function parseDateToISO(date: string) { 
 	return date.split(".").reverse().join("-")
 }

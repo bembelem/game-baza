@@ -30,6 +30,7 @@ const props = defineProps<{
 <style scoped>
 .submit_button {
 	padding: var(--space__xs);
+	width: 100%;
 	border: var(--border__md) solid var(--bc_submit_button, var(--c_brand__purple));
 	background-color: var(--bc_submit_button, var(--c_brand__purple));
 	transition:

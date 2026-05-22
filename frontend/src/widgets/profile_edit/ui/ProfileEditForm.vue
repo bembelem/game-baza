@@ -7,9 +7,13 @@ import PasswordField from "@/shared/ui/PasswordField.vue"
 import SubmitButton from "@/shared/ui/SubmitButton.vue"
 import { usernameValidate, emailValidate, birthdateValidate, passwordValidate } from "@/entities/user/lib/userValidation"
 import { authStore } from "@/entities/user/store/authStore"
+import { parseISOToDate } from "@/shared/lib/date"
+import { toProfileEditPayload } from "../lib/profileEditTransform"
+import { profileEditFetch } from "@/features/profile_edit/api/profileEditAPI"
 import { formatDateInput } from "@/shared/lib/date"
+import { isAPIValidationError } from "@/shared/interface/APIError"
 
-export interface EditProfileFormFields {
+export interface ProfileEditFormFields {
 	username: string
 	email: string
 	birthdate: string
@@ -17,14 +21,14 @@ export interface EditProfileFormFields {
 	confirmPassword: string
 }
 
-function newPasswordValidate(value: EditProfileFormFields["newPassword"]) {
+function newPasswordValidate(value: ProfileEditFormFields["newPassword"]) {
 	if (!value) 
 		return true
 
 	return passwordValidate(value)
 }
 
-function confirmPasswordValidate(value: EditProfileFormFields["confirmPassword"]) {
+function confirmPasswordValidate(value: ProfileEditFormFields["confirmPassword"]) {
 	if (!value && !values.newPassword) 
 		return true
 	if (!value) 
@@ -38,7 +42,7 @@ function confirmPasswordValidate(value: EditProfileFormFields["confirmPassword"]
 const successMessage = ref<string | null>(null)
 const errorMessage = ref<string | null>(null)
 
-const { values, errors, isSubmitting, handleSubmit, isFieldValid } = useForm<EditProfileFormFields>({
+const { values, errors, isSubmitting, handleSubmit, isFieldValid } = useForm<ProfileEditFormFields>({
 	validationSchema: {
 		username: usernameValidate,
 		email: emailValidate,
@@ -49,7 +53,7 @@ const { values, errors, isSubmitting, handleSubmit, isFieldValid } = useForm<Edi
 	initialValues: {
 		username: authStore.data.value?.username ?? "",
 		email: authStore.data.value?.email ?? "",
-		birthdate: authStore.data.value?.birthdate ?? "",
+		birthdate: parseISOToDate(authStore.data.value?.birthdate ?? ""),
 		newPassword: "",
 		confirmPassword: "",
 	},
@@ -62,14 +66,21 @@ const onSubmit = handleSubmit(async (values) => {
 	errorMessage.value = null
 
 	try {
-		// TODO: fetchUserEditFetch
-
+		const transformedValues = toProfileEditPayload({ ...values })
+		const data = await profileEditFetch(transformedValues)
+		authStore.data.value = data
 		successMessage.value = "Данные успешно обновлены"
 	} catch (error) {
 		if (error instanceof TypeError) {
 			errorMessage.value = "Не удалось подключиться к серверу"
 			return
 		}
+
+		if (isAPIValidationError(error)) {
+			errorMessage.value = error.message
+			return
+		}
+
 		errorMessage.value = "Не удалось сохранить данные"
 		console.error("Непредвиденная ошибка", error)
 	}
@@ -78,7 +89,7 @@ const onSubmit = handleSubmit(async (values) => {
 
 <template>
 	<form
-	class="user_edit_form"
+	class="edit_profile_form"
 	@submit.prevent="onSubmit">
 		<h1 class="greeting">Привет, {{ userName }}!</h1>
 
@@ -144,10 +155,12 @@ const onSubmit = handleSubmit(async (values) => {
 		<hr class="divider"/>
 
 		<div class="footer">
-			<SubmitButton
-			label="Сохранить изменения"
-			:is-available="true"
-			:is-submitting="isSubmitting"/>
+			<div class="submit_button_container">
+				<SubmitButton
+				label="Сохранить изменения"
+				:is-available="true"
+				:is-submitting="isSubmitting"/>
+			</div>
 
 			<p
 			v-if="successMessage"
@@ -165,7 +178,7 @@ const onSubmit = handleSubmit(async (values) => {
 </template>
 
 <style scoped>
-.user_edit_form {
+.edit_profile_form {
 	--bc_input_field: var(--c_brand__gold);
 	--bc_input_field__focus: var(--c_brand__gold_bright);
 	--bc_password_field: var(--c_brand__gold);
@@ -190,6 +203,7 @@ const onSubmit = handleSubmit(async (values) => {
 	display: flex;
 	flex-direction: column;
 	gap: var(--space__sm);
+	width: 50%;
 }
 
 .section__label {
@@ -212,6 +226,11 @@ const onSubmit = handleSubmit(async (values) => {
 	align-items: center;
 	flex-wrap: wrap;
 	gap: var(--space__md);
+	width: 100%;
+}
+
+.submit_button_container {
+	width: 25%;
 }
 
 .footer__message {
@@ -222,5 +241,23 @@ const onSubmit = handleSubmit(async (values) => {
 }
 .footer__message--error {
 	color: var(--c_text__error);
+}
+
+
+@media (max-width: 1024px) {
+	.section {
+		width: 75%;
+	}
+	.submit_button_container {
+		width: 50%;
+	}
+}
+@media (max-width: 600px) {
+	.section {
+		width: 100%;
+	}
+	.submit_button_container {
+		width: 100%;
+	}
 }
 </style>
