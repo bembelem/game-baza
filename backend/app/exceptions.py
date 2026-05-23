@@ -39,7 +39,7 @@ class ValidationHTTPException(AppHTTPException):
 class AuthenticationHTTPException(AppHTTPException):
     status_code = 401
     error_code  = "2010_AUTHENTICATION_ERROR"
-    message     = "Ошибка авторизации."
+    message     = "Ошибка аутентификации."
 
 
 class EmailAlreadyExistsHTTPException(ValidationHTTPException):
@@ -70,13 +70,15 @@ class IncorrectTokenHTTPException(AuthenticationHTTPException):
     message = "Токен не передан или не действителен."
 
 
-# Not Found — фабрика, чтобы не плодить однотипные классы
+# Not Found
 
 class NotFoundHTTPException(AppHTTPException):
     status_code = 404
-    error_code  = "4040_NOT_FOUND"
-    message     = "Ресурс не найден."
+    error_code = "4040_NOT_FOUND"
+    message = "Ресурс не найден."
 
+class UserNotFoundHTTPException(NotFoundHTTPException):
+    message = "Пользователь не найден."
 
 def _make_not_found(resource: str, field: str) -> type[NotFoundHTTPException]:
     """Создаёт подкласс NotFoundHTTPException с готовым message и details."""

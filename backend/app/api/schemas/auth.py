@@ -4,6 +4,8 @@ from datetime import date
 
 from pydantic import BaseModel, EmailStr, field_validator, model_validator, Field, ConfigDict
 
+from app.exceptions import UserNotFoundHTTPException
+
 
 class UserRegisterRequest(BaseModel):
     """Тело запроса POST /auth/register."""
@@ -16,13 +18,11 @@ class UserRegisterRequest(BaseModel):
         pattern=r"^[a-zA-Z0-9_ ]+$",
         description="3-50 символов: латиница, цифры, подчёркивания, пробелы",
     )
-    email: EmailStr = Field(description="Email пользователя")
+    email: EmailStr = Field(description="Email пользователя", max_length=100)
     birthdate: date = Field(description="Дата рождения (YYYY-MM-DD или DD.MM.YYYY)")
     password: str = Field(
         min_length=6,
         max_length=50,
-
-
         pattern=r"^(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{};:'\",.<>/?\\|`~]).+$",
         description="Минимум 6 символов, хотя бы одна цифра и один спецсимвол",
     )
@@ -46,9 +46,9 @@ class UserRegisterRequest(BaseModel):
 class UserLoginRequest(BaseModel):
     """Тело запроса POST /auth/login."""
 
-    username: str | None = None
-    email: EmailStr | None = None
-    password: str
+    username: str | None
+    email: EmailStr | None
+    password: str = Field()
 
     @model_validator(mode="after")
     def at_least_one_field(self) -> "UserLoginRequest":
@@ -56,6 +56,21 @@ class UserLoginRequest(BaseModel):
             raise ValueError("Необходимо указать либо username, либо email")
         return self
 
+    @model_validator(mode="after")
+    def username_validate(self) -> "UserLoginRequest":
+        if self.username:
+            if (len(self.username) < 3 or len(self.username) > 50 or
+                not re.match(r"^[a-zA-Z0-9_ ]+$", self.username)):
+                raise UserNotFoundHTTPException()
+        return self
+
+    @model_validator(mode="after")
+    def password_validate(self) -> "UserLoginRequest":
+        if self.password:
+            if (len(self.password) < 6 or len(self.password) > 50 or
+                    not re.match(r"^(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{};:'\",.<>/?\\|`~]).+$", self.password)):
+                raise UserNotFoundHTTPException()
+        return self
 
 class Token(BaseModel):
     """Не используется напрямую (токен в cookie), но описывает формат если когда-нибудь будет в body."""

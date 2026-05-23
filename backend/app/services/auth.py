@@ -47,7 +47,6 @@ class AuthService:
 
     async def register_user(self, data: UserRegisterRequest):
         async with async_session_maker() as session:
-
             hashed_password = self.hash_password(data.password)
             new_user = UserAdd(
                 username=data.username,

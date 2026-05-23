@@ -2,7 +2,7 @@ from fastapi import APIRouter, Response
 
 from app.api.controllers.examples.responses import ME_RESPONSES, MessageResponse
 from app.api.dependencies import UserIdDep
-from app.services.schemas.users import UserPrivate
+from app.services.schemas.users import UserPrivate, UserPublic
 from app.api.schemas.users import UserPatch
 from app.repositories.users import UserRepository
 from app.services.auth import AuthService
@@ -54,3 +54,16 @@ async def delete_me(response: Response, user_id: UserIdDep):
     await auth_service.delete_user(user_id)
     response.delete_cookie("access_token")
     return MessageResponse(message="Профиль удалён")
+
+@router.get(
+    "/{user_id}",
+    response_model=UserPublic,
+    status_code=200,
+    summary="Публичный профиль пользователся",
+    description="Возвращает публичный профиль зарегестрированнрого пользователя."
+)
+async def get_user(user_id: int):
+    async with async_session_maker() as session:
+        user_private = await UserRepository(session).get_one_or_none(id=user_id)
+        user_public = UserPublic.model_validate(user_private, from_attributes=True)
+    return user_public
