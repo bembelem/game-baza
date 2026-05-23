@@ -668,23 +668,12 @@ components:
       type: object
       title: UserPublic
       description: Публичный профиль пользователя — безопасные поля, отдаётся другим.
-      required: [id, username, description, avatar_img, created_at]
+      required: [id, username, created_at]
       properties:
         id:
           type: integer
         username:
           type: string
-        description:
-          type: string
-          maxLength: 500
-          nullable: true
-          description: 'О себе (текст, до 500 символов)'
-        avatar_img:
-          type: string
-          format: uri
-          nullable: true
-          description: URL аватара пользователя
-          example: 'https://cdn.game-baza.example.com/avatars/42.jpg'
         created_at:
           type: string
           format: date
@@ -694,28 +683,17 @@ components:
       type: object
       title: UserPrivate
       description: Полный профиль пользователя — отдаётся только владельцу (/users/me).
-      required: [ id, username, email, birthdate, avatar_img, description, created_at ]
+      required: [id, username, email, birthdate, created_at]
       properties:
         id:
           type: integer
         username:
           type: string
-        description:
-          type: string
-          maxLength: 500
-          nullable: true
-          description: 'О себе (текст, до 500 символов)'
-        avatar_img:
-          type: string
-          format: uri
-          nullable: true
-          description: URL аватара пользователя
-          example: 'https://cdn.game-baza.example.com/avatars/42.jpg'
         email:
           type: string
           format: email
         birthdate:
-          type: date
+          type: string
           format: date
         created_at:
           type: string
@@ -725,9 +703,7 @@ components:
     UserPatch:
       type: object
       title: UserPatch
-      description: |
-        Частичное обновление профиля. Все поля опциональны.
-        Аватар обновляется отдельно через POST /users/me/avatar.
+      description: Частичное обновление профиля. Все поля опциональны — присылай только то что меняешь.
       properties:
         username:
           type: string
@@ -745,11 +721,6 @@ components:
         birthdate:
           type: string
           format: date
-        description:
-          type: string
-          maxLength: 500
-          nullable: true
-          description: 'О себе. Передай null чтобы очистить.'
 
     # ----- Games -----
 
