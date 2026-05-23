@@ -645,6 +645,11 @@ components:
           maxLength: 50
           pattern: '^(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{};:''\",.<>/?\\|`~]).+$'
           description: 'Минимум 6 символов, хотя бы одна цифра и один спецсимвол'
+      example:
+        username: john_doe
+        email: john@example.com
+        birthdate: '2000-01-15'
+        password: SecurePass123!
 
     UserLoginRequest:
       type: object
@@ -661,6 +666,9 @@ components:
           nullable: true
         password:
           type: string
+      example:
+        email: john@example.com
+        password: SecurePass123!
 
     # ----- Users -----
 
@@ -677,6 +685,10 @@ components:
         created_at:
           type: string
           format: date
+      example:
+        id: 42
+        username: john_doe
+        created_at: '2024-05-20'
 
 
     UserPrivate:
@@ -698,6 +710,12 @@ components:
         created_at:
           type: string
           format: date
+      example:
+        id: 42
+        username: john_doe
+        email: john@example.com
+        birthdate: '2000-01-15'
+        created_at: '2024-05-20'
 
 
     UserPatch:
@@ -721,6 +739,9 @@ components:
         birthdate:
           type: string
           format: date
+      example:
+        username: new_nickname
+        birthdate: '2000-01-15'
 
     # ----- Games -----
 
@@ -747,6 +768,13 @@ components:
           type: integer
           minimum: 0
           maximum: 100
+      example:
+        id: 1
+        title: Cyberpunk 2077
+        image_url: 'https://example.com/cyberpunk.jpg'
+        min_price_original: 2999
+        min_price_discount: 1499
+        discount_percent: 50
 
     GameDetails:
       type: object
@@ -792,6 +820,28 @@ components:
           items:
             $ref: '#/components/schemas/Offer'
           default: []
+      example:
+        id: 1
+        title: Cyberpunk 2077
+        image_url: 'https://example.com/cyberpunk.jpg'
+        min_price_original: 2999
+        min_price_discount: 1499
+        discount_percent: 50
+        description: 'Cyberpunk 2077 — это приключенческая RPG в Найт-Сити.'
+        release_date: '2020-12-10'
+        developer: CD Projekt Red
+        publisher: CD Projekt
+        genres: [Экшены, РПГ]
+        offers:
+          - id: 10
+            game_id: 1
+            store_id: 1
+            store: Steam
+            store_game_link: 'https://store.steampowered.com/app/1091500/'
+            price_original: 2999
+            price_discount: 1499
+            discount_percent: 50
+            positive_percent: 85
 
     GamesResponse:
       type: object
@@ -814,6 +864,18 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/GameCard'
+      example:
+        total: 5322
+        last_id: 20
+        per_page: 20
+        has_more: true
+        items:
+          - id: 1
+            title: Cyberpunk 2077
+            image_url: 'https://example.com/cyberpunk.jpg'
+            min_price_original: 2999
+            min_price_discount: 1499
+            discount_percent: 50
 
     # ----- Offers -----
 
@@ -847,6 +909,16 @@ components:
           minimum: 0
           maximum: 100
           description: Процент положительных отзывов в магазине
+      example:
+        id: 10
+        game_id: 1
+        store_id: 1
+        store: Steam
+        store_game_link: 'https://store.steampowered.com/app/1091500/'
+        price_original: 2999
+        price_discount: 1499
+        discount_percent: 50
+        positive_percent: 85
 
     OfferPrice:
       type: object
@@ -862,6 +934,11 @@ components:
         recorded_at:
           type: string
           format: date
+      example:
+        id: 100
+        offer_id: 10
+        price: 1499
+        recorded_at: '2024-05-20'
 
     OfferPrices:
       type: object
@@ -875,6 +952,17 @@ components:
           items:
             $ref: '#/components/schemas/OfferPrice'
           default: []
+      example:
+        offer_id: 10
+        prices_list:
+          - id: 100
+            offer_id: 10
+            price: 2999
+            recorded_at: '2024-05-01'
+          - id: 101
+            offer_id: 10
+            price: 1499
+            recorded_at: '2024-05-20'
 
     # ----- Catalogs -----
 
@@ -887,6 +975,9 @@ components:
           type: integer
         name:
           type: string
+      example:
+        id: 1
+        name: Экшены
 
     GenresResponse:
       type: object
@@ -897,6 +988,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Genre'
+      example:
+        genres:
+          - { id: 1, name: Экшены }
+          - { id: 2, name: РПГ }
+          - { id: 3, name: Стратегии }
 
     Store:
       type: object
@@ -911,6 +1007,10 @@ components:
           type: string
           format: uri
           nullable: true
+      example:
+        id: 1
+        name: Steam
+        url: 'https://store.steampowered.com/'
 
     StoresResponse:
       type: object
@@ -921,6 +1021,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Store'
+      example:
+        stores:
+          - { id: 1, name: Steam, url: 'https://store.steampowered.com/' }
+          - { id: 2, name: Epic Games, url: 'https://store.epicgames.com/' }
 
     Platform:
       type: object
@@ -935,6 +1039,10 @@ components:
           type: string
           format: uri
           nullable: true
+      example:
+        id: 1
+        name: PC
+        url: null
 
     PlatformsResponse:
       type: object
@@ -945,6 +1053,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Platform'
+      example:
+        platforms:
+          - { id: 1, name: PC,  url: null }
+          - { id: 2, name: PS5, url: null }
 
     Publisher:
       type: object
@@ -955,6 +1067,9 @@ components:
           type: integer
         name:
           type: string
+      example:
+        id: 1
+        name: CD Projekt
 
     PublishersResponse:
       type: object
@@ -965,6 +1080,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Publisher'
+      example:
+        publishers:
+          - { id: 1, name: CD Projekt }
+          - { id: 2, name: KONAMI }
 
     Developer:
       type: object
@@ -975,6 +1094,9 @@ components:
           type: integer
         name:
           type: string
+      example:
+        id: 1
+        name: CD Projekt Red
 
     DevelopersResponse:
       type: object
@@ -985,6 +1107,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Developer'
+      example:
+        developers:
+          - { id: 1, name: CD Projekt Red }
+          - { id: 2, name: Bugbear Entertainment }
 
     # ----- Common -----
 
@@ -995,6 +1121,8 @@ components:
       properties:
         message:
           type: string
+      example:
+        message: Профиль удалён
 
     ErrorDetailResponse:
       type: object
@@ -1015,6 +1143,12 @@ components:
         traceId:
           type: string
           description: ID трассировки запроса (X-Request-ID), для дебага
+      example:
+        error: 2010_AUTHENTICATION_ERROR
+        message: Ошибка авторизации.
+        details:
+          password: Неверный пароль.
+        traceId: 9696004a-6866-4a79-bc53-f4383040cba1
 
   # ----- Error Responses -----
 
