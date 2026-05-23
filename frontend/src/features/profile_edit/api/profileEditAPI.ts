@@ -24,3 +24,16 @@ export async function profileEditFetch(profileEditPayload: ProfileEditPayload): 
 
 	return data
 }
+
+
+export async function profileDeleteFetch(abortController: AbortController) {
+	const response = await fetch("http://localhost:8000/users/me", {
+		method: "DELETE",
+		credentials: "include",
+		signal: abortController.signal
+	})
+
+	if (!response.ok) {
+		throw new Error(`Ошибка proflieDeleteFetch: ${response.status}`)
+	}
+}

@@ -25,3 +25,15 @@ export async function authFetch(authPayload: AuthPayload): Promise<User> {
 
 	return data
 }
+
+
+export async function logoutFetch() {
+	const response = await fetch("http://localhost:8000/auth/logout", {
+		method: "POST",
+		credentials: "include"
+	})
+
+	if (!response.ok) {
+		throw new Error(`Ошибка logoutFetch: ${response.status}`)
+	}
+}

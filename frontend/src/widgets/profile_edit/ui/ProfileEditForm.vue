@@ -1,17 +1,21 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue"
+import { useRouter } from "vue-router"
 import { useForm } from "vee-validate"
 import FormField from "@/shared/ui/FormField.vue"
 import InputField from "@/shared/ui/InputField.vue"
 import PasswordField from "@/shared/ui/PasswordField.vue"
 import SubmitButton from "@/shared/ui/SubmitButton.vue"
+import ConfirmDialog from "@/shared/ui/ConfirmDialog.vue"
+import { profileEditFetch, profileDeleteFetch } from "@/features/profile_edit/api/profileEditAPI"
+import { logoutFetch } from "@/features/auth/api/authAPI"
 import { usernameValidate, emailValidate, birthdateValidate, passwordValidate } from "@/entities/user/lib/userValidation"
-import { authStore } from "@/entities/user/store/authStore"
-import { parseISOToDate } from "@/shared/lib/date"
 import { toProfileEditPayload } from "../lib/profileEditTransform"
-import { profileEditFetch } from "@/features/profile_edit/api/profileEditAPI"
-import { formatDateInput } from "@/shared/lib/date"
+import { authStore } from "@/entities/user/store/authStore"
 import { isAPIValidationError } from "@/shared/interface/APIError"
+import { Routes } from "@/shared/lib/router"
+import { parseISOToDate, formatDateInput } from "@/shared/lib/date"
+import { updateFetchDataController } from "@/shared/lib/fetchData"
 
 export interface ProfileEditFormFields {
 	username: string
@@ -21,26 +25,13 @@ export interface ProfileEditFormFields {
 	confirmPassword: string
 }
 
-function newPasswordValidate(value: ProfileEditFormFields["newPassword"]) {
-	if (!value) 
-		return true
-
-	return passwordValidate(value)
-}
-
-function confirmPasswordValidate(value: ProfileEditFormFields["confirmPassword"]) {
-	if (!value && !values.newPassword) 
-		return true
-	if (!value) 
-		return "Подтвердите пароль"
-	if (value !== values.newPassword) 
-		return "Пароли не совпадают"
-
-	return true
-}
+const router = useRouter()
 
 const successMessage = ref<string | null>(null)
 const errorMessage = ref<string | null>(null)
+const isDeleteDialogVisible = ref(false)
+const isDeletePending = ref(false)
+const profileDeleteController = ref<AbortController>()
 
 const { values, errors, isSubmitting, handleSubmit, isFieldValid } = useForm<ProfileEditFormFields>({
 	validationSchema: {
@@ -60,6 +51,24 @@ const { values, errors, isSubmitting, handleSubmit, isFieldValid } = useForm<Pro
 })
 
 const userName = computed(() => authStore.data.value?.username ?? "")
+
+function newPasswordValidate(value: ProfileEditFormFields["newPassword"]) {
+	if (!value)
+		return true
+
+	return passwordValidate(value)
+}
+
+function confirmPasswordValidate(value: ProfileEditFormFields["confirmPassword"]) {
+	if (!value && !values.newPassword)
+		return true
+	if (!value)
+		return "Подтвердите пароль"
+	if (value !== values.newPassword)
+		return "Пароли не совпадают"
+
+	return true
+}
 
 const onSubmit = handleSubmit(async (values) => {
 	successMessage.value = null
@@ -85,6 +94,39 @@ const onSubmit = handleSubmit(async (values) => {
 		console.error("Непредвиденная ошибка", error)
 	}
 })
+
+function handleLogout() {
+	authStore.data.value = null
+	router.push(Routes.auth)
+	logoutFetch().catch(error => console.error("Непредвиденная ошибка", error))
+}
+
+async function handleProfileDelete() {
+	const newGameInfoController = updateFetchDataController(profileDeleteController)
+	isDeletePending.value = true
+
+	try {
+		await profileDeleteFetch(newGameInfoController)
+		authStore.data.value = null
+		router.push(Routes.auth)
+	} catch (error) {
+		if (error instanceof TypeError) {
+			errorMessage.value = "Не удалось подключиться к серверу"
+			return
+		}
+		errorMessage.value = "Не удалось удалить аккаунт"
+		console.error("Непредвиденная ошибка", error)
+	} finally {
+		profileDeleteController.value = undefined
+		isDeleteDialogVisible.value = false
+		isDeletePending.value = false
+	}
+}
+
+function handleCancelProfileDelete() {
+	profileDeleteController.value?.abort()
+	isDeleteDialogVisible.value = false
+}
 </script>
 
 <template>
@@ -94,7 +136,7 @@ const onSubmit = handleSubmit(async (values) => {
 		<h1 class="greeting">Привет, {{ userName }}!</h1>
 
 		<section class="section">
-			<p class="section__label">ОСНОВНАЯ ИНФОРМАЦИЯ</p>
+			<p class="section_label">ОСНОВНАЯ ИНФОРМАЦИЯ</p>
 
 			<FormField
 			label="Никнейм"
@@ -130,8 +172,8 @@ const onSubmit = handleSubmit(async (values) => {
 		<hr class="divider"/>
 
 		<section class="section">
-			<p class="section__label">СМЕНА ПАРОЛЯ</p>
-			<p class="section__hint">Оставьте пустым, если не хотите менять пароль</p>
+			<p class="section_label">СМЕНА ПАРОЛЯ</p>
+			<p class="section_hint">Оставьте пустым, если не хотите менять пароль</p>
 
 			<FormField
 			label="Новый пароль"
@@ -155,26 +197,53 @@ const onSubmit = handleSubmit(async (values) => {
 		<hr class="divider"/>
 
 		<div class="footer">
-			<div class="submit_button_container">
-				<SubmitButton
-				label="Сохранить изменения"
-				:is-available="true"
-				:is-submitting="isSubmitting"/>
+			<div class="footer_row">
+				<div class="submit_button_container">
+					<SubmitButton
+					label="Сохранить изменения"
+					:is-submitting="isSubmitting"/>
+				</div>
+
+				<p
+				v-if="successMessage"
+				class="footer_message footer_message--success">
+					{{ successMessage }}
+				</p>
+
+				<p
+				v-else-if="errorMessage"
+				class="footer_message footer_message--error">
+					{{ errorMessage }}
+				</p>
 			</div>
 
-			<p
-			v-if="successMessage"
-			class="footer__message footer__message--success">
-				{{ successMessage }}
-			</p>
+			<div class="footer_row">
+				<button
+				class="action_button action_button--logout"
+				type="button"
+				@click="handleLogout">
+					Выйти
+				</button>
 
-			<p
-			v-else-if="errorMessage"
-			class="footer__message footer__message--error">
-				{{ errorMessage }}
-			</p>
+				<button
+				class="action_button action_button--delete"
+				type="button"
+				@click="isDeleteDialogVisible = true">
+					Удалить аккаунт
+				</button>
+			</div>
 		</div>
 	</form>
+
+	<ConfirmDialog
+	class="delete_confirm_dialog"
+	v-if="isDeleteDialogVisible"
+	title="Удалить аккаунт?"
+	message="Это действие необратимо. Все данные будут удалены."
+	confirm-label="Удалить"
+	:is-confirming="isDeletePending"
+	@confirm="handleProfileDelete"
+	@cancel="handleCancelProfileDelete"/>
 </template>
 
 <style scoped>
@@ -206,22 +275,31 @@ const onSubmit = handleSubmit(async (values) => {
 	width: 50%;
 }
 
-.section__label {
+.section_label {
 	font-size: var(--fs__lg);
 	color: var(--c_text__muted);
 }
 
-.section__hint {
+.section_hint {
 	font-size: var(--fs__xs);
 	color: var(--c_text__muted);
 }
 
 .divider {
 	border: none;
-	border-top: var(--border__md) solid var(--c_bg__accent) ;
+	border-top: var(--border__md) solid var(--c_bg__accent);
 }
 
 .footer {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: var(--space__md);
+	margin-top: var(--space__lg);
+	width: 100%;
+}
+
+.footer_row {
 	display: flex;
 	align-items: center;
 	flex-wrap: wrap;
@@ -230,26 +308,44 @@ const onSubmit = handleSubmit(async (values) => {
 }
 
 .submit_button_container {
-	width: 25%;
+	width: 50%;
 }
 
-.footer__message {
-	font-size: var(--fs__sm);
+.footer_message {
+	font-size: var(--fs__xs);
+	text-align: center;
 }
-.footer__message--success {
+.footer_message--success {
 	color: var(--c_text__success);
 }
-.footer__message--error {
+.footer_message--error {
 	color: var(--c_text__error);
 }
 
+.action_button {
+	background: none;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+}
+.action_button--logout {
+	color: var(--c_text__muted);
+}
+.action_button--delete {
+	color: var(--c_text__error);
+}
+
+.delete_confirm_dialog {
+	--bc_submit_button: var(--c_error);
+	--bc_submit_button__accent: var(--c_error_bright);
+}
 
 @media (max-width: 1024px) {
 	.section {
 		width: 75%;
 	}
 	.submit_button_container {
-		width: 50%;
+		width: 75%;
 	}
 }
 @media (max-width: 600px) {
@@ -258,6 +354,9 @@ const onSubmit = handleSubmit(async (values) => {
 	}
 	.submit_button_container {
 		width: 100%;
+	}
+	.footer_row {
+		justify-content: space-evenly;
 	}
 }
 </style>

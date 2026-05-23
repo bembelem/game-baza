@@ -1,11 +1,15 @@
 <script lang="ts" setup>
 import LoadIndicator from "./LoadIndicator.vue"
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
 	label: string
+	type?: "submit" | "button" | "reset" 
 	isSubmitting?: boolean
 	isAvailable?: boolean
-}>()
+}>(), {
+	type: "submit",
+	isAvailable: true
+})
 </script>
 
 <template>
@@ -15,7 +19,7 @@ const props = defineProps<{
 			'submit_button--fulfilled': props.isAvailable,
 			'submit_button--submitted': props.isSubmitting
 		}"
-		type="submit"
+		:type="props.type"
 		:disabled="!props.isAvailable || props.isSubmitting">
 
 		<LoadIndicator
