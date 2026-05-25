@@ -5,7 +5,6 @@ import type {
 } from "../interface/Filters"
 import type { ToArray } from "../interface/Helpers"
 import { reactive } from "vue"
-import equal from "fast-deep-equal"
 
 
 export function useFiltersOptions<T>(
@@ -18,15 +17,22 @@ export function useFiltersOptions<T>(
 		if (filtersDefinition[name].values) {
 			return filtersDefinition[name].values as ToArray<T[K]>
 		}
-	
+
 		const availableOptions = availableFiltersOptions?.[name]?.value ?? []
 		const injectedOptions = injectedFiltersOptions[name] ?? []
-	
 		const combined = [...availableOptions, ...injectedOptions]
-	
-		return combined.filter((item, index) => 
-			[...availableOptions, ...injectedOptions].findIndex((i) => equal(i, item)) == index
-		) as ToArray<T[K]>
+
+		const seen = new Set<string>()
+		const result: typeof combined= []
+		combined.forEach((item) => {
+			const key = JSON.stringify(item)
+			if (!seen.has(key)) {
+				seen.add(key)
+				result.push(item)
+			}
+		})
+
+		return result
 	}
 
 	function injectFilterOption<K extends keyof T>(name: K, value: T[K]) {
