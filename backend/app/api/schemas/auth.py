@@ -46,8 +46,8 @@ class UserRegisterRequest(BaseModel):
 class UserLoginRequest(BaseModel):
     """Тело запроса POST /auth/login."""
 
-    username: str | None
-    email: EmailStr | None
+    username: str | None = None
+    email: EmailStr | None = None
     password: str = Field()
 
     @model_validator(mode="after")

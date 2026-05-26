@@ -1,8 +1,17 @@
+from enum import Enum
 from typing import Annotated, Optional
 
 from fastapi import Query
-from fastapi.openapi.models import Example
 from pydantic import BaseModel
+
+
+class GameSort(str, Enum):
+    """Варианты сортировки каталога игр."""
+    PRICE_ASC = "price_asc"
+    PRICE_DESC = "price_desc"
+    TITLE_ASC = "title_asc"
+    TITLE_DESC = "title_desc"
+    POPULARITY = "popularity"
 
 
 class GameCard(BaseModel):
@@ -67,16 +76,8 @@ class GameFilters:
             ] = None,
 
             sort: Annotated[
-                Optional[str],
-                Query(
-                    description="Сортировка: price_asc, price_desc, title_asc, title_desc",
-                    openapi_examples={
-                        "1": Example(summary="Сначала дешевле", value="price_asc"),
-                        "2": Example(summary="Сначала дороже", value="price_desc"),
-                        "3": Example(summary="По названию А-Я", value="title_asc"),
-                        "4": Example(summary="По названию Я-А", value="title_desc"),
-                    }
-                )
+                Optional[GameSort],
+                Query(description="Сортировка каталога"),
             ] = None,
     ):
         self.title = title

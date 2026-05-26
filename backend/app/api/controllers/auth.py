@@ -24,7 +24,7 @@ async def register(
 ):
     user = await auth_service.register_user(data)
     access_token = auth_service.create_access_token({"user_id": user.id})
-    response.set_cookie("access_token", access_token)
+    response.set_cookie("access_token", access_token, httponly=True)
     return user
 
 
@@ -42,7 +42,7 @@ async def login(
 ):
     user = await auth_service.login_user(data)
     access_token = auth_service.create_access_token({"user_id": user.id})
-    response.set_cookie("access_token", access_token)
+    response.set_cookie("access_token", access_token, httponly=True)
     return user
 
 
@@ -54,5 +54,5 @@ async def login(
     description="Удаляет JWT-cookie и завершает сессию пользователя.",
 )
 async def logout(response: Response):
-    response.delete_cookie("access_token")
+    response.delete_cookie("access_token", httponly=True)
     return {"message": "Logged out"}

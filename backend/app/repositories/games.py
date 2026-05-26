@@ -1,7 +1,7 @@
 from sqlalchemy import select, func, and_, exists
 from sqlalchemy.orm import selectinload
 
-from app.services.schemas.games import GameFilters
+from app.services.schemas.games import GameFilters, GameSort
 from app.repositories.base import BaseRepository
 from database.models.catalogs import (
     DeveloperOrm,
@@ -145,10 +145,10 @@ class GameRepository(BaseRepository):
 
         # Сортировка
         sort_map = {
-            "price_asc":  offer_sub.c.min_disc.asc(),
-            "price_desc": offer_sub.c.min_disc.desc(),
-            "title_asc":  GameOrm.title.asc(),
-            "title_desc": GameOrm.title.desc(),
+            GameSort.PRICE_ASC:  offer_sub.c.min_disc.asc(),
+            GameSort.PRICE_DESC: offer_sub.c.min_disc.desc(),
+            GameSort.TITLE_ASC:  GameOrm.title.asc(),
+            GameSort.TITLE_DESC: GameOrm.title.desc(),
         }
         order_clause = sort_map.get(filters.sort, GameOrm.id.asc())
 

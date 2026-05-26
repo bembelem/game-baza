@@ -89,7 +89,7 @@ def _offer_to_schema(offer: OfferOrm) -> Offer:
         id=offer.id,
         game_id=offer.game_id,
         store_id=offer.store_id or 0,
-        store=offer.store.name.capitalize() if offer.store else "",
+        store=offer.store.name if offer.store else "",
         store_game_link=offer.store_game_link or offer.link or "",
         price_original=offer.price_original or 0,
         price_discount=offer.price_discount or 0,

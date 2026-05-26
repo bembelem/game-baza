@@ -19,10 +19,8 @@ from app.api.controllers.catalogs import (
     router_stores,
 )
 from app.api.controllers.users import router as users_router
-from app.api.controllers.stubs import (
-    router_offers as stub_offers_router,
-    router_users as stub_users_router,
-)
+
+
 from app.exception_handlers import (
     app_http_exception_handler,
     request_validation_handler,
@@ -36,39 +34,7 @@ SPEC_PATH = Path(__file__).parent.parent.parent / "docs" / "api" / "openapi.yaml
 
 setup_logging(level="INFO")
 
-app = FastAPI(
-    title="Game-Baza API",
-    description=(
-        "REST API платформы для сравнения цен на игры. "
-        "Поддерживает каталог игр, фильтрацию, историю цен, "
-        "аутентификацию через JWT-cookie и вишлист пользователя."
-    ),
-    version="0.1.0",
-    contact={
-        "name": "Game-Baza Team",
-        "email": "support@game-baza.example.com",
-        "url": "https://github.com/bembelem/game-baza",
-    },
-    license_info={
-        "name": "MIT",
-        "url": "https://opensource.org/licenses/MIT",
-    },
-    servers=[
-        {"url": "http://localhost:8000", "description": "Локальная разработка"},
-    ],
-    # Теги в алфавитном порядке (требование openapi-tags-alphabetical)
-    openapi_tags=[
-        {"name": "Auth",       "description": "Регистрация, вход и выход из аккаунта"},
-        {"name": "Developers", "description": "Справочник разработчиков"},
-        {"name": "Games",      "description": "Каталог игр, детали и отзывы"},
-        {"name": "Genres",     "description": "Справочник жанров"},
-        {"name": "Offers",     "description": "Предложения магазинов и история цен"},
-        {"name": "Platforms",  "description": "Справочник платформ"},
-        {"name": "Publishers", "description": "Справочник издателей"},
-        {"name": "Stores",     "description": "Справочник магазинов"},
-        {"name": "Users",      "description": "Профили пользователей и управление вишлистом"},
-    ],
-)
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
@@ -92,9 +58,7 @@ app.add_exception_handler(Exception, unhandled_exception_handler)
 
 app.include_router(auth_router)
 app.include_router(users_router)
-app.include_router(stub_users_router)   # незавершённые users-эндпоинты (см. stubs.py)
 app.include_router(games_router)
-app.include_router(stub_offers_router)  # все offers-эндпоинты пока заглушки
 app.include_router(router_stores)
 app.include_router(router_platforms)
 app.include_router(router_publishers)
@@ -103,4 +67,4 @@ app.include_router(router_genres)
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app.main:app", log_level="debug", port=8080)
+    uvicorn.run("app.main:app", log_level="debug", port=8000)

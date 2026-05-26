@@ -1,10 +1,4 @@
-"""Мапперы между ORM-моделями и Pydantic-схемами.
-
-GameDataMapper намеренно отсутствует: response-схема GameCard содержит
-агрегаты (min_price_*, discount_percent), которых нет в GameOrm.
-Тривиальный mapper.model_validate() бы упал. Конвертация GameOrm → GameCard
-делается вручную в GameRepository.list_page() с подсчётом агрегатов в SQL.
-"""
+"""Мапперы между ORM-моделями и Pydantic-схемами."""
 from typing import Type, TypeVar
 
 from pydantic import BaseModel
