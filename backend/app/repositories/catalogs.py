@@ -1,13 +1,9 @@
-"""Репозитории справочников (genres, stores, platforms, publishers, developers).
-
-Все они однотипны: модель с id+name, эндпоинты list+get_by_id.
-Один базовый класс, пять подклассов с указанием модели.
-"""
+"""Репозитории справочников (genres, stores, platforms, publishers, developers)."""
 from typing import Generic, TypeVar
 
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.repositories.base import BaseRepository
 from database.database import Base
 from database.models.catalogs import (
     DeveloperOrm,
@@ -20,13 +16,8 @@ from database.models.catalogs import (
 M = TypeVar("M", bound=Base)
 
 
-class CatalogRepository(Generic[M]):
-    """Базовый репозиторий для справочников с уникальным `name`."""
-
+class CatalogRepository(BaseRepository, Generic[M]):
     model: type[M]
-
-    def __init__(self, session: AsyncSession):
-        self.session = session
 
     async def list_all(self) -> list[M]:
         stmt = select(self.model).order_by(self.model.name)

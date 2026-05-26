@@ -1,11 +1,10 @@
 from app.api.schemas.games import (
-    Game,
     GameDetails,
-    GameFilters,
-    GamesPage,
+    GamesResponse,
     ReviewsResponse,
 )
-from app.api.schemas.offers import Offer
+from app.services.schemas.games import GameCard, GameFilters
+from app.services.schemas.offers import Offer
 from app.api.dependencies import PaginationParams
 from app.exceptions import GameNotFoundHTTPException
 from app.repositories.games import GameRepository, _calc_discount
@@ -17,7 +16,7 @@ class GamesService:
 
     async def get_games_page(
         self, filters: GameFilters, pagination: PaginationParams
-    ) -> GamesPage:
+    ) -> GamesResponse:
         async with async_session_maker() as session:
             items, total = await GameRepository(session).list_page(
                 filters=filters,
@@ -25,13 +24,13 @@ class GamesService:
                 per_page=pagination.per_page,
             )
 
-        games = [Game(**item) for item in items]
+        games = [GameCard(**item) for item in items]
         last_id = games[-1].id if games else None
         # has_more: если набрали ровно per_page — потенциально есть ещё страница.
         # Точнее можно было бы LIMIT per_page+1, но для UX-страницы такой оценки достаточно.
         has_more = len(games) == pagination.per_page and total > pagination.last_id + len(games)
 
-        return GamesPage(
+        return GamesResponse(
             total=total,
             last_id=last_id,
             per_page=pagination.per_page,
@@ -85,16 +84,19 @@ def _aggregate_min_prices(offers: list[OfferOrm]) -> tuple[int, int]:
 
 
 def _offer_to_schema(offer: OfferOrm) -> Offer:
+    # offer.store подгружено через selectinload в GameRepository.get_details
     return Offer(
         id=offer.id,
         game_id=offer.game_id,
         store_id=offer.store_id or 0,
+        store=offer.store.name if offer.store else "",
         store_game_link=offer.store_game_link or offer.link or "",
         price_original=offer.price_original or 0,
         price_discount=offer.price_discount or 0,
         discount_percent=_percent_to_int(offer.discount_percent),
         positive_percent=offer.positive_percent or 0,
     )
+
 
 
 def _percent_to_int(value: str | None) -> int:

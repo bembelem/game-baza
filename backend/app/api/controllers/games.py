@@ -1,7 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Path
 
 from app.api.dependencies import GameFiltersDep, PaginationDep
-from app.api.schemas.games import GameDetails, GamesPage, ReviewsResponse
+from app.api.schemas.games import GameDetails, GamesResponse, ReviewsResponse
 from app.services.games import GamesService
 
 router = APIRouter(prefix="/games", tags=["Games"])
@@ -10,7 +10,7 @@ games_service = GamesService()
 
 @router.get(
     "",
-    response_model=GamesPage,
+    response_model=GamesResponse,
     summary="Список игр",
     description="Возвращает постраничный список игр с минимальными ценами. "
                 "Поддерживает фильтрацию и курсорную пагинацию.",
@@ -36,7 +36,7 @@ async def get_games(
         422: {"description": "Ошибка валидации"},
     },
 )
-async def get_game(game_id: int):
+async def get_game(game_id: int = Path(description="ID игры")):
     return await games_service.get_game_details(game_id)
 
 
@@ -49,5 +49,5 @@ async def get_game(game_id: int):
         404: {"description": "Игра не найдена"},
     },
 )
-async def get_reviews(game_id: int):
+async def get_reviews(game_id: int = Path(description="ID игры")):
     return await games_service.get_reviews(game_id)

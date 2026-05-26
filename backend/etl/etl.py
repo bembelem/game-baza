@@ -40,8 +40,6 @@ async def run_etl() -> None:
                 break
 
             for raw in batch:
-                # SAVEPOINT — при ошибке откатится только этот raw,
-                # а не весь батч и не уже отмеченные is_processed соседи.
                 try:
                     async with session.begin_nested():
                         await _process_one(session, raw)
@@ -62,7 +60,7 @@ async def run_etl() -> None:
     )
 
 
-# ----- batch fetch ----------------------------------------------------------
+# batch fetch
 
 async def _fetch_unprocessed(session: AsyncSession, limit: int) -> list[RawOfferOrm]:
     result = await session.execute(
@@ -74,7 +72,7 @@ async def _fetch_unprocessed(session: AsyncSession, limit: int) -> list[RawOffer
     return list(result.scalars().all())
 
 
-# ----- основной конвейер ----------------------------------------------------
+# основной конвейер
 
 async def _process_one(session: AsyncSession, raw: RawOfferOrm) -> None:
     """Нормализует один raw_offer в Game + Offer (+ справочники)."""
@@ -98,7 +96,7 @@ async def _process_one(session: AsyncSession, raw: RawOfferOrm) -> None:
     await _upsert_offer(session, raw=raw, game=game, store=store)
 
 
-# ----- справочники ----------------------------------------------------------
+# справочники
 
 async def _get_or_create_store(session: AsyncSession, name: str) -> StoreOrm:
     return await _get_or_create_named(session, StoreOrm, name)
@@ -146,7 +144,7 @@ async def _get_or_create_named(session: AsyncSession, model, name: str):
     return obj
 
 
-# ----- games ----------------------------------------------------------------
+# games
 
 async def _get_or_create_game(
     session: AsyncSession,
@@ -167,15 +165,24 @@ async def _get_or_create_game(
 
     # selectinload — eager-load M2M, иначе обращение к game.genres / game.platforms
     # ниже триггернёт lazy load и упадёт с MissingGreenlet в async-сессии.
+    # Ищем по normalized_title ИЛИ по точному title — на случай, если в БД
+    # лежит запись со старым normalized_title (после смены логики нормализации):
+    # без фолбэка по title insert упадёт с UniqueViolation на games_title_key.
+    from sqlalchemy import or_
     result = await session.execute(
         select(GameOrm)
         .options(
             selectinload(GameOrm.genres),
             selectinload(GameOrm.platforms),
         )
-        .where(GameOrm.normalized_title == normalized)
+        .where(or_(GameOrm.normalized_title == normalized, GameOrm.title == raw.title))
     )
-    game = result.scalar_one_or_none()
+    game = result.scalars().first()
+    # Нашли по title с устаревшим normalized? Оставляем как есть — пытаться
+    # обновить normalized опасно: оно UNIQUE, а в БД могут быть дубли
+    # (две разные записи: "Dark Souls III" и "Dark Souls III Deluxe Edition"
+    # обе захотят normalized='dark souls iii' и одна из них упадёт).
+    # Лечится разовым скриптом дедупа, не на горячем пути ETL.
 
     if game is not None:
         # обогащаем уже существующую игру тем, чего у неё не было
@@ -217,7 +224,7 @@ def _merge_m2m(existing: list, incoming: Iterable) -> None:
             existing.append(obj)
 
 
-# ----- offers ---------------------------------------------------------------
+# offers
 
 async def _upsert_offer(
     session: AsyncSession,
@@ -292,7 +299,7 @@ def _join_or_none(values: list[str] | None) -> str | None:
     return ", ".join(values)
 
 
-# ----- entry point ----------------------------------------------------------
+# entry point
 
 if __name__ == "__main__":
     logging.basicConfig(

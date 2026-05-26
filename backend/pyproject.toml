@@ -16,6 +16,7 @@ dependencies = [
     "pydantic-settings>=2.13.1",
     "pydantic[email]>=2.12.5",
     "pyjwt>=2.12.1",
+    "pytest>=9.0.3",
     "scrapy>=2.15.0",
     "sqlalchemy>=2.0.48",
     "uvicorn>=0.41.0",
@@ -23,3 +24,7 @@ dependencies = [
 [tool.mypy]
 plugins = ['pydantic.mypy']
 mypy_path = "backend"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

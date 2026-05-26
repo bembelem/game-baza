@@ -4,7 +4,10 @@ import jwt
 from jwt import ExpiredSignatureError, DecodeError
 from pwdlib import PasswordHash
 
-from app.api.schemas.auth import UserRequestRegister, UserAdd, UserRequestLogin
+from app.api.schemas.auth import UserRegisterRequest, UserLoginRequest
+from app.api.schemas.users import UserPatch
+from app.services.schemas.auth import UserAdd
+from app.services.schemas.users import UserPrivate
 from database.config import settings
 from database.database import async_session_maker
 from app.exceptions import EmailAlreadyExistsHTTPException, UsernameAlreadyExistsHTTPException, \
@@ -28,7 +31,7 @@ class AuthService:
     def hash_password(self, password):
         return self.password_hash.hash(password)
 
-    async def login_user(self, data: UserRequestLogin):
+    async def login_user(self, data: UserLoginRequest):
         async with async_session_maker() as session:
             if data.email:
                 user = await UserRepository(session).get_user_with_hashed_password(email=data.email)
@@ -42,9 +45,8 @@ class AuthService:
                 raise IncorrectPasswordHTTPException()
             return user
 
-    async def register_user(self, data: UserRequestRegister):
+    async def register_user(self, data: UserRegisterRequest):
         async with async_session_maker() as session:
-
             hashed_password = self.hash_password(data.password)
             new_user = UserAdd(
                 username=data.username,
@@ -63,6 +65,43 @@ class AuthService:
                 raise AppHTTPException()
             await session.commit()
             return user
+
+    async def update_user(self, user_id: int, data: UserPatch) -> UserPrivate:
+        """Частичное обновление профиля. Пароль хешируется, если передан.
+
+        Пустой PATCH (без полей) — просто возвращает текущего юзера.
+        На дубликате email/username бросает соответствующее 409.
+        """
+        fields = data.model_dump(exclude_unset=True, exclude_none=True)
+        if "password" in fields:
+            fields["hashed_password"] = self.hash_password(fields.pop("password"))
+
+        async with async_session_maker() as session:
+            repo = UserRepository(session)
+            if not fields:
+                # клиент прислал пустой PATCH — просто отдаём текущего
+                return await repo.get_one_or_none(id=user_id)
+
+            try:
+                user = await repo.update_by_id(user_id, fields)
+                await session.commit()
+            except ObjectAlreadyExistsError as ex:
+                if ex.constraint == "users_email_key":
+                    raise EmailAlreadyExistsHTTPException()
+                if ex.constraint == "users_username_key":
+                    raise UsernameAlreadyExistsHTTPException()
+                raise AppHTTPException()
+
+            if user is None:
+                # юзера с таким id уже нет — токен битый/устаревший
+                raise IncorrectTokenHTTPException()
+            return user
+
+    async def delete_user(self, user_id: int) -> None:
+        """Удаляет пользователя. Идемпотентно: если уже удалён — ничего страшного."""
+        async with async_session_maker() as session:
+            await UserRepository(session).delete_by_id(user_id)
+            await session.commit()
 
     def decode_token(self, token) -> dict:
         try:

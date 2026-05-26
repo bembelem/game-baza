@@ -1,0 +1,18 @@
+extends: ['spectral:oas']
+
+rules:
+  # operationId критичен для генерации клиентов
+  operation-operationId: error
+
+  # summary достаточно как краткое описание; description у каждой операции — оверкилл
+  operation-description: off
+
+  # examples — приятно, но требовать на каждый эндпоинт overkill
+  oas3-valid-schema-example: error
+
+  # Глобальные настройки — warn, не блокируют разработку
+  info-description: warn
+  info-contact: warn
+  oas3-api-servers: warn
+  openapi-tags: warn
+  operation-tag-defined: warn

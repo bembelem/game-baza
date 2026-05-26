@@ -7,6 +7,7 @@ class Offer(BaseModel):
     id: int
     game_id: int
     store_id: int
+    store: str
     store_game_link: str
     price_original: int
     price_discount: int

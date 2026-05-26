@@ -1,9 +1,8 @@
 from sqlalchemy import select, func, and_, exists
 from sqlalchemy.orm import selectinload
 
-from app.api.schemas.games import GameFilters
+from app.services.schemas.games import GameFilters, GameSort
 from app.repositories.base import BaseRepository
-from app.repositories.mappers.mappers import GameDataMapper
 from database.models.catalogs import (
     DeveloperOrm,
     GenreOrm,
@@ -18,7 +17,8 @@ from database.models.games import GameOrm, OfferOrm, RawOfferOrm
 
 class GameRepository(BaseRepository):
     model = GameOrm
-    mapper = GameDataMapper
+    # mapper не задан — методы из base возвращают ORM напрямую.
+    # Конвертация в GameCard / GameDetails делается в сервисе с агрегатами.
 
     async def get_or_create_batch(self, titles: list[str]) -> dict[str, int]:
         stmt = select(GameOrm.id, GameOrm.normalized_title).where(
@@ -63,7 +63,7 @@ class GameRepository(BaseRepository):
         await self.session.flush()
         return game
 
-    # ----- list / page -----------------------------------------------------
+    # list / page
 
     async def list_page(
         self, filters: GameFilters, last_id: int, per_page: int
@@ -103,29 +103,33 @@ class GameRepository(BaseRepository):
         # Фильтры
         conditions = []
         if filters.title:
-            conditions.append(GameOrm.title.ilike(f"%{filters.title}%"))
+            # ILIKE с % в конце — prefix match, case-insensitive ('c' → 'Cyberpunk', 'Counter-Strike')
+            conditions.append(GameOrm.title.ilike(f"{filters.title}%"))
 
         if filters.genres:
-            conditions.append(
-                exists().where(
-                    and_(
-                        genres_games.c.game_id == GameOrm.id,
-                        genres_games.c.genre_id == GenreOrm.id,
-                        GenreOrm.name.in_(filters.genres),
+            for genre_name in filters.genres:
+                conditions.append(
+                    exists().where(
+                        and_(
+                            genres_games.c.game_id == GameOrm.id,
+                            genres_games.c.genre_id == GenreOrm.id,
+                            GenreOrm.name == genre_name,
+                        )
                     )
                 )
-            )
 
+        # игра должна поддерживать ВСЕ выбранные платформы.
         if filters.platforms:
-            conditions.append(
-                exists().where(
-                    and_(
-                        platforms_games.c.game_id == GameOrm.id,
-                        platforms_games.c.platform_id == PlatformOrm.id,
-                        PlatformOrm.name.in_(filters.platforms),
+            for platform_name in filters.platforms:
+                conditions.append(
+                    exists().where(
+                        and_(
+                            platforms_games.c.game_id == GameOrm.id,
+                            platforms_games.c.platform_id == PlatformOrm.id,
+                            PlatformOrm.name == platform_name,
+                        )
                     )
                 )
-            )
 
         if filters.price_min is not None:
             conditions.append(offer_sub.c.min_disc >= filters.price_min)
@@ -141,10 +145,10 @@ class GameRepository(BaseRepository):
 
         # Сортировка
         sort_map = {
-            "price_asc":  offer_sub.c.min_disc.asc(),
-            "price_desc": offer_sub.c.min_disc.desc(),
-            "title_asc":  GameOrm.title.asc(),
-            "title_desc": GameOrm.title.desc(),
+            GameSort.PRICE_ASC:  offer_sub.c.min_disc.asc(),
+            GameSort.PRICE_DESC: offer_sub.c.min_disc.desc(),
+            GameSort.TITLE_ASC:  GameOrm.title.asc(),
+            GameSort.TITLE_DESC: GameOrm.title.desc(),
         }
         order_clause = sort_map.get(filters.sort, GameOrm.id.asc())
 
@@ -172,7 +176,7 @@ class GameRepository(BaseRepository):
         ]
         return items, total
 
-    # ----- details ---------------------------------------------------------
+    # Details
 
     async def get_details(self, game_id: int) -> GameOrm | None:
         stmt = (
@@ -181,7 +185,8 @@ class GameRepository(BaseRepository):
                 selectinload(GameOrm.developer),
                 selectinload(GameOrm.publisher),
                 selectinload(GameOrm.genres),
-                selectinload(GameOrm.offers),
+                # offers + store одним loader-цепочкой → store.name доступен в сервисе
+                selectinload(GameOrm.offers).selectinload(OfferOrm.store),
             )
             .where(GameOrm.id == game_id)
         )

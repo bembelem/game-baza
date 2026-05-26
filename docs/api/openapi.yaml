@@ -1,50 +1,32 @@
 openapi: 3.1.0
 info:
   title: Game-Baza API
-  description: >
-    REST API платформы для сравнения цен на игры.
-    Поддерживает каталог игр, фильтрацию, историю цен,
-    аутентификацию через JWT-cookie и вишлист пользователя.
-  version: 0.1.0
+  description: 'REST API платформы для сравнения цен на игры. Поддерживает каталог игр, фильтрацию, аутентификацию через JWT-cookie.'
   contact:
     name: Game-Baza Team
-
+    url: 'https://github.com/bembelem/game-baza'
+    email: support@game-baza.example.com
+  license:
+    name: MIT
+    url: 'https://opensource.org/licenses/MIT'
+  version: 0.1.0
 servers:
-  - url: http://localhost:8000
+  - url: 'http://localhost:8080'
     description: Локальная разработка
-
-tags:
-  - name: Auth
-    description: Регистрация, вход и выход из аккаунта
-  - name: Users
-    description: Профили пользователей и управление вишлистом
-  - name: Games
-    description: Каталог игр, детали и отзывы
-  - name: Offers
-    description: Предложения магазинов и история цен
-  - name: Stores
-    description: Справочник магазинов
-  - name: Platforms
-    description: Справочник платформ
-  - name: Publishers
-    description: Справочник издателей
-  - name: Genres
-    description: Справочник жанров
 
 paths:
   /auth/register:
     post:
-      tags:
-        - Auth
+      tags: [Auth]
       summary: Регистрация
-      description: Создаёт нового пользователя и устанавливает JWT-cookie.
+      description: Создаёт нового пользователя и устанавливает JWT-cookie с access_token.
       operationId: registerUser
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserRequestRegister'
+              $ref: '#/components/schemas/UserRegisterRequest'
             examples:
               '1':
                 summary: Обычный пользователь
@@ -59,7 +41,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserPrivate'
         '409':
           description: Пользователь уже существует
           content:
@@ -83,34 +65,19 @@ paths:
                     details:
                       username: Пользователь с таким username уже существует.
                     traceId: 9696004a-6866-4a79-bc53-f4383040cba1
-        '422':
-          description: Ошибка валидации полей
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetailResponse'
-              example:
-                error: 2020_VALIDATION_ERROR
-                message: Данные не прошли валидацию.
-                details:
-                  username: Value error, Username must be at least 3 characters
-                  email: 'value is not a valid email address: An email address must have an @-sign.'
-                  password: Value error, Password must contain at least one uppercase letter
-                traceId: 12e797e6-bdfa-466b-99c8-dbb4122e7c9b
 
   /auth/login:
     post:
-      tags:
-        - Auth
+      tags: [Auth]
       summary: Вход
-      description: Аутентифицирует пользователя по email или username и устанавливает JWT-cookie.
+      description: 'Аутентифицирует пользователя по email или username, устанавливает JWT-cookie.'
       operationId: loginUser
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserRequestLogin'
+              $ref: '#/components/schemas/UserLoginRequest'
             examples:
               '1':
                 summary: Вход по email
@@ -128,50 +95,28 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserPrivate'
         '401':
           description: Ошибка авторизации
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetailResponse'
-              examples:
-                email_not_registered:
-                  summary: Email не зарегистрирован
-                  value:
-                    error: 2010_AUTHENTICATION_ERROR
-                    message: Ошибка авторизации.
-                    details:
-                      email: Пользователь с таким email не зарегистрирован.
-                    traceId: 9696004a-6866-4a79-bc53-f4383040cba1
-                incorrect_password:
-                  summary: Неверный пароль
-                  value:
-                    error: 2010_AUTHENTICATION_ERROR
-                    message: Ошибка авторизации.
-                    details:
-                      password: Неверный пароль.
-                    traceId: 9696004a-6866-4a79-bc53-f4383040cba1
         '422':
-          description: Ошибка валидации полей
+          description: Ошибка валидации
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetailResponse'
-              example:
-                error: 2020_VALIDATION_ERROR
-                message: Данные не прошли валидацию.
-                details:
-                  email: 'value is not a valid email address: An email address must have an @-sign.'
-                traceId: 12e797e6-bdfa-466b-99c8-dbb4122e7c9b
 
   /auth/logout:
     post:
-      tags:
-        - Auth
+      tags: [Auth]
       summary: Выход
       description: Удаляет JWT-cookie и завершает сессию пользователя.
       operationId: logoutUser
+      security:
+        - cookieAuth: []
       responses:
         '200':
           description: Успешный выход
@@ -180,52 +125,59 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
 
-  /users/me:
+  /users/{user_id}:
     get:
-      tags:
-        - Users
-      summary: Мой профиль
-      description: Возвращает профиль авторизованного пользователя.
-      operationId: getMe
+      tags: [ Users ]
+      summary: Публичные данные пользователя
+      description: Возвращает публичные данные пользователя.
+      operationId: getUserById
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: ID пользователя
+          schema:
+            type: integer
       responses:
         '200':
           description: Данные профиля
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserPublic'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /users/me:
+    get:
+      tags: [Users]
+      summary: Мой профиль
+      description: Возвращает полный профиль авторизованного пользователя.
+      operationId: getMe
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Данные профиля
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPrivate'
         '401':
           description: Токен не передан или не действителен
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetailResponse'
-              example:
-                error: 2011_IncorrectToken_ERROR
-                message: Токен не передан или не действителен.
-                details: {}
-                traceId: 9696004a-6866-4a79-bc53-f4383040cba1
-    delete:
-      tags:
-        - Users
-      summary: Удалить профиль
-      description: Удаляет профиль авторизованного пользователя.
-      operationId: deleteMe
-      responses:
-        '200':
-          description: Профиль удалён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MessageResponse'
-        '401':
-          description: Не авторизован, токен отсутствует или недействителен
     patch:
-      tags:
-        - Users
+      tags: [Users]
       summary: Изменить профиль
-      description: Частично обновляет профиль авторизованного пользователя и возвращает обновлённые данные.
+      description: 'Частично обновляет профиль авторизованного пользователя. Поля передаются опционально, пустые игнорируются.'
       operationId: updateMe
+      security:
+        - cookieAuth: []
       requestBody:
         required: true
         content:
@@ -238,116 +190,49 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserPublic'
         '401':
-          description: Не авторизован, токен отсутствует или недействителен
+          description: Токен не передан или не действителен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetailResponse'
+        '409':
+          description: Email или username уже занят
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetailResponse'
         '422':
           description: Ошибка валидации
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetailResponse'
-
-  /users/{user_id}:
-    get:
-      tags:
-        - Users
-      summary: Публичный профиль пользователя
-      description: Возвращает публичный профиль пользователя по его ID.
-      operationId: getUserById
-      parameters:
-        - name: user_id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Публичный профиль
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserPublic'
-        '404':
-          description: Пользователь не найден
-
-  /users/{user_id}/wishlist:
-    get:
-      tags:
-        - Users
-      summary: Вишлист пользователя
-      description: Возвращает список игр в вишлисте пользователя по его ID.
-      operationId: getUserWishlist
-      parameters:
-        - name: user_id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Вишлист пользователя
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Wishlist'
-        '404':
-          description: Пользователь не найден
-
-  /users/me/wishlist/{game_id}:
-    post:
-      tags:
-        - Users
-      summary: Добавить игру в вишлист
-      description: Добавляет игру по её ID в вишлист авторизованного пользователя.
-      operationId: addToWishlist
-      parameters:
-        - name: game_id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Игра добавлена в вишлист
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MessageResponse'
-        '401':
-          description: Не авторизован
-        '404':
-          description: Игра не найдена
-        '409':
-          description: Игра уже в вишлисте
     delete:
-      tags:
-        - Users
-      summary: Убрать игру из вишлиста
-      description: Удаляет игру по её ID из вишлиста авторизованного пользователя.
-      operationId: removeFromWishlist
-      parameters:
-        - name: game_id
-          in: path
-          required: true
-          schema:
-            type: integer
+      tags: [Users]
+      summary: Удалить профиль
+      description: Удаляет профиль авторизованного пользователя и сбрасывает cookie.
+      operationId: deleteMe
+      security:
+        - cookieAuth: []
       responses:
         '200':
-          description: Игра удалена из вишлиста
+          description: Профиль удалён
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MessageResponse'
         '401':
-          description: Не авторизован
-        '404':
-          description: Игра не найдена в вишлисте
+          description: Токен не передан или не действителен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetailResponse'
 
   /games:
     get:
-      tags:
-        - Games
+      tags: [Games]
       summary: Список игр
       description: Возвращает постраничный список игр с минимальными ценами. Поддерживает фильтрацию и курсорную пагинацию.
       operationId: listGames
@@ -355,6 +240,7 @@ paths:
         - name: last_id
           in: query
           required: false
+          description: ID последней записи (cursor)
           schema:
             type: integer
             minimum: 0
@@ -362,6 +248,7 @@ paths:
         - name: per_page
           in: query
           required: false
+          description: Записей на страницу
           schema:
             type: integer
             maximum: 20
@@ -370,106 +257,82 @@ paths:
         - name: title
           in: query
           required: false
-          description: Поиск по названию игры (минимум 2 символа)
+          description: Поиск по названию игры
           schema:
-            anyOf:
-              - type: string
-                minLength: 2
-                maxLength: 100
-              - type: 'null'
+            type: string
+            maxLength: 100
         - name: stores
           in: query
           required: false
           description: Фильтр по магазинам
           schema:
-            anyOf:
-              - type: array
-                items:
-                  type: string
-              - type: 'null'
+            type: array
+            items:
+              type: string
         - name: platforms
           in: query
           required: false
           description: Фильтр по платформам
           schema:
-            anyOf:
-              - type: array
-                items:
-                  type: string
-              - type: 'null'
+            type: array
+            items:
+              type: string
         - name: genres
           in: query
           required: false
           description: Фильтр по жанрам
           schema:
-            anyOf:
-              - type: array
-                items:
-                  type: string
-              - type: 'null'
+            type: array
+            items:
+              type: string
         - name: price_min
           in: query
           required: false
           description: Минимальная цена в рублях
           schema:
-            anyOf:
-              - type: integer
-                minimum: 0
-                maximum: 999999
-              - type: 'null'
+            type: integer
+            minimum: 0
+            maximum: 999999
         - name: price_max
           in: query
           required: false
           description: Максимальная цена в рублях
           schema:
-            anyOf:
-              - type: integer
-                minimum: 0
-                maximum: 999999
-              - type: 'null'
+            type: integer
+            minimum: 0
+            maximum: 999999
         - name: sort
           in: query
           required: false
           description: 'Сортировка: price_asc, price_desc, title_asc, title_desc'
           schema:
-            anyOf:
-              - type: string
-                enum: [price_asc, price_desc, title_asc, title_desc]
-              - type: 'null'
-          examples:
-            '1':
-              summary: Сначала дешевле
-              value: price_asc
-            '2':
-              summary: Сначала дороже
-              value: price_desc
-            '3':
-              summary: По названию А-Я
-              value: title_asc
-            '4':
-              summary: По названию Я-А
-              value: title_desc
+            type: string
+            enum: [price_asc, price_desc, title_asc, title_desc]
       responses:
         '200':
           description: Постраничный список игр
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GamesPage'
+                $ref: '#/components/schemas/GamesResponse'
         '422':
           description: Ошибка валидации параметров
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetailResponse'
 
-  /games/{game_id}:
+  '/games/{game_id}':
     get:
-      tags:
-        - Games
+      tags: [Games]
       summary: Информация об игре
-      description: 'Возвращает детальную информацию об игре: описание, жанры, платформы и офферы по магазинам.'
+      description: 'Возвращает детальную информацию об игре: описание, жанры, разработчика, издателя и офферы по магазинам.'
       operationId: getGame
       parameters:
         - name: game_id
           in: path
           required: true
+          description: ID игры
           schema:
             type: integer
       responses:
@@ -481,41 +344,22 @@ paths:
                 $ref: '#/components/schemas/GameDetails'
         '404':
           description: Игра не найдена
-
-  /games/{game_id}/reviews:
-    get:
-      tags:
-        - Games
-      summary: Отзывы об игре
-      description: Возвращает отзывы пользователей об игре.
-      operationId: getGameReviews
-      parameters:
-        - name: game_id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Список отзывов
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReviewsResponse'
-        '404':
-          description: Игра не найдена
+                $ref: '#/components/schemas/ErrorDetailResponse'
 
-  /offers/{offer_id}:
+  '/offers/{offer_id}':
     get:
-      tags:
-        - Offers
+      tags: [Offers]
       summary: Оффер магазина
-      description: Возвращает информацию о конкретном предложении игры в магазине.
+      description: Возвращает информацию о конкретном оффере по его ID.
       operationId: getOffer
       parameters:
         - name: offer_id
           in: path
           required: true
+          description: ID оффера
           schema:
             type: integer
       responses:
@@ -527,36 +371,43 @@ paths:
                 $ref: '#/components/schemas/Offer'
         '404':
           description: Оффер не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetailResponse'
 
-  /offers/{offer_id}/price-history:
+  '/offers/{offer_id}/price-history':
     get:
-      tags:
-        - Offers
-      summary: История цен
+      tags: [Offers]
+      summary: История цен оффера
       description: Возвращает историю изменения цены для конкретного оффера.
       operationId: getOfferPriceHistory
       parameters:
         - name: offer_id
           in: path
           required: true
+          description: ID оффера
           schema:
             type: integer
       responses:
         '200':
-          description: История цен оффера
+          description: История цен
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OfferPrices'
         '404':
           description: Оффер не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetailResponse'
 
   /stores:
     get:
-      tags:
-        - Stores
+      tags: [Stores]
       summary: Список магазинов
-      description: Возвращает список всех магазинов, доступных в каталоге.
+      description: Возвращает справочник всех магазинов.
       operationId: listStores
       responses:
         '200':
@@ -566,17 +417,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/StoresResponse'
 
-  /stores/{store_id}:
+  '/stores/{store_id}':
     get:
-      tags:
-        - Stores
+      tags: [Stores]
       summary: Магазин
-      description: Возвращает информацию о конкретном магазине по его ID.
+      description: Возвращает магазин по его ID.
       operationId: getStore
       parameters:
         - name: store_id
           in: path
           required: true
+          description: ID магазина
           schema:
             type: integer
       responses:
@@ -588,13 +439,16 @@ paths:
                 $ref: '#/components/schemas/Store'
         '404':
           description: Магазин не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetailResponse'
 
   /platforms:
     get:
-      tags:
-        - Platforms
+      tags: [Platforms]
       summary: Список платформ
-      description: Возвращает список всех игровых платформ.
+      description: Возвращает справочник всех игровых платформ.
       operationId: listPlatforms
       responses:
         '200':
@@ -604,17 +458,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlatformsResponse'
 
-  /platforms/{platform_id}:
+  '/platforms/{platform_id}':
     get:
-      tags:
-        - Platforms
+      tags: [Platforms]
       summary: Платформа
-      description: Возвращает информацию о конкретной платформе по её ID.
+      description: Возвращает платформу по её ID.
       operationId: getPlatform
       parameters:
         - name: platform_id
           in: path
           required: true
+          description: ID платформы
           schema:
             type: integer
       responses:
@@ -626,13 +480,16 @@ paths:
                 $ref: '#/components/schemas/Platform'
         '404':
           description: Платформа не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetailResponse'
 
   /publishers:
     get:
-      tags:
-        - Publishers
+      tags: [Publishers]
       summary: Список издателей
-      description: Возвращает список всех издателей игр.
+      description: Возвращает справочник всех издателей.
       operationId: listPublishers
       responses:
         '200':
@@ -642,17 +499,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/PublishersResponse'
 
-  /publishers/{publisher_id}:
+  '/publishers/{publisher_id}':
     get:
-      tags:
-        - Publishers
+      tags: [Publishers]
       summary: Издатель
-      description: Возвращает информацию о конкретном издателе по его ID.
+      description: Возвращает издателя по его ID.
       operationId: getPublisher
       parameters:
         - name: publisher_id
           in: path
           required: true
+          description: ID издателя
           schema:
             type: integer
       responses:
@@ -664,13 +521,57 @@ paths:
                 $ref: '#/components/schemas/Publisher'
         '404':
           description: Издатель не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetailResponse'
+
+  /developers:
+    get:
+      tags: [Developers]
+      summary: Список разработчиков
+      description: Возвращает справочник всех разработчиков.
+      operationId: listDevelopers
+      responses:
+        '200':
+          description: Список разработчиков
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DevelopersResponse'
+
+  '/developers/{developer_id}':
+    get:
+      tags: [Developers]
+      summary: Разработчик
+      description: Возвращает разработчика по его ID.
+      operationId: getDeveloper
+      parameters:
+        - name: developer_id
+          in: path
+          required: true
+          description: ID разработчика
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Данные разработчика
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Developer'
+        '404':
+          description: Разработчик не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetailResponse'
 
   /genres:
     get:
-      tags:
-        - Genres
+      tags: [Genres]
       summary: Список жанров
-      description: Возвращает список всех жанров игр.
+      description: Возвращает справочник всех жанров игр.
       operationId: listGenres
       responses:
         '200':
@@ -680,17 +581,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/GenresResponse'
 
-  /genres/{genre_id}:
+  '/genres/{genre_id}':
     get:
-      tags:
-        - Genres
+      tags: [Genres]
       summary: Жанр
-      description: Возвращает информацию о конкретном жанре по его ID.
+      description: Возвращает жанр по его ID.
       operationId: getGenre
       parameters:
         - name: genre_id
           in: path
           required: true
+          description: ID жанра
           schema:
             type: integer
       responses:
@@ -702,82 +603,102 @@ paths:
                 $ref: '#/components/schemas/Genre'
         '404':
           description: Жанр не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetailResponse'
 
 components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: access_token
+      description: JWT-токен в HttpOnly cookie. Устанавливается /auth/login и /auth/register.
+
   schemas:
-    ErrorDetailResponse:
-      type: object
-      required:
-        - error
-        - message
-        - details
-        - traceId
-      properties:
-        error:
-          type: string
-          description: Код ошибки
-        message:
-          type: string
-          description: Человекочитаемое сообщение
-        details:
-          type: object
-          additionalProperties: true
-          description: Детали ошибки по полям
-        traceId:
-          type: string
-          description: ID трассировки для отладки
+    # ----- Auth -----
 
-    MessageResponse:
+    UserRegisterRequest:
       type: object
-      required:
-        - message
+      title: UserRegisterRequest
+      description: Тело запроса POST /auth/register.
+      required: [username, email, birthdate, password]
       properties:
-        message:
+        username:
           type: string
-
-    User:
-      type: object
-      required:
-        - id
-        - email
-        - birthdate
-        - username
-        - created_at
-      properties:
-        id:
-          type: integer
+          minLength: 3
+          maxLength: 50
+          pattern: '^[a-zA-Z0-9_ ]+$'
+          description: '3-50 символов: латиница, цифры, подчёркивания, пробелы'
         email:
           type: string
           format: email
+          description: Email пользователя
         birthdate:
           type: string
           format: date
+          description: Дата рождения (YYYY-MM-DD)
+        password:
+          type: string
+          minLength: 6
+          maxLength: 50
+          pattern: '^(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{};:''\",.<>/?\\|`~]).+$'
+          description: 'Минимум 6 символов, хотя бы одна цифра и один спецсимвол'
+      example:
+        username: john_doe
+        email: john@example.com
+        birthdate: '2000-01-15'
+        password: SecurePass123!
+
+    UserLoginRequest:
+      type: object
+      title: UserLoginRequest
+      description: Тело запроса POST /auth/login. Нужно указать либо email, либо username.
+      required: [password]
+      properties:
         username:
           type: string
-        created_at:
+          nullable: true
+        email:
           type: string
-          format: date
+          format: email
+          nullable: true
+        password:
+          type: string
+      example:
+        email: john@example.com
+        password: SecurePass123!
+
+    # ----- Users -----
 
     UserPublic:
       type: object
-      required:
-        - username
-        - created_at
+      title: UserPublic
+      description: Публичный профиль пользователя — безопасные поля, отдаётся другим.
+      required: [id, username, created_at]
       properties:
+        id:
+          type: integer
         username:
           type: string
         created_at:
           type: string
           format: date
+      example:
+        id: 42
+        username: john_doe
+        created_at: '2024-05-20'
 
-    UserRequestRegister:
+
+    UserPrivate:
       type: object
-      required:
-        - username
-        - email
-        - birthdate
-        - password
+      title: UserPrivate
+      description: Полный профиль пользователя — отдаётся только владельцу (/users/me).
+      required: [id, username, email, birthdate, created_at]
       properties:
+        id:
+          type: integer
         username:
           type: string
         email:
@@ -786,101 +707,49 @@ components:
         birthdate:
           type: string
           format: date
-        password:
+        created_at:
           type: string
+          format: date
+      example:
+        id: 42
+        username: john_doe
+        email: john@example.com
+        birthdate: '2000-01-15'
+        created_at: '2024-05-20'
 
-    UserRequestLogin:
-      type: object
-      required:
-        - password
-      properties:
-        username:
-          anyOf:
-            - type: string
-            - type: 'null'
-        email:
-          anyOf:
-            - type: string
-              format: email
-            - type: 'null'
-        password:
-          type: string
 
     UserPatch:
       type: object
+      title: UserPatch
+      description: Частичное обновление профиля. Все поля опциональны — присылай только то что меняешь.
       properties:
         username:
-          anyOf:
-            - type: string
-            - type: 'null'
+          type: string
+          minLength: 3
+          maxLength: 50
+          pattern: '^[a-zA-Z0-9_ ]+$'
         email:
-          anyOf:
-            - type: string
-              format: email
-            - type: 'null'
+          type: string
+          format: email
         password:
-          anyOf:
-            - type: string
-            - type: 'null'
+          type: string
+          minLength: 6
+          maxLength: 50
+          pattern: '^(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{};:''\",.<>/?\\|`~]).+$'
         birthdate:
-          anyOf:
-            - type: string
-              format: date
-            - type: 'null'
-
-    Wishlist:
-      type: object
-      required:
-        - id
-        - user_id
-        - total
-      properties:
-        id:
-          type: integer
-        user_id:
-          type: integer
-        total:
-          type: integer
-        items:
-          type: array
-          default: []
-          items:
-            $ref: '#/components/schemas/WishlistItem'
-      examples:
-        - id: 1
-          user_id: 1
-          total: 1
-          items:
-            - added_at: '2024-01-01'
-              game:
-                id: 1
-                title: Cyberpunk 2077
-                image_url: https://example.com/cyberpunk.jpg
-                min_price_original: 2999
-                min_price_discount: 1499
-                discount_percent: 50
-
-    WishlistItem:
-      type: object
-      required:
-        - game
-        - added_at
-      properties:
-        game:
-          $ref: '#/components/schemas/Game'
-        added_at:
           type: string
           format: date
+      example:
+        username: new_nickname
+        birthdate: '2000-01-15'
 
-    Game:
+    # ----- Games -----
+
+    GameCard:
       type: object
-      required:
-        - id
-        - title
-        - image_url
-        - min_price_original
-        - min_price_discount
-        - discount_percent
+      title: GameCard
+      description: Карточка игры для списка (response для GET /games).
+      required: [id, title, image_url, min_price_original, min_price_discount, discount_percent]
       properties:
         id:
           type: integer
@@ -891,37 +760,27 @@ components:
           format: uri
         min_price_original:
           type: integer
-          description: Цена без скидки в рублях
+          description: Минимальная цена без скидки среди всех офферов
         min_price_discount:
           type: integer
-          description: Цена со скидкой в рублях
+          description: Минимальная цена со скидкой среди всех офферов
         discount_percent:
           type: integer
           minimum: 0
           maximum: 100
-      examples:
-        - id: 1
-          title: Cyberpunk 2077
-          image_url: https://example.com/cyberpunk.jpg
-          min_price_original: 2999
-          min_price_discount: 1499
-          discount_percent: 50
+      example:
+        id: 1
+        title: Cyberpunk 2077
+        image_url: 'https://example.com/cyberpunk.jpg'
+        min_price_original: 2999
+        min_price_discount: 1499
+        discount_percent: 50
 
     GameDetails:
       type: object
-      required:
-        - id
-        - title
-        - image_url
-        - min_price_original
-        - min_price_discount
-        - discount_percent
-        - description
-        - release_date
-        - developer
-        - publisher
-        - genres
-        - offers
+      title: GameDetails
+      description: 'Подробная страница игры (response для GET /games/{id}).'
+      required: [id, title, image_url, min_price_original, min_price_discount, discount_percent]
       properties:
         id:
           type: integer
@@ -939,42 +798,64 @@ components:
           minimum: 0
           maximum: 100
         description:
-          anyOf:
-            - type: string
-            - type: 'null'
+          type: string
+          nullable: true
         release_date:
           type: string
           format: date
+          nullable: true
         developer:
           type: string
+          nullable: true
         publisher:
           type: string
+          nullable: true
         genres:
           type: array
           items:
             type: string
+          default: []
         offers:
           type: array
           items:
             $ref: '#/components/schemas/Offer'
+          default: []
+      example:
+        id: 1
+        title: Cyberpunk 2077
+        image_url: 'https://example.com/cyberpunk.jpg'
+        min_price_original: 2999
+        min_price_discount: 1499
+        discount_percent: 50
+        description: 'Cyberpunk 2077 — это приключенческая RPG в Найт-Сити.'
+        release_date: '2020-12-10'
+        developer: CD Projekt Red
+        publisher: CD Projekt
+        genres: [Экшены, РПГ]
+        offers:
+          - id: 10
+            game_id: 1
+            store_id: 1
+            store: Steam
+            store_game_link: 'https://store.steampowered.com/app/1091500/'
+            price_original: 2999
+            price_discount: 1499
+            discount_percent: 50
+            positive_percent: 85
 
-    GamesPage:
+    GamesResponse:
       type: object
-      required:
-        - total
-        - last_id
-        - per_page
-        - has_more
-        - items
+      title: GamesResponse
+      description: Постраничный ответ каталога — список карточек + метаданные.
+      required: [total, last_id, per_page, has_more, items]
       properties:
         total:
           type: integer
           minimum: 0
         last_id:
-          anyOf:
-            - type: integer
-            - type: 'null'
-          description: ID последнего элемента для курсорной пагинации
+          type: integer
+          nullable: true
+          description: ID последнего элемента (cursor для следующей страницы)
         per_page:
           type: integer
         has_more:
@@ -982,19 +863,26 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/Game'
+            $ref: '#/components/schemas/GameCard'
+      example:
+        total: 5322
+        last_id: 20
+        per_page: 20
+        has_more: true
+        items:
+          - id: 1
+            title: Cyberpunk 2077
+            image_url: 'https://example.com/cyberpunk.jpg'
+            min_price_original: 2999
+            min_price_discount: 1499
+            discount_percent: 50
+
+    # ----- Offers -----
 
     Offer:
       type: object
-      required:
-        - id
-        - game_id
-        - store_id
-        - store_game_link
-        - price_original
-        - price_discount
-        - discount_percent
-        - positive_percent
+      title: Offer
+      required: [id, game_id, store_id, store, store_game_link, price_original, price_discount, discount_percent, positive_percent]
       properties:
         id:
           type: integer
@@ -1002,15 +890,16 @@ components:
           type: integer
         store_id:
           type: integer
+        store:
+          type: string
+          description: Название магазина
         store_game_link:
           type: string
           format: uri
         price_original:
           type: integer
-          description: Цена без скидки в рублях
         price_discount:
           type: integer
-          description: Цена со скидкой в рублях
         discount_percent:
           type: integer
           minimum: 0
@@ -1019,15 +908,22 @@ components:
           type: integer
           minimum: 0
           maximum: 100
-          description: Процент положительных отзывов
+          description: Процент положительных отзывов в магазине
+      example:
+        id: 10
+        game_id: 1
+        store_id: 1
+        store: Steam
+        store_game_link: 'https://store.steampowered.com/app/1091500/'
+        price_original: 2999
+        price_discount: 1499
+        discount_percent: 50
+        positive_percent: 85
 
     OfferPrice:
       type: object
-      required:
-        - id
-        - offer_id
-        - price
-        - recorded_at
+      title: OfferPrice
+      required: [id, offer_id, price, recorded_at]
       properties:
         id:
           type: integer
@@ -1035,147 +931,279 @@ components:
           type: integer
         price:
           type: integer
-          description: Цена в рублях на момент записи
         recorded_at:
           type: string
           format: date
+      example:
+        id: 100
+        offer_id: 10
+        price: 1499
+        recorded_at: '2024-05-20'
 
     OfferPrices:
       type: object
-      required:
-        - offer_id
+      title: OfferPrices
+      required: [offer_id]
       properties:
         offer_id:
           type: integer
         prices_list:
           type: array
-          default: []
           items:
             $ref: '#/components/schemas/OfferPrice'
+          default: []
+      example:
+        offer_id: 10
+        prices_list:
+          - id: 100
+            offer_id: 10
+            price: 2999
+            recorded_at: '2024-05-01'
+          - id: 101
+            offer_id: 10
+            price: 1499
+            recorded_at: '2024-05-20'
 
-    Store:
-      type: object
-      required:
-        - id
-        - name
-        - url
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-        url:
-          type: string
-          format: uri
-
-    StoresResponse:
-      type: object
-      required:
-        - stores
-      properties:
-        stores:
-          type: array
-          items:
-            $ref: '#/components/schemas/Store'
-
-    Platform:
-      type: object
-      required:
-        - id
-        - name
-        - url
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-        url:
-          type: string
-          format: uri
-
-    PlatformsResponse:
-      type: object
-      required:
-        - platforms
-      properties:
-        platforms:
-          type: array
-          items:
-            $ref: '#/components/schemas/Platform'
-
-    Publisher:
-      type: object
-      required:
-        - id
-        - name
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-
-    PublishersResponse:
-      type: object
-      required:
-        - publishers
-      properties:
-        publishers:
-          type: array
-          items:
-            $ref: '#/components/schemas/Publisher'
+    # ----- Catalogs -----
 
     Genre:
       type: object
-      required:
-        - id
-        - name
+      title: Genre
+      required: [id, name]
       properties:
         id:
           type: integer
-        title:
+        name:
           type: string
+      example:
+        id: 1
+        name: Экшены
 
     GenresResponse:
       type: object
-      required:
-        - genres
+      title: GenresResponse
+      required: [genres]
       properties:
         genres:
           type: array
           items:
             $ref: '#/components/schemas/Genre'
+      example:
+        genres:
+          - { id: 1, name: Экшены }
+          - { id: 2, name: РПГ }
+          - { id: 3, name: Стратегии }
 
-    Review:
+    Store:
       type: object
-      required:
-        - id
-        - user_id
-        - game_id
-        - rating
-        - text
-        - created_at
+      title: Store
+      required: [id, name]
       properties:
         id:
           type: integer
-        user_id:
-          type: integer
-        game_id:
-          type: integer
-        rating:
-          type: integer
-          minimum: 1
-          maximum: 10
-        text:
+        name:
           type: string
-        created_at:
+        url:
           type: string
-          format: date-time
+          format: uri
+          nullable: true
+      example:
+        id: 1
+        name: Steam
+        url: 'https://store.steampowered.com/'
 
-    ReviewsResponse:
+    StoresResponse:
       type: object
+      title: StoresResponse
+      required: [stores]
       properties:
-        reviews:
+        stores:
           type: array
-          default: []
           items:
-            $ref: '#/components/schemas/Review'
+            $ref: '#/components/schemas/Store'
+      example:
+        stores:
+          - { id: 1, name: Steam, url: 'https://store.steampowered.com/' }
+          - { id: 2, name: Epic Games, url: 'https://store.epicgames.com/' }
+
+    Platform:
+      type: object
+      title: Platform
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        url:
+          type: string
+          format: uri
+          nullable: true
+      example:
+        id: 1
+        name: PC
+        url: null
+
+    PlatformsResponse:
+      type: object
+      title: PlatformsResponse
+      required: [platforms]
+      properties:
+        platforms:
+          type: array
+          items:
+            $ref: '#/components/schemas/Platform'
+      example:
+        platforms:
+          - { id: 1, name: PC,  url: null }
+          - { id: 2, name: PS5, url: null }
+
+    Publisher:
+      type: object
+      title: Publisher
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      example:
+        id: 1
+        name: CD Projekt
+
+    PublishersResponse:
+      type: object
+      title: PublishersResponse
+      required: [publishers]
+      properties:
+        publishers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Publisher'
+      example:
+        publishers:
+          - { id: 1, name: CD Projekt }
+          - { id: 2, name: KONAMI }
+
+    Developer:
+      type: object
+      title: Developer
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      example:
+        id: 1
+        name: CD Projekt Red
+
+    DevelopersResponse:
+      type: object
+      title: DevelopersResponse
+      required: [developers]
+      properties:
+        developers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Developer'
+      example:
+        developers:
+          - { id: 1, name: CD Projekt Red }
+          - { id: 2, name: Bugbear Entertainment }
+
+    # ----- Common -----
+
+    MessageResponse:
+      type: object
+      title: MessageResponse
+      required: [message]
+      properties:
+        message:
+          type: string
+      example:
+        message: Профиль удалён
+
+    ErrorDetailResponse:
+      type: object
+      title: ErrorDetailResponse
+      description: Унифицированный формат всех ошибок API.
+      required: [error, message, details, traceId]
+      properties:
+        error:
+          type: string
+          description: Машино-читаемый код ошибки (например 2010_AUTHENTICATION_ERROR)
+        message:
+          type: string
+          description: Человеко-читаемое сообщение
+        details:
+          type: object
+          additionalProperties: true
+          description: Детали ошибки по полям
+        traceId:
+          type: string
+          description: ID трассировки запроса (X-Request-ID), для дебага
+      example:
+        error: 2010_AUTHENTICATION_ERROR
+        message: Ошибка авторизации.
+        details:
+          password: Неверный пароль.
+        traceId: 9696004a-6866-4a79-bc53-f4383040cba1
+
+  # ----- Error Responses -----
+
+  responses:
+    ValidationError:
+      description: Ошибка валидации параметров или тела
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDetailResponse'
+
+    Unauthorized:
+      description: Не авторизован, токен отсутствует или недействителен
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDetailResponse'
+
+    NotFound:
+      description: Ресурс не найден
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDetailResponse'
+
+    Conflict:
+      description: Конфликт (например, email уже занят)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDetailResponse'
+
+    InternalError:
+      description: Внутренняя ошибка сервера
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorDetailResponse'
+
+tags:
+  - name: Auth
+    description: 'Регистрация, вход и выход из аккаунта'
+  - name: Developers
+    description: Справочник разработчиков
+  - name: Games
+    description: 'Каталог игр, детали и офферы'
+  - name: Genres
+    description: Справочник жанров
+  - name: Offers
+    description: Предложения магазинов и история цен
+  - name: Platforms
+    description: Справочник платформ
+  - name: Publishers
+    description: Справочник издателей
+  - name: Stores
+    description: Справочник магазинов
+  - name: Users
+    description: Профиль авторизованного пользователя
