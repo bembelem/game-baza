@@ -10,8 +10,8 @@ class SteamSpider(scrapy.Spider):
     name = "steam_spider"
 
     def __init__(self, *args, **kwargs):
-        logging.getLogger("scrapy").setLevel(logging.DEBUG)
-        logging.getLogger("twisted").setLevel(logging.DEBUG)
+        logging.getLogger("scrapy").setLevel(logging.INFO)
+        logging.getLogger("twisted").setLevel(logging.INFO)
         self.seen_links = set()
         super().__init__(*args, **kwargs)
 
@@ -90,7 +90,7 @@ class SteamSpider(scrapy.Spider):
             "price_original": prices_data["price_original"],
             "discount_percent": prices_data["discount_percent"],
             "price_discount": prices_data["price_discount"],
-            "image_url": game.css("div.search_capsule img::attr(src)").get(),
+            "image_url": self._build_image_url(game),
             "released": game.css(".search_released::text").get(default="").strip(),
             "reviews_count": reviews_data["reviews_count"],
             "positive_percent": reviews_data["positive_percent"],
@@ -112,6 +112,22 @@ class SteamSpider(scrapy.Spider):
         yield item
 
     # Вспомогательные функции
+    @staticmethod
+    def _build_image_url(game):
+        """Берём app_id и собираем URL на крупную картинку (library_600x900_2x — 1200×1800).
+
+        В поиске Steam отдаёт мелкий capsule_sm_120.jpg (120×45), для карточек слишком мелкая.
+        Все картинки игры лежат по предсказуемому пути с разными filename — подменяем.
+        """
+        app_id = game.attrib.get("data-ds-appid")
+        if not app_id:
+            # фолбэк — что отдал Steam в выдаче
+            return game.css("div.search_capsule img::attr(src)").get()
+        return (
+            f"https://shared.fastly.steamstatic.com/store_item_assets/"
+            f"steam/apps/{app_id}/library_600x900_2x.jpg"
+        )
+
     def parse_reviews_data(self, game):
         reviews_score = game.css('span.search_review_summary::attr(data-tooltip-html)').get()
         if not reviews_score:
