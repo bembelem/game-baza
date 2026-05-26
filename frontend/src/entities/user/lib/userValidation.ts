@@ -1,10 +1,8 @@
 export function usernameValidate(value: string) {
 	if (!value) 
 		return "Никнейм обязателен"
-	if (value.length < 3) 
-		return "Минимум 3 символа"
-	if (!/^[a-zA-Z0-9]+$/.test(value)) 
-		return "Только латиница и цифры"
+	if (!/^[a-zA-Z0-9_ ]{3,50}$/.test(value))
+    	return "От 3 до 50 символов: латиница, цифры, подчёркивания, пробелы"
 
 	return true
 }
@@ -44,14 +42,12 @@ export function birthdateValidate(value: string) {
 export function passwordValidate(value: string) {
 	if (!value) 
 		return "Пароль обязателен"
-	if (value.length < 6) 
-		return "Минимум 6 символов"
-	if (!/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};":"\\|,.<>\/?]+$/.test(value)) 
-		return "Только латиница, цифры и спецсимволы"
-	if (!/[0-9]/.test(value)) 
-		return "Минимум одна цифра"
-	if (!/[!@#$%^&*()_+\-=\[\]{};":"\\|,.<>\/?]/.test(value)) 
-		return "Минимум один спецсимвол"
+	if (value.length < 6
+    	|| value.length > 50
+		|| !/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};":"\\|,.<>\/?]+$/.test(value)
+		|| !/[0-9]/.test(value)
+		|| !/[!@#$%^&*()_+\-=\[\]{};":"\\|,.<>\/?]/.test(value) 
+	) return "От 6 до 50 символов: латиница, хотя бы одна цифра и один спецсимвол"
 	
 	return true
 }
