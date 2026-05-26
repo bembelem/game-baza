@@ -165,15 +165,24 @@ async def _get_or_create_game(
 
     # selectinload — eager-load M2M, иначе обращение к game.genres / game.platforms
     # ниже триггернёт lazy load и упадёт с MissingGreenlet в async-сессии.
+    # Ищем по normalized_title ИЛИ по точному title — на случай, если в БД
+    # лежит запись со старым normalized_title (после смены логики нормализации):
+    # без фолбэка по title insert упадёт с UniqueViolation на games_title_key.
+    from sqlalchemy import or_
     result = await session.execute(
         select(GameOrm)
         .options(
             selectinload(GameOrm.genres),
             selectinload(GameOrm.platforms),
         )
-        .where(GameOrm.normalized_title == normalized)
+        .where(or_(GameOrm.normalized_title == normalized, GameOrm.title == raw.title))
     )
-    game = result.scalar_one_or_none()
+    game = result.scalars().first()
+    # Нашли по title с устаревшим normalized? Оставляем как есть — пытаться
+    # обновить normalized опасно: оно UNIQUE, а в БД могут быть дубли
+    # (две разные записи: "Dark Souls III" и "Dark Souls III Deluxe Edition"
+    # обе захотят normalized='dark souls iii' и одна из них упадёт).
+    # Лечится разовым скриптом дедупа, не на горячем пути ETL.
 
     if game is not None:
         # обогащаем уже существующую игру тем, чего у неё не было
