@@ -105,5 +105,9 @@ def normalize_date(ru_date: str) -> date | None:
 def price_to_int(price: str) -> int:
     if price in ['Бесплатно', '', None]:
         return 0
-    price = int(re.sub(r'\D', '', price))
-    return price
+    # Steam (RU) отдаёт "1 439,10₽": запятая — копейки, пробел — разряды тысяч.
+    # Отбрасываем дробную часть (по , или .), затем чистим неразрядные символы.
+    # Иначе \D-чистка склеила бы копейки с рублями: "1 439,10" → 143910.
+    integer_part = re.split(r'[.,]', price)[0]
+    digits = re.sub(r'\D', '', integer_part)
+    return int(digits) if digits else 0

@@ -7,11 +7,17 @@ from pydantic import BaseModel
 
 class GameSort(str, Enum):
     """Варианты сортировки каталога игр."""
-    PRICE_ASC = "price_asc"
-    PRICE_DESC = "price_desc"
+    CHEAP = "cheap"                # сначала дешёвые
+    EXPENSIVE = "expensive"        # сначала дорогие
+    DISCOUNT = "discount"          # сначала с большей скидкой
     TITLE_ASC = "title_asc"
     TITLE_DESC = "title_desc"
-    POPULARITY = "popularity"
+    POPULARITY = "popularity"       # больше всего отзывов
+    RATING = "rating"              # выше % положительных
+    RELEASE_NEW = "release_new"    # сначала новые
+    RELEASE_OLD = "release_old"    # сначала старые
+    PUBLISHER_ASC = "publisher_asc"
+    PUBLISHER_DESC = "publisher_desc"
 
 
 class GameCard(BaseModel):
@@ -57,6 +63,13 @@ class GameFilters:
                 )
             ] = None,
 
+            publishers: Annotated[
+                Optional[list[str]],
+                Query(
+                    description="Фильтр по издателям",
+                )
+            ] = None,
+
             price_min: Annotated[
                 Optional[int],
                 Query(
@@ -84,6 +97,7 @@ class GameFilters:
         self.stores = stores
         self.platforms = platforms
         self.genres = genres
+        self.publishers = publishers
         self.price_min = price_min
         self.price_max = price_max
         self.sort = sort

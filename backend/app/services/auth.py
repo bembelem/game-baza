@@ -73,6 +73,7 @@ class AuthService:
         На дубликате email/username бросает соответствующее 409.
         """
         fields = data.model_dump(exclude_unset=True, exclude_none=True)
+        print(fields)
         if "password" in fields:
             fields["hashed_password"] = self.hash_password(fields.pop("password"))
 

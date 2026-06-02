@@ -20,19 +20,19 @@ class GamesService:
         async with async_session_maker() as session:
             items, total = await GameRepository(session).list_page(
                 filters=filters,
-                last_id=pagination.last_id,
+                offset=pagination.last_id,
                 per_page=pagination.per_page,
             )
 
         games = [GameCard(**item) for item in items]
-        last_id = games[-1].id if games else None
-        # has_more: если набрали ровно per_page — потенциально есть ещё страница.
-        # Точнее можно было бы LIMIT per_page+1, но для UX-страницы такой оценки достаточно.
-        has_more = len(games) == pagination.per_page and total > pagination.last_id + len(games)
+        # last_id теперь — offset для следующей страницы (сколько уже отдано).
+        # Имя поля сохранено ради контракта фронта; фронт просто шлёт его обратно.
+        next_offset = pagination.last_id + len(games)
+        has_more = next_offset < total
 
         return GamesResponse(
             total=total,
-            last_id=last_id,
+            last_id=next_offset if has_more else None,
             per_page=pagination.per_page,
             has_more=has_more,
             items=games,

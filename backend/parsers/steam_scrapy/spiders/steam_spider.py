@@ -99,6 +99,13 @@ class SteamSpider(scrapy.Spider):
 
     def parse_game_page(self, response):
         item = response.meta["item"]
+
+        # Реальный header.jpg берём со страницы игры: только тут есть верный хэш.
+        # У каждого ассета (capsule/header/library) свой хэш — из выдачи его не собрать.
+        header = response.css("img.game_header_image_full::attr(src)").get()
+        if header:
+            item["image_url"] = header.split("?", 1)[0]  # отрезаем ?t=cache-buster
+
         details_block = response.css("#genresAndManufacturer")
 
         item["developer"] = details_block.xpath('.//div[b="Разработчик:"]/a/text()').get()
@@ -114,19 +121,16 @@ class SteamSpider(scrapy.Spider):
     # Вспомогательные функции
     @staticmethod
     def _build_image_url(game):
-        """Берём app_id и собираем URL на крупную картинку (library_600x900_2x — 1200×1800).
-
-        В поиске Steam отдаёт мелкий capsule_sm_120.jpg (120×45), для карточек слишком мелкая.
-        Все картинки игры лежат по предсказуемому пути с разными filename — подменяем.
-        """
-        app_id = game.attrib.get("data-ds-appid")
-        if not app_id:
-            # фолбэк — что отдал Steam в выдаче
-            return game.css("div.search_capsule img::attr(src)").get()
-        return (
-            f"https://shared.fastly.steamstatic.com/store_item_assets/"
-            f"steam/apps/{app_id}/library_600x900_2x.jpg"
-        )
+        """Берём app_id и собираем URL на header.jpg (460×215)."""
+        # Steam в выдаче отдаёт capsule c хэшем в пути:
+        #   .../store_item_assets/steam/apps/{id}/{hash}/capsule_231x87.jpg?t=...
+        # Хэш из app_id не вычислить, но он уже есть в этом URL — берём его
+        # и меняем только имя файла на header.jpg (460×215), отбросив ?t=.
+        capsule = game.css("div.search_capsule img::attr(src)").get()
+        if not capsule:
+            return None
+        base = capsule.split("?", 1)[0]                 # отрезаем ?t=...
+        return base.rsplit("/", 1)[0] + "/header.jpg"   # подменяем filename
 
     def parse_reviews_data(self, game):
         reviews_score = game.css('span.search_review_summary::attr(data-tooltip-html)').get()

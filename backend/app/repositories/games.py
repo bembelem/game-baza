@@ -66,12 +66,16 @@ class GameRepository(BaseRepository):
     # list / page
 
     async def list_page(
-        self, filters: GameFilters, last_id: int, per_page: int
+        self, filters: GameFilters, offset: int, per_page: int
     ) -> tuple[list[dict], int]:
         """Список игр с агрегированной минимальной ценой и общим count.
 
         Возвращает (items, total). items — список словарей с полями
         Game-схемы. total — общее количество подходящих под фильтры игр.
+
+        Пагинация — offset-based: работает для любой сортировки. Курсор
+        id > last_id годился только для сортировки по id; при сортировке по
+        цене/скидке/дате он давал повторы и пропуски.
         """
         # Подзапрос: для каждой игры — min цены по офферам, учитывая фильтр магазинов.
         offer_q = (
@@ -79,6 +83,9 @@ class GameRepository(BaseRepository):
                 OfferOrm.game_id.label("game_id"),
                 func.min(OfferOrm.price_original).label("min_orig"),
                 func.min(OfferOrm.price_discount).label("min_disc"),
+                # для сортировок по популярности/рейтингу — максимум по офферам игры
+                func.max(OfferOrm.reviews_count).label("reviews"),
+                func.max(OfferOrm.positive_percent).label("rating"),
             )
             .group_by(OfferOrm.game_id)
         )
@@ -89,6 +96,8 @@ class GameRepository(BaseRepository):
         offer_sub = offer_q.subquery()
 
         # Базовый select по играм, JOIN с агрегатами по офферам.
+        # outerjoin издателя — нужен для фильтра и сортировки по publisher
+        # (1:1 по FK, строки не размножаются).
         base = (
             select(
                 GameOrm.id,
@@ -98,6 +107,7 @@ class GameRepository(BaseRepository):
                 offer_sub.c.min_disc,
             )
             .join(offer_sub, offer_sub.c.game_id == GameOrm.id)
+            .outerjoin(PublisherOrm, PublisherOrm.id == GameOrm.publisher_id)
         )
 
         # Фильтры
@@ -131,6 +141,9 @@ class GameRepository(BaseRepository):
                     )
                 )
 
+        if filters.publishers:
+            conditions.append(PublisherOrm.name.in_(filters.publishers))
+
         if filters.price_min is not None:
             conditions.append(offer_sub.c.min_disc >= filters.price_min)
         if filters.price_max is not None:
@@ -143,21 +156,37 @@ class GameRepository(BaseRepository):
         total_stmt = select(func.count()).select_from(base.subquery())
         total = (await self.session.execute(total_stmt)).scalar_one()
 
-        # Сортировка
+        # Скидка в %: (orig - disc) / orig. *100.0 — чтобы было float, а не
+        # целочисленное деление (в Postgres int/int = int → почти всегда 0).
+        # nullif(orig, 0) защищает от деления на ноль (→ NULL → nullslast).
+        discount_expr = (
+            (offer_sub.c.min_orig - offer_sub.c.min_disc)
+            * 100.0
+            / func.nullif(offer_sub.c.min_orig, 0)
+        )
+
+        # Сортировка. nullslast — игры без отзывов/даты/издателя уходят в конец.
         sort_map = {
-            GameSort.PRICE_ASC:  offer_sub.c.min_disc.asc(),
-            GameSort.PRICE_DESC: offer_sub.c.min_disc.desc(),
-            GameSort.TITLE_ASC:  GameOrm.title.asc(),
-            GameSort.TITLE_DESC: GameOrm.title.desc(),
+            GameSort.CHEAP:          offer_sub.c.min_disc.asc(),
+            GameSort.EXPENSIVE:      offer_sub.c.min_disc.desc(),
+            GameSort.DISCOUNT:       discount_expr.desc().nullslast(),
+            GameSort.TITLE_ASC:      GameOrm.title.asc(),
+            GameSort.TITLE_DESC:     GameOrm.title.desc(),
+            GameSort.POPULARITY:     offer_sub.c.reviews.desc().nullslast(),
+            GameSort.RATING:         offer_sub.c.rating.desc().nullslast(),
+            GameSort.RELEASE_NEW:    GameOrm.release_date.desc().nullslast(),
+            GameSort.RELEASE_OLD:    GameOrm.release_date.asc().nullslast(),
+            GameSort.PUBLISHER_ASC:  PublisherOrm.name.asc().nullslast(),
+            GameSort.PUBLISHER_DESC: PublisherOrm.name.desc().nullslast(),
         }
         order_clause = sort_map.get(filters.sort, GameOrm.id.asc())
 
-        # Cursor pagination: id > last_id — работает для default-сортировки.
-        # Для price/title-сортировок это не идеальный курсор (могут дублироваться
-        # элементы между страницами), но для MVP сойдёт.
+        # Offset-пагинация. id.asc() вторым ключом — стабильный tiebreaker,
+        # чтобы при равных значениях sort-поля порядок был детерминированным
+        # (иначе offset на следующей странице мог бы дать повтор/пропуск).
         paged = (
-            base.where(GameOrm.id > last_id)
-            .order_by(order_clause, GameOrm.id.asc())
+            base.order_by(order_clause, GameOrm.id.asc())
+            .offset(offset)
             .limit(per_page)
         )
 
