@@ -128,6 +128,31 @@ class BaseRepository:
         обновляет все колонки, кроме перечисленных в `skip_cols`.
         Коммитит транзакцию в конце.
         """
+        if not rows:
+            return
+
+        table = self.model.__table__
+
+        # 1. Чистим строки от «лишних» ключей. Скрапер кладёт в item служебные
+        #    поля (label, item_id, price, activation, details...), которых нет
+        #    среди колонок таблицы — иначе pg_insert падает с CompileError
+        #    "Unconsumed column names".
+        valid_cols = set(table.columns.keys())
+        rows = [{k: v for k, v in row.items() if k in valid_cols} for row in rows]
+
+        # 2. Дедуп внутри батча по колонкам конфликтующего constraint'а.
+        #    ON CONFLICT DO UPDATE не может задеть одну и ту же строку дважды
+        #    в рамках одного INSERT (CardinalityViolationError). Скрапер может
+        #    выдать один и тот же товар несколько раз в пределах батча —
+        #    оставляем последнее вхождение.
+        conflict_cols = self._constraint_columns(constraint)
+        if conflict_cols:
+            deduped: dict[tuple, dict] = {}
+            for row in rows:
+                key = tuple(row.get(c) for c in conflict_cols)
+                deduped[key] = row  # последнее вхождение побеждает
+            rows = list(deduped.values())
+
         stmt = pg_insert(self.model).values(rows)
         stmt = stmt.on_conflict_do_update(
             constraint=constraint,
@@ -139,3 +164,14 @@ class BaseRepository:
         )
         await self.session.execute(stmt)
         await self.session.commit()
+
+    def _constraint_columns(self, constraint: str) -> list[str]:
+        """Имена колонок UNIQUE-constraint'а по его имени (для дедупа батча).
+
+        Если constraint не найден среди метаданных таблицы — возвращаем []
+        (дедуп пропускаем, поведение как раньше).
+        """
+        for const in self.model.__table__.constraints:
+            if const.name == constraint:
+                return [col.name for col in const.columns]
+        return []

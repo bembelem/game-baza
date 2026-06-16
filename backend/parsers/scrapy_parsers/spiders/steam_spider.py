@@ -8,9 +8,10 @@ from scrapy.exceptions import CloseSpider
 
 class SteamSpider(scrapy.Spider):
     name = "steam_spider"
+    store_name = "steam"
 
     def __init__(self, *args, **kwargs):
-        logging.getLogger("scrapy").setLevel(logging.INFO)
+        logging.getLogger("scrapy_parsers").setLevel(logging.INFO)
         logging.getLogger("twisted").setLevel(logging.INFO)
         self.seen_links = set()
         super().__init__(*args, **kwargs)

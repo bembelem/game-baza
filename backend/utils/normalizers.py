@@ -74,10 +74,18 @@ MONTHS = {
     "июл": 7, "авг": 8, "сен": 9, "окт": 10, "ноя": 11, "дек": 12
 }
 
-# "21 авг. 2012 г."
+# "21 авг. 2012 г."  либо ISO "2026-06-05" (SteamBuy отдаёт ISO)
 def normalize_date(ru_date: str) -> date | None:
     if not ru_date:
         return None
+
+    # ISO YYYY-MM-DD (SteamBuy). "0000-00-00" и прочий мусор отсеются ValueError'ом.
+    iso = re.fullmatch(r"\s*(\d{4})-(\d{2})-(\d{2})\s*", ru_date)
+    if iso:
+        try:
+            return date(int(iso[1]), int(iso[2]), int(iso[3]))
+        except ValueError:
+            return None
 
     ru_date = ru_date.lower()
 
@@ -96,7 +104,9 @@ def normalize_date(ru_date: str) -> date | None:
     if not day.isdigit() or not year.isdigit():
         return None
 
-    month_num = MONTHS.get(month)
+    # MONTHS — 3-буквенные ключи. Steam даёт "авг.", gabestore — "февраля";
+    # обрезка до 3 букв нормализует оба варианта ("фев", "авг", "мая"...).
+    month_num = MONTHS.get(month[:3])
     if not month_num:
         return None
 

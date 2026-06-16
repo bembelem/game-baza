@@ -26,6 +26,10 @@ logger = logging.getLogger(__name__)
 
 BATCH_SIZE = 100
 
+# Магазин-источник истины для полей игры (см. _get_or_create_game).
+# Должен совпадать со SteamSpider.store_name.
+STEAM_STORE = "steam"
+
 
 async def run_etl() -> None:
     """Обрабатывает все необработанные raw_offers батчами."""
@@ -185,19 +189,26 @@ async def _get_or_create_game(
     # Лечится разовым скриптом дедупа, не на горячем пути ETL.
 
     if game is not None:
-        # обогащаем уже существующую игру тем, чего у неё не было
-        if not game.description and raw.description:
-            game.description = raw.description
-        if not game.release_date and raw.released:
-            game.release_date = raw.released
-        if not game.image_url and raw.image_url:
-            game.image_url = raw.image_url
-        if game.developer_id is None and developer is not None:
+        # Steam — авторитетный источник: его значения перетирают всё.
+        # Остальные магазины заполняют только пустые поля. Правило не зависит
+        # от порядка обработки: если Steam записал — другие уже не трогают
+        # (поле непустое); если не-Steam записал первым — Steam всё равно перетрёт.
+        is_steam = raw.store == STEAM_STORE
+
+        game.title = _take(game.title, raw.title, is_steam)
+        game.description = _take(game.description, raw.description, is_steam)
+        game.release_date = _take(game.release_date, raw.released, is_steam)
+        game.image_url = _take(game.image_url, raw.image_url, is_steam)
+        if developer is not None and (is_steam or game.developer_id is None):
             game.developer = developer
-        if game.publisher_id is None and publisher is not None:
+        if publisher is not None and (is_steam or game.publisher_id is None):
             game.publisher = publisher
-        _merge_m2m(game.genres, genres)
-        _merge_m2m(game.platforms, platforms)
+        # genres/platforms — набор ОДНОГО магазина, не union: Steam заменяет
+        # целиком, не-Steam — только если ещё пусто.
+        if genres and (is_steam or not game.genres):
+            game.genres = list(genres)
+        if platforms and (is_steam or not game.platforms):
+            game.platforms = list(platforms)
         return game
 
     game = GameOrm(
@@ -216,12 +227,18 @@ async def _get_or_create_game(
     return game
 
 
-def _merge_m2m(existing: list, incoming: Iterable) -> None:
-    """Добавляет в M2M-коллекцию элементы, которых там ещё нет (по id)."""
-    existing_ids = {obj.id for obj in existing if obj.id is not None}
-    for obj in incoming:
-        if obj.id not in existing_ids:
-            existing.append(obj)
+def _take(current, incoming, is_steam: bool):
+    """Значение поля игры с приоритетом Steam.
+
+    - пустой incoming никогда не затирает уже заполненное;
+    - Steam перетирает существующее;
+    - не-Steam пишет только в пустое.
+    """
+    if not incoming:
+        return current
+    if is_steam:
+        return incoming
+    return incoming if not current else current
 
 
 # offers

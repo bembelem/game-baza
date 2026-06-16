@@ -6,7 +6,7 @@ custom_settings = {
     "LOG_LEVEL": "INFO",
     "FEED_EXPORT_ENCODING": "utf-8",
     "ITEM_PIPELINES": {
-        "parsers.steam_scrapy.pipelines.ParserPipeline": 300,
+        "parsers.scrapy_parsers.pipelines.ParserPipeline": 300,
     },
 }
 
